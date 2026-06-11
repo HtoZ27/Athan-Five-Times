@@ -17,6 +17,8 @@ RowLayout {
         model: root.model
         delegate: Rectangle {
             id: tabRect
+            required property var modelData
+            required property int index
             implicitWidth: tabLabel.implicitWidth + 20
             implicitHeight: 36
             color: root.currentIndex === index ? root._pal.primary : "transparent"

@@ -144,6 +144,8 @@ Dialog {
 
                     delegate: Rectangle {
                         id: tabRect
+                        required property var modelData
+                        required property int index
                         implicitWidth: tabLabel.implicitWidth + 20
                         implicitHeight: 36
                         color: currentTabIndex === index ? accentColor : Qt.rgba(cardColor.r, cardColor.g, cardColor.b, 0.55)

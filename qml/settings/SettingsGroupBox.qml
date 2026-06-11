@@ -7,7 +7,7 @@ GroupBox {
     id: root
     Layout.fillWidth: true
     property string titleText: ""
-    readonly property var _pal: Theme.resolvePalette(
+    property var _pal: Theme.resolvePalette(
         typeof themeController !== 'undefined' && themeController
             ? themeController.resolvedTheme : "dark")
     property color textColor: _pal.text
