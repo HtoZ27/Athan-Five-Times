@@ -35,6 +35,20 @@ def _get_calc_methods() -> Dict[str, dict]:
             "طهران": methods.TEHRAN,
 
             # --- Custom parameter methods (for precise local conventions) ---
+            # Southeast Asia
+            "إندونيسيا (وزارة الشؤون الدينية)": {
+                "fajr_angle": 20.0, "isha_angle": 18.0,
+                "dhuhr_interval": 0, "maghrib_interval": 2,
+            },
+            "ماليزيا (JAKIM)": {
+                "fajr_angle": 20.0, "isha_angle": 18.0,
+                "dhuhr_interval": 0, "maghrib_interval": 2,
+            },
+            "سنغافورة (MUIS)": {
+                "fajr_angle": 20.0, "isha_angle": 18.0,
+                "dhuhr_interval": 0, "maghrib_interval": 2,
+            },
+
             # North Africa / Maghreb
             "وزارة الشؤون الدينية التونسية": {
                 "fajr_angle": 18.0, "isha_angle": 18.0,
@@ -66,12 +80,26 @@ def _get_calc_methods() -> Dict[str, dict]:
                 "fajr_angle": 19.5, "isha_angle": 17.5,
                 "dhuhr_interval": 0, "maghrib_interval": 2,
             },
-            "العراق (سنّة)": {
+            "العراق": {
                 "fajr_angle": 17.5, "isha_angle": 17.5,
                 "dhuhr_interval": 0, "maghrib_interval": 2,
             },
             "فلسطين (وزارة الأوقاف)": {
                 "fajr_angle": 17.5, "isha_angle": 17.5,
+                "dhuhr_interval": 0, "maghrib_interval": 2,
+            },
+
+            # Europe / Turkey / Russia
+            "ديانة تركيا (Diyanet)": {
+                "fajr_angle": 18.0, "isha_angle": 17.0,
+                "dhuhr_interval": 0, "maghrib_interval": 2,
+            },
+            "روسيا (اتحاد المسلمين)": {
+                "fajr_angle": 16.0, "isha_angle": 15.0,
+                "dhuhr_interval": 0, "maghrib_interval": 2,
+            },
+            "اتحاد المنظمات الإسلامية في فرنسا (UOIF)": {
+                "fajr_angle": 12.0, "isha_angle": 12.0,
                 "dhuhr_interval": 0, "maghrib_interval": 2,
             },
 
