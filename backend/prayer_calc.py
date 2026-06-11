@@ -36,21 +36,21 @@ def _get_calc_methods() -> Dict[str, dict]:
 
             # --- Custom parameter methods (for precise local conventions) ---
             # Southeast Asia
-            "إندونيسيا (وزارة الشؤون الدينية)": {
+            "إندونيسيا": {
                 "fajr_angle": 20.0, "isha_angle": 18.0,
                 "dhuhr_interval": 0, "maghrib_interval": 2,
             },
-            "ماليزيا (JAKIM)": {
+            "ماليزيا": {
                 "fajr_angle": 20.0, "isha_angle": 18.0,
                 "dhuhr_interval": 0, "maghrib_interval": 2,
             },
-            "سنغافورة (MUIS)": {
+            "سنغافورة": {
                 "fajr_angle": 20.0, "isha_angle": 18.0,
                 "dhuhr_interval": 0, "maghrib_interval": 2,
             },
 
             # North Africa / Maghreb
-            "وزارة الشؤون الدينية التونسية": {
+            "تونس": {
                 "fajr_angle": 18.0, "isha_angle": 18.0,
                 "dhuhr_interval": 0, "maghrib_interval": 2,
             },
@@ -76,7 +76,7 @@ def _get_calc_methods() -> Dict[str, dict]:
             },
 
             # Levant / Iraq
-            "سوريا (وزارة الأوقاف)": {
+            "سوريا": {
                 "fajr_angle": 19.5, "isha_angle": 17.5,
                 "dhuhr_interval": 0, "maghrib_interval": 2,
             },
@@ -84,36 +84,36 @@ def _get_calc_methods() -> Dict[str, dict]:
                 "fajr_angle": 17.5, "isha_angle": 17.5,
                 "dhuhr_interval": 0, "maghrib_interval": 2,
             },
-            "فلسطين (وزارة الأوقاف)": {
+            "فلسطين": {
                 "fajr_angle": 17.5, "isha_angle": 17.5,
                 "dhuhr_interval": 0, "maghrib_interval": 2,
             },
 
             # Europe / Turkey / Russia
-            "ديانة تركيا (Diyanet)": {
+            "تركيا": {
                 "fajr_angle": 18.0, "isha_angle": 17.0,
                 "dhuhr_interval": 0, "maghrib_interval": 2,
             },
-            "روسيا (اتحاد المسلمين)": {
+            "روسيا": {
                 "fajr_angle": 16.0, "isha_angle": 15.0,
                 "dhuhr_interval": 0, "maghrib_interval": 2,
             },
-            "اتحاد المنظمات الإسلامية في فرنسا (UOIF)": {
+            "فرنسا": {
                 "fajr_angle": 12.0, "isha_angle": 12.0,
                 "dhuhr_interval": 0, "maghrib_interval": 2,
             },
 
             # Arabian Peninsula
-            "الهيئة العامة للشؤون الإسلامية (الإمارات)": {
+            "الإمارات": {
                 "fajr_angle": 18.5, "isha_angle": 18.5,
                 "dhuhr_interval": 0, "maghrib_interval": 2,
                 "isha_interval": 90,
             },
-            "وزارة الأوقاف القطرية": {
+            "قطر": {
                 "fajr_angle": 18.0, "isha_angle": 18.0,
                 "dhuhr_interval": 0, "maghrib_interval": 2,
             },
-            "وزارة الأوقاف الكويتية": {
+            "الكويت": {
                 "fajr_angle": 18.0, "isha_angle": 17.5,
                 "dhuhr_interval": 0, "maghrib_interval": 2,
             },
@@ -123,7 +123,7 @@ def _get_calc_methods() -> Dict[str, dict]:
             },
 
             # South Asia
-            "طريقة فاروقي (باكستان/شمال الهند)": {
+            "فاروقي": {
                 "fajr_angle": 18.0, "isha_angle": 18.0,
                 "dhuhr_interval": 0, "maghrib_interval": 2,
             },
@@ -393,7 +393,7 @@ def calculate(
     latitude: float,
     longitude: float,
     target_date: Optional[date] = None,
-    method_name: str = "وزارة الشؤون الدينية التونسية",
+    method_name: str = "تونس",
     madhab: str = "shafi",
     tz_name: Optional[str] = None,
     offsets: Optional[Dict[str, int]] = None,
