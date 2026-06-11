@@ -5,7 +5,7 @@ import Theme 1.0
 
 Dialog {
     id: root
-    title: qsTr("عن البرنامج")
+    title: backendController.translate("عن البرنامج")
 
     width: 460
     height: 560
@@ -72,7 +72,7 @@ Dialog {
 
             Label {
                 Layout.alignment: Qt.AlignHCenter
-                text: qsTr("أذان الصلاة")
+                text: backendController.translate("أذان الصلاة")
                 font.pixelSize: 22
                 font.bold: true
                 color: textColor
@@ -80,7 +80,7 @@ Dialog {
 
             Label {
                 Layout.alignment: Qt.AlignHCenter
-                text: qsTr("تطبيق مفتوح المصدر لأوقات الصلاة والأذان")
+                text: backendController.translate("تطبيق مفتوح المصدر لأوقات الصلاة والأذان")
                 font.pixelSize: 13
                 color: secondaryTextColor
             }
@@ -115,7 +115,7 @@ Dialog {
 
                 Label {
                     Layout.fillWidth: true
-                    text: qsTr("المكتبات المستخدمة")
+                    text: backendController.translate("المكتبات المستخدمة")
                     font.pixelSize: 14
                     font.bold: true
                     color: accentColor
@@ -151,7 +151,7 @@ Dialog {
 
             Label {
                 Layout.alignment: Qt.AlignHCenter
-                text: qsTr("الإصدار") + " " + (typeof appVersion !== 'undefined' ? appVersion : "1.0.0")
+                text: backendController.translate("الإصدار") + " " + (typeof appVersion !== 'undefined' ? appVersion : "1.0.0")
                 font.pixelSize: 13
                 font.bold: true
                 color: accentColor

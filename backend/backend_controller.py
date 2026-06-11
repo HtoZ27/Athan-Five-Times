@@ -1121,3 +1121,15 @@ class PrayerEngine(QObject):
             logger.info("Settings imported successfully from %s", path)
         except (OSError, json.JSONDecodeError, ValueError, KeyError) as exc:
             logger.warning("Import failed: %s", exc)
+
+    @Slot(str, result=str)
+    def translate(self, key: str) -> str:
+        """Translate a key via Python's i18n system (for QML, replaces qsTr)."""
+        from .i18n import t
+        return t(key)
+
+    @Slot(str, result=str)
+    def translatePrayer(self, key: str) -> str:
+        """Translate a prayer key via Python's i18n system."""
+        from .i18n import t_prayer
+        return t_prayer(key)

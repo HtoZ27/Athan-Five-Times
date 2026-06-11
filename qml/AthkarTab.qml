@@ -47,7 +47,7 @@ Rectangle {
 
             Label {
                 id: titleLabel
-                text: qsTr("الأذكار العامة")
+                text: backendController.translate("الأذكار العامة")
                 font.pixelSize: 20
                 font.bold: true
                 horizontalAlignment: Text.AlignHCenter
@@ -90,7 +90,7 @@ Rectangle {
                     function onGeneralAthkarChanged() {
                         if (prayerEngine && prayerEngine.getAthkarProvider()) {
                             bodyText.text = prayerEngine.getAthkarProvider().getGeneralAthkarText()
-                            titleLabel.text = prayerEngine.getAthkarProvider().getTitle() || qsTr("الأذكار العامة")
+                            titleLabel.text = prayerEngine.getAthkarProvider().getTitle() || backendController.translate("الأذكار العامة")
                         }
                     }
                 }
@@ -102,28 +102,28 @@ Rectangle {
                 spacing: 8
 
                 Button {
-                    text: qsTr("أذكار الصباح")
+                    text: backendController.translate("أذكار الصباح")
                     Layout.fillWidth: true
                     Layout.preferredHeight: 40
                     font.pixelSize: 14
                     onClicked: {
                         currentCategory = "morning"
                         if (prayerEngine)
-                            prayerEngine.getAthkarProvider().setGeneralAthkar("morning", qsTr("أذكار الصباح"))
+                            prayerEngine.getAthkarProvider().setGeneralAthkar("morning", backendController.translate("أذكار الصباح"))
                     }
                     background: Rectangle { color: currentCategory === "morning" ? accentColor : Qt.rgba(cardColor.r, cardColor.g, cardColor.b, 0.55); radius: 8; border.color: borderColor; border.width: 1 }
                     contentItem: Text { text: parent.text; color: currentCategory === "morning" ? "#fff" : textColor; font.pixelSize: 14; font.bold: currentCategory === "morning"; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
                 }
 
                 Button {
-                    text: qsTr("أذكار المساء")
+                    text: backendController.translate("أذكار المساء")
                     Layout.fillWidth: true
                     Layout.preferredHeight: 40
                     font.pixelSize: 14
                     onClicked: {
                         currentCategory = "evening"
                         if (prayerEngine)
-                            prayerEngine.getAthkarProvider().setGeneralAthkar("evening", qsTr("أذكار المساء"))
+                            prayerEngine.getAthkarProvider().setGeneralAthkar("evening", backendController.translate("أذكار المساء"))
                     }
                     background: Rectangle { color: currentCategory === "evening" ? accentColor : Qt.rgba(cardColor.r, cardColor.g, cardColor.b, 0.55); radius: 8; border.color: borderColor; border.width: 1 }
                     contentItem: Text { text: parent.text; color: currentCategory === "evening" ? "#fff" : textColor; font.pixelSize: 14; font.bold: currentCategory === "evening"; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }

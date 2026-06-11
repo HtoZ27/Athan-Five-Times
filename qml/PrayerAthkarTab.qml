@@ -48,7 +48,7 @@ Rectangle {
 
             Label {
                 id: titleLabel
-                text: prayerTitle || qsTr("أذكار بعد الصلاة")
+                text: prayerTitle || backendController.translate("أذكار بعد الصلاة")
                 font.pixelSize: 20
                 font.bold: true
                 horizontalAlignment: Text.AlignHCenter

@@ -10,7 +10,7 @@ from .prayer_calc import PRAYER_ORDER
 logger = logging.getLogger(__name__)
 
 PRAYERS_WITH_AZAN = [k for k in PRAYER_ORDER if k != "sunrise"]
-THEME_IDS = ["auto", "dark", "light", "ottoman_gold", "catppuccin_mocha", "catppuccin_latte"]
+THEME_IDS = ["auto", "light", "dark", "ottoman_gold", "catppuccin_mocha", "catppuccin_latte"]
 LANGS = ["ar", "en", "fr", "es", "it", "de", "ru", "tr", "es_la", "pa", "hi", "ur", "tk", "ps", "id", "ms", "so"]
 DARK_THEMES = {"dark", "ottoman_gold", "catppuccin_mocha"}
 

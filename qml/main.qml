@@ -14,7 +14,7 @@ ApplicationWindow {
     width: 500
     height: 800
 
-    title: qsTr("أذان الأوقات الخمس")
+    title: backendController.translate("أذان الأوقات الخمس")
     flags: Qt.FramelessWindowHint | Qt.Window
     color: "transparent"
 
@@ -106,13 +106,13 @@ ApplicationWindow {
     }
 
     function retranslate() {
-        title = qsTr("أذان الأوقات الخمس")
-        tab0.text = qsTr("أوقات الصلاة")
-        tab0.ToolTip.text = qsTr("أوقات الصلاة")
-        tab1.text = qsTr("أذكار الصلاة")
-        tab1.ToolTip.text = qsTr("أذكار الصلاة")
-        tab2.text = qsTr("الأذكار العامة")
-        tab2.ToolTip.text = qsTr("الأذكار العامة")
+        title = backendController.translate("أذان الأوقات الخمس")
+        tab0.text = backendController.translate("أوقات الصلاة")
+        tab0.ToolTip.text = backendController.translate("أوقات الصلاة")
+        tab1.text = backendController.translate("أذكار الصلاة")
+        tab1.ToolTip.text = backendController.translate("أذكار الصلاة")
+        tab2.text = backendController.translate("الأذكار العامة")
+        tab2.ToolTip.text = backendController.translate("الأذكار العامة")
         isRtl = prayerEngine ? prayerEngine.isRtl() : true
     }
 
@@ -177,7 +177,7 @@ ApplicationWindow {
                 }
 
                 Text {
-                    text: qsTr("أذان الأوقات الخمس")
+                    text: backendController.translate("أذان الأوقات الخمس")
                     font.pixelSize: 15
                     font.bold: true
                     color: textMutedColor
@@ -308,7 +308,7 @@ ApplicationWindow {
                     spacing: 2
 
                     Text {
-                        text: qsTr("الصلاة القادمة")
+                        text: backendController.translate("الصلاة القادمة")
                         font.pixelSize: 12
                         font.bold: true
                         horizontalAlignment: Text.AlignHCenter
@@ -372,10 +372,10 @@ ApplicationWindow {
 
                 TabButton {
                     id: tab0
-                    text: qsTr("أوقات الصلاة")
+                    text: backendController.translate("أوقات الصلاة")
                     font.pixelSize: 13
                     hoverEnabled: true
-                    ToolTip.text: qsTr("أوقات الصلاة")
+                    ToolTip.text: backendController.translate("أوقات الصلاة")
                     ToolTip.visible: hovered
                     background: Rectangle { color: mainTabBar.currentIndex === 0 ? accentColor : "transparent"; radius: rMed }
                     contentItem: Text {
@@ -389,10 +389,10 @@ ApplicationWindow {
                 }
                 TabButton {
                     id: tab1
-                    text: qsTr("أذكار الصلاة")
+                    text: backendController.translate("أذكار الصلاة")
                     font.pixelSize: 13
                     hoverEnabled: true
-                    ToolTip.text: qsTr("أذكار الصلاة")
+                    ToolTip.text: backendController.translate("أذكار الصلاة")
                     ToolTip.visible: hovered
                     background: Rectangle { color: mainTabBar.currentIndex === 1 ? accentColor : "transparent"; radius: rMed }
                     contentItem: Text {
@@ -406,10 +406,10 @@ ApplicationWindow {
                 }
                 TabButton {
                     id: tab2
-                    text: qsTr("الأذكار العامة")
+                    text: backendController.translate("الأذكار العامة")
                     font.pixelSize: 13
                     hoverEnabled: true
-                    ToolTip.text: qsTr("الأذكار العامة")
+                    ToolTip.text: backendController.translate("الأذكار العامة")
                     ToolTip.visible: hovered
                     background: Rectangle { color: mainTabBar.currentIndex === 2 ? accentColor : "transparent"; radius: rMed }
                     contentItem: Text {
@@ -448,7 +448,7 @@ ApplicationWindow {
 
                     Button {
                         id: azanStopBtn
-                        text: qsTr("إيقاف الأذان")
+                        text: backendController.translate("إيقاف الأذان")
                         visible: prayerEngine ? prayerEngine.isAzanPlaying() : false
                         onClicked: prayerEngine.stopAzan()
                         font.pixelSize: 14
@@ -457,7 +457,7 @@ ApplicationWindow {
                     }
 
                     Button {
-                        text: qsTr("عن البرنامج")
+                        text: backendController.translate("عن البرنامج")
                         onClicked: creditsDialog.open()
                         font.pixelSize: 14
                         background: Rectangle { color: "transparent"; border.color: accentColor; border.width: 1; radius: 8 }
@@ -465,7 +465,7 @@ ApplicationWindow {
                     }
 
                     Button {
-                        text: qsTr("الإعدادات")
+                        text: backendController.translate("الإعدادات")
                         onClicked: settingsDialog.open()
                         font.pixelSize: 14
                         background: Rectangle { color: accentColor; radius: 8 }
