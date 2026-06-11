@@ -1,14 +1,14 @@
 """
 Theme Controller - Simple, reliable theme management.
-Single source of truth: JSON settings file (shared with PrayerEngine).
+Single source of truth: settings via settings.py (shared with PrayerEngine).
 """
 
-import json
 import logging
 import os
-import threading
 from PySide6.QtCore import QObject, Signal, Property, Slot, Qt
 from PySide6.QtGui import QGuiApplication
+
+from .settings import load as load_settings, save as save_settings
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,6 @@ SETTINGS_DIR = os.path.join(
     "athan-five-times",
 )
 SETTINGS_FILE = os.path.join(SETTINGS_DIR, "settings.json")
-_SETTINGS_LOCK = threading.RLock()
 
 
 class ThemeController(QObject):
@@ -37,45 +36,24 @@ class ThemeController(QObject):
         self._connect_system_theme()
     
     def _load_user_theme(self) -> str:
-        """Load user's theme choice from shared JSON settings file."""
+        """Load user's theme choice from shared settings via cache."""
         try:
-            if os.path.exists(SETTINGS_FILE):
-                with _SETTINGS_LOCK:
-                    with open(SETTINGS_FILE, "r", encoding="utf-8") as f:
-                        data = json.load(f)
-                        theme = data.get("theme", "auto")
-                        if theme in THEMES:
-                            return theme
+            data = load_settings()
+            theme = data.get("theme", "auto")
+            if theme in THEMES:
+                return theme
         except Exception as e:
-            logger.warning(f"Failed to load theme from JSON: {e}")
+            logger.warning(f"Failed to load theme: {e}")
         return "auto"
-    
+
     def _save_user_theme(self, theme: str):
-        """Save user's theme choice to shared JSON settings file."""
+        """Save user's theme choice to shared settings via cache."""
         try:
-            os.makedirs(os.path.dirname(SETTINGS_FILE), exist_ok=True)
-            
-            # Read current settings
-            data = {}
-            if os.path.exists(SETTINGS_FILE):
-                with _SETTINGS_LOCK:
-                    with open(SETTINGS_FILE, "r", encoding="utf-8") as f:
-                        data = json.load(f)
-            
-            # Update theme
+            data = load_settings()
             data["theme"] = theme
-            
-            # Atomic write
-            tmp = SETTINGS_FILE + ".tmp"
-            with _SETTINGS_LOCK:
-                with open(tmp, "w", encoding="utf-8") as f:
-                    json.dump(data, f, ensure_ascii=False, indent=2)
-                    f.flush()
-                    os.fsync(f.fileno())
-                os.replace(tmp, SETTINGS_FILE)
-                
+            save_settings(data)
         except Exception as e:
-            logger.error(f"Failed to save theme to JSON: {e}")
+            logger.error(f"Failed to save theme: {e}")
     
     def _detect_system_theme(self) -> str:
         """Detect system theme (light/dark) - Qt5/Qt6 compatible."""

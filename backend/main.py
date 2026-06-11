@@ -7,11 +7,12 @@ import os
 import logging
 import gc
 
-# تحسينات الذاكرة
+# Memory optimizations
 os.environ["GTK_MODULES"] = ""
-# تقليل استخدام الذاكرة - Qt
 os.environ.setdefault("QT_AUTO_SCREEN_SCALE_FACTOR", "0")
 os.environ.setdefault("QT_QPA_PLATFORMTHEME", "qt5ct")
+os.environ["QT_ACCESSIBILITY"] = "0"
+os.environ["QT_QUICK_CONTROLS_STYLE"] = "Fusion"
 
 from PySide6.QtCore import QUrl, QTimer, QCoreApplication, Qt, QMetaObject, Q_ARG
 from PySide6.QtGui import QIcon, QFont, QFontDatabase
@@ -118,6 +119,8 @@ class QmlAthanApp:
             logger.error("Failed to load QML")
             sys.exit(1)
 
+        gc.collect()
+
         self._app.setApplicationName(t("app_name"))
 
         self._restore_window_geometry()
@@ -170,7 +173,7 @@ class QmlAthanApp:
                 result["latitude"] = best_lat
                 result["longitude"] = best_lon
             result["timezone"] = tz
-            method = COUNTRY_METHODS.get(country_code, "الجمعية الإسلامية لأمريكا الشمالية (ISNA)")
+            method = COUNTRY_METHODS.get(country_code, "وزارة الشؤون الدينية التونسية")
             result["method"] = method
             logger.info("Auto-located: %s/%s (%.4f, %.4f) %s", country_code, result["city"], lat, lon, tz)
             result["first_run"] = False
@@ -305,7 +308,9 @@ class QmlAthanApp:
             self._show_window()
 
     def _quit(self):
+        self._azan_flash_timer.stop()
         self._prayer_engine.stopAzan()
+        self._prayer_engine.cleanup()
         self._theme_controller.cleanup()
         root = self._engine.rootObjects()
         if root:

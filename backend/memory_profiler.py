@@ -29,7 +29,7 @@ class MemoryProfiler:
     """مراقب الذاكرة للتطبيق."""
 
     def __init__(self, max_frames: int = 25):
-        self.max_frames = max_frames
+        self.max_frames = max_frames  # أقصى عدد من اللقطات قبل الحذف
         self._snapshots: List[MemorySnapshot] = []
         self._running = False
         self._monitor_thread: Optional[threading.Thread] = None
@@ -89,6 +89,8 @@ class MemoryProfiler:
             top_allocations=top_allocations
         )
         self._snapshots.append(mem_snapshot)
+        if len(self._snapshots) > self.max_frames:
+            self._snapshots.pop(0)
         return mem_snapshot
 
     def get_summary(self) -> Dict:

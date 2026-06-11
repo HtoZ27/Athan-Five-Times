@@ -132,11 +132,12 @@ ApplicationWindow {
 
         Image {
             anchors.fill: parent
-            source: "../assets/nabawi.png"
+            source: "../assets/nabawi.webp"
             fillMode: Image.PreserveAspectCrop
-            mipmap: true
+            mipmap: false
             sourceSize.width: 960
             sourceSize.height: 560
+            cache: false
             visible: backgroundEnabled
         }
 

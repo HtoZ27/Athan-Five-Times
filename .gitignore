@@ -7,3 +7,11 @@ build/
 *.tar.gz
 *.png
 .DS_Store
+*.bak
+*.backup
+.pytest_cache/
+.vscode/
+.idea/
+.coverage
+htmlcov/
+.python-version

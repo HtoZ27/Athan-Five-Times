@@ -2,6 +2,7 @@
 Backend Controller - Python-QML bridge for the Athan application.
 """
 
+import gc
 import logging
 import os
 import subprocess
@@ -271,6 +272,7 @@ class PrayerEngine(QObject):
     def _on_azan_done(self):
         QMetaObject.invokeMethod(self, "_set_azan_playing",
             Qt.ConnectionType.QueuedConnection, Q_ARG(bool, False))
+        gc.collect()
 
     def _schedule_next_prayer(self):
         if not self._result:
@@ -338,11 +340,13 @@ class PrayerEngine(QObject):
         try:
             if hasattr(self, '_clock_timer') and self._clock_timer:
                 self._clock_timer.stop()
+                self._clock_timer = None
         except RuntimeError:
             pass
         try:
             if hasattr(self, '_prayer_timer') and self._prayer_timer:
                 self._prayer_timer.stop()
+                self._prayer_timer = None
         except RuntimeError:
             pass
         try:
@@ -353,6 +357,7 @@ class PrayerEngine(QObject):
         try:
             if hasattr(self, '_dnd_timer') and self._dnd_timer:
                 self._dnd_timer.stop()
+                self._dnd_timer = None
         except RuntimeError:
             pass
         try:
@@ -744,6 +749,10 @@ class PrayerEngine(QObject):
         if _CALC_METHODS_CACHE is None:
             _CALC_METHODS_CACHE = list(CALCULATION_METHODS.keys())
         return _CALC_METHODS_CACHE
+
+    @Slot(str, result="QString")
+    def getDefaultMethod(self, country_code: str):
+        return COUNTRY_METHODS.get(country_code, "")
 
     @Slot(result="QVariantList")
     def getMadhabs(self):

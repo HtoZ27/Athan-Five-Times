@@ -298,6 +298,11 @@ Dialog {
                                             backendController.updateSetting("country", item.code)
                                             cityCombo.model = backendController.getCitiesForCountry(item.code)
                                             cityCombo.currentIndex = -1
+                                            var defaultMethod = backendController.getDefaultMethod(item.code)
+                                            if (defaultMethod) {
+                                                var idx = methodCombo.find(defaultMethod)
+                                                if (idx >= 0) methodCombo.currentIndex = idx
+                                            }
                                         }
                                         onAccepted: {
                                             if (editText && currentIndex < 0)
