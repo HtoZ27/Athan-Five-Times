@@ -66,10 +66,6 @@ def _get_calc_methods() -> Dict[str, dict]:
                 "dhuhr_interval": 0, "maghrib_interval": 2,
             },
 
-            "طريقة جافري (إثنا عشرية)": {
-                "fajr_angle": 16.0, "isha_angle": 14.0,
-                "dhuhr_interval": 5, "maghrib_interval": 3,
-            },
             "طريقة فاروقي (باكستان/شمال الهند)": {
                 "fajr_angle": 18.0, "isha_angle": 18.0,
                 "dhuhr_interval": 0, "maghrib_interval": 2,
