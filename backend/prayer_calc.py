@@ -33,16 +33,7 @@ def _get_calc_methods() -> Dict[str, dict]:
             "الجمعية الإسلامية لأمريكا الشمالية (ISNA)": methods.ISNA,
             "رابطة العالم الإسلامي (MWL)": methods.MUSLIM_WORLD_LEAGUE,
             "طهران": methods.TEHRAN,
-            "دبي": methods.MAKKAH,  # UAE uses Makkah params with Isha 90min
-            "قطر": methods.MAKKAH,
-            "الكويت": methods.MAKKAH,
-            "سلطنة عُمان": methods.MUSLIM_WORLD_LEAGUE,
-            "البحرين": methods.MAKKAH,
-            "تركيا": methods.MUSLIM_WORLD_LEAGUE,
-            "ماليزيا": methods.MUSLIM_WORLD_LEAGUE,
-            "سنغافورة": methods.MUSLIM_WORLD_LEAGUE,
-            "إندونيسيا": methods.MUSLIM_WORLD_LEAGUE,
-            
+
             # --- Custom parameter methods (for precise local conventions) ---
             "وزارة الشؤون الدينية التونسية": {
                 "fajr_angle": 18.0, "isha_angle": 18.0,
@@ -61,11 +52,6 @@ def _get_calc_methods() -> Dict[str, dict]:
                 "fajr_angle": 18.0, "isha_angle": 17.5,
                 "dhuhr_interval": 0, "maghrib_interval": 2,
             },
-            "وزارة الأوقاف المصرية": {
-                "fajr_angle": 19.5, "isha_angle": 17.5,
-                "dhuhr_interval": 0, "maghrib_interval": 2,
-            },
-
             "طريقة فاروقي (باكستان/شمال الهند)": {
                 "fajr_angle": 18.0, "isha_angle": 18.0,
                 "dhuhr_interval": 0, "maghrib_interval": 2,
