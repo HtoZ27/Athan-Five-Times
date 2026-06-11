@@ -52,6 +52,18 @@ def _get_calc_methods() -> Dict[str, dict]:
                 "fajr_angle": 18.0, "isha_angle": 17.5,
                 "dhuhr_interval": 0, "maghrib_interval": 2,
             },
+            "فلسطين (وزارة الأوقاف)": {
+                "fajr_angle": 17.5, "isha_angle": 17.5,
+                "dhuhr_interval": 0, "maghrib_interval": 2,
+            },
+            "سوريا (وزارة الأوقاف)": {
+                "fajr_angle": 19.5, "isha_angle": 17.5,
+                "dhuhr_interval": 0, "maghrib_interval": 2,
+            },
+            "السودان": {
+                "fajr_angle": 19.5, "isha_angle": 17.5,
+                "dhuhr_interval": 0, "maghrib_interval": 2,
+            },
             "طريقة فاروقي (باكستان/شمال الهند)": {
                 "fajr_angle": 18.0, "isha_angle": 18.0,
                 "dhuhr_interval": 0, "maghrib_interval": 2,
