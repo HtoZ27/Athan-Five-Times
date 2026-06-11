@@ -1,0 +1,24 @@
+#!/bin/bash
+set -e
+
+HERE="$(dirname "$(readlink -f "${0}")")"
+export PYTHONPATH="${HERE}/usr/share/prayer_app:${PYTHONPATH}"
+export QT_QPA_PLATFORM_PLUGIN_PATH="${HERE}/usr/lib/qt6/plugins"
+export QT_PLUGIN_PATH="${HERE}/usr/lib/qt6/plugins"
+
+# Audio support for AppImage - use host PulseAudio
+if [ -z "$PULSE_SERVER" ] && [ -S "/run/user/$(id -u)/pulse/native" ]; then
+    export PULSE_SERVER="unix:/run/user/$(id -u)/pulse/native"
+fi
+
+# Allow access to host D-Bus for notifications
+if [ -z "$DBUS_SESSION_BUS_ADDRESS" ] && [ -S "/run/user/$(id -u)/bus" ]; then
+    export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$(id -u)/bus"
+fi
+
+cd "${HERE}/usr/share/prayer_app"
+if command -v python3 &> /dev/null; then
+    exec python3 -m backend.main "$@"
+else
+    exec python -m backend.main "$@"
+fi

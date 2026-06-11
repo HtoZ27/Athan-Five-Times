@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Left wall -->
+  <path d="M 18 28 L 48 14 L 48 114 L 18 98 Z" fill="#2A2A2A" stroke="#1A1A1A" stroke-width="1"/>
+  <!-- Right wall (front face) -->
+  <path d="M 48 14 L 112 14 L 112 98 L 48 114 Z" fill="#383838" stroke="#1A1A1A" stroke-width="1"/>
+  <!-- Top face -->
+  <path d="M 48 14 L 18 28 L 82 28 L 112 14 Z" fill="#4A4A4A" stroke="#1A1A1A" stroke-width="1"/>
+  <!-- Roof top surface -->
+  <rect x="48" y="14" width="64" height="4" rx="1" fill="#555"/>
+  <!-- Gold band (belt) around front face -->
+  <rect x="48" y="50" width="64" height="8" rx="1" fill="#C8922B"/>
+  <!-- Gold band continuation on left wall -->
+  <rect x="18" y="54" width="30" height="5" rx="1" fill="#B07D1A"/>
+  <!-- Gold band on top face -->
+  <rect x="48" y="52" width="64" height="4" rx="1" fill="#C8922B" opacity="0.5"/>
+  <!-- Door raised platform (gold embroidery area) -->
+  <rect x="66" y="54" width="28" height="48" rx="2" fill="#C8922B" opacity="0.15"/>
+  <!-- Door outer frame -->
+  <rect x="68" y="56" width="24" height="44" rx="2" fill="#C8922B" stroke="#B07D1A" stroke-width="1"/>
+  <!-- Door inner panel -->
+  <rect x="72" y="60" width="16" height="36" rx="1.5" fill="#8B6914"/>
+  <!-- Door arch -->
+  <path d="M 72 60 Q 80 52 88 60" fill="#C8922B" stroke="#B07D1A" stroke-width="0.8"/>
+  <!-- Door arch inner -->
+  <path d="M 73 61 Q 80 54 87 61" fill="#A87A1A"/>
+  <!-- Door vertical center line (split) -->
+  <line x1="80" y1="60" x2="80" y2="96" stroke="#6B4E0A" stroke-width="0.8"/>
+  <!-- Door decorative circles -->
+  <circle cx="80" cy="66" r="1.5" fill="#D4A53A"/>
+  <circle cx="80" cy="76" r="1" fill="#D4A53A"/>
+  <circle cx="80" cy="86" r="1" fill="#D4A53A"/>
+  <!-- Left wall gold corner (Black Stone side) -->
+  <rect x="44" y="16" width="5" height="96" rx="2" fill="#C8922B"/>
+  <!-- Shadow under roof on front face -->
+  <rect x="48" y="17" width="64" height="4" fill="rgba(0,0,0,0.25)"/>
+  <!-- Shadow under roof on left wall -->
+  <rect x="18" y="30" width="30" height="3" fill="rgba(0,0,0,0.2)"/>
+</svg>

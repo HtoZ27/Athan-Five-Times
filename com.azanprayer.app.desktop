@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=أذان الأوقات الخمس
+Name[en]=Athan Five Times
+Comment=تطبيق أذان الأوقات الخمس
+Comment[en]=Five times prayer, adhan, and athkar application
+Exec=./run.sh
+Icon=kaaba
+Terminal=false
+Categories=Qt;Utility;Calendar;Education
+StartupNotify=true
+StartupWMClass=backend-main

@@ -1,0 +1,82 @@
+"""
+Theme Controller - Simple, reliable theme management.
+Single source of truth: QSettings.
+"""
+
+import logging
+from PySide6.QtCore import QObject, Signal, Property, Slot, QSettings
+from PySide6.QtGui import QGuiApplication
+
+logger = logging.getLogger(__name__)
+
+THEMES = ["auto", "light", "dark", "ottoman_gold"]
+
+
+class ThemeController(QObject):
+    """Simple theme controller with QSettings persistence."""
+    
+    themeChanged = Signal(str)  # emits resolved theme (light/dark/ottoman_gold)
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._settings = QSettings("AthanPrayer", "Theme")
+        self._user_theme = self._load_user_theme()
+    
+    def _load_user_theme(self) -> str:
+        """Load user's theme choice from QSettings."""
+        theme = self._settings.value("theme", "auto")
+        if theme not in THEMES:
+            theme = "auto"
+        return theme
+    
+    def _detect_system_theme(self) -> str:
+        """Detect system theme (light/dark)."""
+        try:
+            hints = QGuiApplication.styleHints()
+            scheme = hints.colorScheme()
+            ColorScheme = type(scheme)
+            if scheme == ColorScheme.Dark:
+                return "dark"
+            return "light"
+        except (AttributeError, RuntimeError):
+            return "light"
+    
+    @Property(str, notify=themeChanged)
+    def theme(self) -> str:
+        """User's theme choice (auto/light/dark/ottoman_gold)."""
+        return self._user_theme
+    
+    @Property(str, notify=themeChanged)
+    def resolvedTheme(self) -> str:
+        """Resolved theme for UI rendering (never 'auto')."""
+        if self._user_theme == "auto":
+            return self._detect_system_theme()
+        return self._user_theme
+    
+    @Slot(str)
+    def setTheme(self, theme_id: str):
+        """Set user's theme choice."""
+        if theme_id not in THEMES:
+            logger.warning(f"Invalid theme: {theme_id}")
+            return
+        if theme_id == self._user_theme:
+            return
+        self._user_theme = theme_id
+        self._settings.setValue("theme", theme_id)
+        self._settings.sync()
+        self.themeChanged.emit(self.resolvedTheme)
+        logger.info(f"Theme changed to: {theme_id} (resolved: {self.resolvedTheme})")
+    
+    @Slot()
+    def toggleTheme(self):
+        """Toggle between light and dark."""
+        current = self.resolvedTheme
+        if current in ("dark", "ottoman_gold"):
+            self.setTheme("light")
+        else:
+            self.setTheme("dark")
+    
+    @Slot(bool)
+    def setAutoTheme(self, auto: bool):
+        if auto:
+            self.setTheme("auto")
