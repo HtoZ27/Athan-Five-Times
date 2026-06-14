@@ -11,8 +11,7 @@ import shutil
 import logging
 import threading
 from dataclasses import dataclass, field, fields
-from functools import lru_cache
-from typing import Any, Dict, List, Optional, get_type_hints
+from typing import Any, Dict, List, get_type_hints
 
 logger = logging.getLogger(__name__)
 
@@ -442,28 +441,31 @@ def invalidate_cache():
     invalidate_resolve_cache()
 
 
-def save(settings: Dict[str, Any]) -> None:
-    settings_copy = dict(settings)
-    os.makedirs(SETTINGS_DIR, exist_ok=True)
-    if os.path.isfile(SETTINGS_FILE):
+def save(settings: Dict[str, Any]) -> bool:
+    with _SETTINGS_LOCK:
+        settings_copy = dict(settings)
+        os.makedirs(SETTINGS_DIR, exist_ok=True)
+        if os.path.isfile(SETTINGS_FILE):
+            try:
+                shutil.copy2(SETTINGS_FILE, SETTINGS_BACKUP)
+            except OSError as exc:
+                logger.warning("Failed to backup settings: %s", exc)
+        tmp: str = SETTINGS_FILE + ".tmp"
         try:
-            shutil.copy2(SETTINGS_FILE, SETTINGS_BACKUP)
-        except OSError as exc:
-            logger.warning("Failed to backup settings: %s", exc)
-    tmp: str = SETTINGS_FILE + ".tmp"
-    try:
-        with open(tmp, "w", encoding="utf-8") as f:
-            json.dump(settings_copy, f, ensure_ascii=False, indent=2)
-        os.replace(tmp, SETTINGS_FILE)
-        invalidate_cache()
-        invalidate_resolve_cache()
-    except (OSError, json.JSONEncodeError, TypeError, ValueError) as exc:
-        logger.error("Failed to save settings: %s", exc)
-        if os.path.isfile(tmp):
-                try:
-                    os.remove(tmp)
-                except OSError:
-                    pass
+            with open(tmp, "w", encoding="utf-8") as f:
+                json.dump(settings_copy, f, ensure_ascii=False, indent=2)
+            os.replace(tmp, SETTINGS_FILE)
+            invalidate_cache()
+            invalidate_resolve_cache()
+            return True
+        except (OSError, json.JSONEncodeError, TypeError, ValueError) as exc:
+            logger.error("Failed to save settings: %s", exc)
+            if os.path.isfile(tmp):
+                    try:
+                        os.remove(tmp)
+                    except OSError:
+                        pass
+            return False
 
 
 AUTOSTART_DIR: str = os.path.join(os.path.expanduser("~"), ".config", "autostart")

@@ -7,7 +7,6 @@ Rectangle {
     id: root
 
     // Reactive palette - updates when themeController.resolvedTheme changes
-    // Reactive palette - updates when themeController.resolvedTheme changes
     property var _pal: Theme.resolvePalette(
         typeof themeController !== 'undefined' && themeController
             ? themeController.resolvedTheme : "light")

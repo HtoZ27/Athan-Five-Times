@@ -135,7 +135,7 @@ QtObject {
         "info": "#4F46E5"
     }
 
-    // Internal cache for resolved palettes - initialized to empty object
+    // Internal cache for resolved palettes
     property var _paletteCache: ({})
 
     // Resolved palette getter with caching and robust undefined handling

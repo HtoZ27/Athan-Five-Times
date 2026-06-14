@@ -1,6 +1,6 @@
 """
 Auto-location via IP geolocation.
-Uses ip-api.com with HTTP, retry, and fallback.
+Uses ip-api.com with HTTPS, retry, and fallback.
 """
 
 import json
@@ -55,7 +55,7 @@ def _country_code(english_name: str) -> str:
     return _COUNTRY_REV.get(english_name, "")
 
 def detect() -> dict | None:
-    """Detect location via ip-api.com (HTTP). 
+    """Detect location via IP geolocation (HTTPS, with fallback).
     Warning: This is a blocking call that can take up to 30s.
     Prefer detect_async() for non-blocking operation.
     """
@@ -63,9 +63,18 @@ def detect() -> dict | None:
 
 
 def _detect_sync(retries: int = 1) -> dict | None:
+    # Primary service
+    result = _try_ip_api(retries)
+    if result:
+        return result
+    # Fallback service
+    return _try_fallback()
+
+
+def _try_ip_api(retries: int) -> dict | None:
     for attempt in range(retries + 1):
         try:
-            req = Request("http://ip-api.com/json/",
+            req = Request("https://ip-api.com/json/",
                           headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"})
             with urlopen(req, timeout=10) as resp:
                 data = json.loads(resp.read().decode())
@@ -93,6 +102,29 @@ def _detect_sync(retries: int = 1) -> dict | None:
             logger.warning("IP geolocation attempt %d failed", attempt + 1)
             if attempt < retries:
                 time.sleep(2)
+    return None
+
+
+def _try_fallback() -> dict | None:
+    """Fallback using ipapi.co (HTTPS)."""
+    try:
+        req = Request("https://ipapi.co/json/",
+                      headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"})
+        with urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read().decode())
+        if data.get("error"):
+            return None
+        country = data.get("country_name", "")
+        return {
+            "city": data.get("city", ""),
+            "country": country,
+            "country_code": data.get("country_code", "").lower(),
+            "latitude": data.get("latitude", 0.0),
+            "longitude": data.get("longitude", 0.0),
+            "timezone": data.get("timezone", ""),
+        }
+    except (URLError, ValueError, AttributeError, KeyError, OSError) as exc:
+        logger.warning("Fallback geolocation failed: %s", exc)
     return None
 
 

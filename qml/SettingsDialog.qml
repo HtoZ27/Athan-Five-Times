@@ -74,7 +74,7 @@ Dialog {
     }
 
     background: Rectangle {
-        color: "transparent"
+        color: backgroundColor
         radius: 12
     }
 
@@ -260,7 +260,7 @@ Dialog {
                                             Layout.fillWidth: true
                                             Layout.preferredHeight: 40
                                             text: backendController.translate("🌍 تحديد موقعي تلقائياً عبر الإنترنت")
-                                            enabled: !useCustomCoords || true
+                                            enabled: !useCustomCoords
                                             onClicked: {
                                                 if (useCustomCoords) {
                                                     customCoordsCheck.checked = false
@@ -451,13 +451,13 @@ Dialog {
                         _populating = true
                         var s = backendController.getSettings()
                         var o = s.offsets || {}
-                        fajrSp.value = o.fajr || 0
-                        sunriseSp.value = o.sunrise || 0
-                        dhuhrSp.value = o.dhuhr || 0
-                        asrSp.value = o.asr || 0
-                        maghribSp.value = o.maghrib || 0
-                        ishaSp.value = o.isha || 0
-                        hijriSp.value = s.hijri_day_offset || 0
+                        fajrSp.value = o.fajr !== undefined ? o.fajr : 0
+                        sunriseSp.value = o.sunrise !== undefined ? o.sunrise : 0
+                        dhuhrSp.value = o.dhuhr !== undefined ? o.dhuhr : 0
+                        asrSp.value = o.asr !== undefined ? o.asr : 0
+                        maghribSp.value = o.maghrib !== undefined ? o.maghrib : 0
+                        ishaSp.value = o.isha !== undefined ? o.isha : 0
+                        hijriSp.value = s.hijri_day_offset !== undefined ? s.hijri_day_offset : 0
                         _populating = false
                     }
 
@@ -483,32 +483,32 @@ Dialog {
                                     RowLayout { Layout.fillWidth: true
                                         Label { text: backendController.translate("الفجر"); color: textColor; Layout.fillWidth: true }
                                         SpinBox { id: fajrSp; from: -60; to: 60
-                                            onValueChanged: backendController.setOffset("fajr", value) }
+                                            onValueChanged: { if (_populating) return; backendController.setOffset("fajr", value) } }
                                     }
                                     RowLayout { Layout.fillWidth: true
                                         Label { text: backendController.translate("الشروق"); color: textColor; Layout.fillWidth: true }
                                         SpinBox { id: sunriseSp; from: -60; to: 60
-                                            onValueChanged: backendController.setOffset("sunrise", value) }
+                                            onValueChanged: { if (_populating) return; backendController.setOffset("sunrise", value) } }
                                     }
                                     RowLayout { Layout.fillWidth: true
                                         Label { text: backendController.translate("الظهر"); color: textColor; Layout.fillWidth: true }
                                         SpinBox { id: dhuhrSp; from: -60; to: 60
-                                            onValueChanged: backendController.setOffset("dhuhr", value) }
+                                            onValueChanged: { if (_populating) return; backendController.setOffset("dhuhr", value) } }
                                     }
                                     RowLayout { Layout.fillWidth: true
                                         Label { text: backendController.translate("العصر"); color: textColor; Layout.fillWidth: true }
                                         SpinBox { id: asrSp; from: -60; to: 60
-                                            onValueChanged: backendController.setOffset("asr", value) }
+                                            onValueChanged: { if (_populating) return; backendController.setOffset("asr", value) } }
                                     }
                                     RowLayout { Layout.fillWidth: true
                                         Label { text: backendController.translate("المغرب"); color: textColor; Layout.fillWidth: true }
                                         SpinBox { id: maghribSp; from: -60; to: 60
-                                            onValueChanged: backendController.setOffset("maghrib", value) }
+                                            onValueChanged: { if (_populating) return; backendController.setOffset("maghrib", value) } }
                                     }
                                     RowLayout { Layout.fillWidth: true
                                         Label { text: backendController.translate("العشاء"); color: textColor; Layout.fillWidth: true }
                                         SpinBox { id: ishaSp; from: -60; to: 60
-                                            onValueChanged: backendController.setOffset("isha", value) }
+                                            onValueChanged: { if (_populating) return; backendController.setOffset("isha", value) } }
                                     }
                                     Button {
                                         Layout.fillWidth: true; Layout.preferredHeight: 36; Layout.topMargin: 4
@@ -525,7 +525,7 @@ Dialog {
                                 ColumnLayout { width: parent.width
                                     SpinBox {
                                         id: hijriSp; Layout.fillWidth: true; from: -5; to: 5
-                                        onValueChanged: backendController.updateSetting("hijri_day_offset", value)
+                                        onValueChanged: { if (_populating) return; backendController.updateSetting("hijri_day_offset", value) }
                                     }
                                 }
                             }
@@ -670,9 +670,9 @@ Dialog {
                             audioFilesModel.append({ prayer: list[i], path: p || "" })
                         }
                         var s = backendController.getSettings()
-                        volumeSp.value = s.volume || 1.0
+                        volumeSp.value = s.volume !== undefined ? s.volume : 1.0
                         fadeInCb.checked = s.fade_in !== false
-                        fadeDurSp.value = s.fade_in_duration || 3
+                        fadeDurSp.value = s.fade_in_duration !== undefined ? s.fade_in_duration : 3
                         takbeerCb.checked = s.takbeer_only || false
                         _populating = false
                     }
@@ -745,7 +745,7 @@ Dialog {
                                         Label { text: backendController.translate("مستوى الصوت:"); color: textColor; ToolTip.text: backendController.translate("ضبط مستوى صوت الأذان (0-100%)") }
                                         Slider {
                                             id: volumeSp; Layout.fillWidth: true; from: 0; to: 1; stepSize: 0.05
-                                            onValueChanged: backendController.updateSetting("volume", value)
+                                            onValueChanged: { if (_populating) return; backendController.updateSetting("volume", value) }
                                         }
                                         Label { text: Math.round(volumeSp.value * 100) + "%"; color: textColor; Layout.preferredWidth: 50 }
                                     }
@@ -753,20 +753,20 @@ Dialog {
                                     CheckBox {
                                         id: fadeInCb; text: backendController.translate("تلاشي الدخول (Fade In)")
                                         ToolTip.text: backendController.translate("يبدأ الأذان بصوت منخفض ويزداد تدريجياً")
-                                        onCheckedChanged: backendController.updateSetting("fade_in", checked)
+                                        onCheckedChanged: { if (_populating) return; backendController.updateSetting("fade_in", checked) }
                                     }
 
                                     RowLayout {
                                         Layout.fillWidth: true; visible: fadeInCb.checked
                                         Label { text: backendController.translate("مدة التلاشي (ثوانٍ):"); color: textColor; Layout.fillWidth: true; ToolTip.text: backendController.translate("مدة الزيادة التدريجية للصوت عند بداية الأذان") }
                                         SpinBox { id: fadeDurSp; from: 1; to: 10
-                                            onValueChanged: backendController.updateSetting("fade_in_duration", value) }
+                                            onValueChanged: { if (_populating) return; backendController.updateSetting("fade_in_duration", value) } }
                                     }
 
                                     CheckBox {
                                         id: takbeerCb; text: backendController.translate("تكبير فقط (بدون أذان كامل)")
                                         ToolTip.text: backendController.translate("يشغل التكبير فقط بدلاً من الأذان الكامل")
-                                        onCheckedChanged: backendController.updateSetting("takbeer_only", checked)
+                                        onCheckedChanged: { if (_populating) return; backendController.updateSetting("takbeer_only", checked) }
                                     }
 
                                     Label {
@@ -804,11 +804,11 @@ Dialog {
                         _populating = true
                         var s = backendController.getSettings()
                         preAzanCb.checked = s.pre_azan_enabled !== false
-                        preAzanSp.value = s.pre_azan_minutes || 10
-                        dndCb.checked = s.dnd_enabled || false
-                        dndFromSp.value = s.dnd_from || 22
-                        dndToSp.value = s.dnd_to || 6
-                        dndDurSp.value = s.dnd_duration || 20
+                        preAzanSp.value = s.pre_azan_minutes !== undefined ? s.pre_azan_minutes : 10
+                        dndCb.checked = s.dnd_enabled !== undefined ? s.dnd_enabled : false
+                        dndFromSp.value = s.dnd_from !== undefined ? s.dnd_from : 22
+                        dndToSp.value = s.dnd_to !== undefined ? s.dnd_to : 6
+                        dndDurSp.value = s.dnd_duration !== undefined ? s.dnd_duration : 20
                         silentCb.checked = s.silent_mode || false
                         _populating = false
                     }
@@ -825,12 +825,12 @@ Dialog {
                                 ColumnLayout { width: parent.width; spacing: 4
                                     CheckBox { id: preAzanCb; text: backendController.translate("تفعيل التنبيه المبكر")
                                         ToolTip.text: backendController.translate("تفعيل التنبيه المبكر قبل الأذان بالدقائق المحددة")
-                                        onCheckedChanged: backendController.updateSetting("pre_azan_enabled", checked) }
+                                        onCheckedChanged: { if (_populating) return; backendController.updateSetting("pre_azan_enabled", checked) } }
                                     RowLayout {
                                         Layout.leftMargin: 20; visible: preAzanCb.checked
                                         Label { text: backendController.translate("دقائق قبل الأذان:"); color: textColor; ToolTip.text: backendController.translate("عدد الدقائق قبل الأذان للتنبيه المبكر") }
                                         SpinBox { id: preAzanSp; from: 1; to: 60
-                                            onValueChanged: backendController.updateSetting("pre_azan_minutes", value) }
+                                            onValueChanged: { if (_populating) return; backendController.updateSetting("pre_azan_minutes", value) } }
                                     }
                                 }
                             }
@@ -842,21 +842,21 @@ Dialog {
                                 ColumnLayout { width: parent.width; spacing: 4
                                     CheckBox { id: dndCb; text: backendController.translate("تفعيل DND")
                                         ToolTip.text: backendController.translate("إيقاف إشعارات النظام خلال فترة DND")
-                                        onCheckedChanged: backendController.updateSetting("dnd_enabled", checked) }
+                                        onCheckedChanged: { if (_populating) return; backendController.updateSetting("dnd_enabled", checked) } }
                                     RowLayout {
                                         Layout.leftMargin: 20; visible: dndCb.checked
                                         Label { text: backendController.translate("من الساعة:"); color: textColor; ToolTip.text: backendController.translate("ساعة بداية فترة DND") }
                                         SpinBox { id: dndFromSp; from: 0; to: 23
-                                            onValueChanged: backendController.updateSetting("dnd_from", value) }
+                                            onValueChanged: { if (_populating) return; backendController.updateSetting("dnd_from", value) } }
                                         Label { text: backendController.translate("إلى الساعة:"); color: textColor; ToolTip.text: backendController.translate("ساعة نهاية فترة DND") }
                                         SpinBox { id: dndToSp; from: 0; to: 23
-                                            onValueChanged: backendController.updateSetting("dnd_to", value) }
+                                            onValueChanged: { if (_populating) return; backendController.updateSetting("dnd_to", value) } }
                                     }
                                     RowLayout {
                                         Layout.leftMargin: 20; visible: dndCb.checked
                                         Label { text: backendController.translate("مدة بعد الصلاة (دقيقة):"); color: textColor; ToolTip.text: backendController.translate("مدة تفعيل DND بعد كل صلاة") }
                                         SpinBox { id: dndDurSp; from: 5; to: 120
-                                            onValueChanged: backendController.updateSetting("dnd_duration", value) }
+                                            onValueChanged: { if (_populating) return; backendController.updateSetting("dnd_duration", value) } }
                                     }
                                 }
                             }
@@ -868,7 +868,7 @@ Dialog {
                                 ColumnLayout { width: parent.width
                                     CheckBox { id: silentCb; text: backendController.translate("الوضع الصامت")
                                         ToolTip.text: backendController.translate("كتم جميع أصوات الأذان والإشعارات")
-                                        onCheckedChanged: backendController.updateSetting("silent_mode", checked) }
+                                        onCheckedChanged: { if (_populating) return; backendController.updateSetting("silent_mode", checked) } }
                                 }
                             }
 
@@ -881,14 +881,14 @@ Dialog {
                     function populate() {
                         _populating = true
                         var s = backendController.getSettings()
-                        athkarCountSp.value = s.athkarCount || 33
+                        athkarCountSp.value = s.athkarCount !== undefined ? s.athkarCount : 33
                         var m = s.athkarMethod || "after_prayer"
                         var opts = ["after_prayer", "specific_time", "both"]
                         var idx = opts.indexOf(m)
                         athkarMethodCb.currentIndex = idx >= 0 ? idx : 0
                         popupEnabledCb.checked = s.athkar_popup_enabled !== false
-                        popupDurSp.value = s.athkar_popup_duration || 300
-                        popupDelaySp.value = s.athkar_popup_delay || 600
+                        popupDurSp.value = s.athkar_popup_duration !== undefined ? s.athkar_popup_duration : 300
+                        popupDelaySp.value = s.athkar_popup_delay !== undefined ? s.athkar_popup_delay : 600
                         _populating = false
                     }
 
@@ -906,7 +906,7 @@ Dialog {
                                         Layout.fillWidth: true
                                         Label { text: backendController.translate("عدد مرات التكرار:"); color: textColor; ToolTip.text: backendController.translate("عدد مرات تكرار كل ذكر") }
                                         SpinBox { id: athkarCountSp; from: 1; to: 99
-                                            onValueChanged: backendController.updateSetting("athkarCount", value) }
+                                            onValueChanged: { if (_populating) return; backendController.updateSetting("athkarCount", value) } }
                                     }
                                     RowLayout {
                                         Layout.fillWidth: true
@@ -915,6 +915,7 @@ Dialog {
                                             id: athkarMethodCb; Layout.fillWidth: true
                                             model: [backendController.translate("بعد الصلاة"), backendController.translate("وقت محدد"), backendController.translate("كلاهما")]
                                             onCurrentIndexChanged: {
+                                                if (_populating) return
                                                 var opts = ["after_prayer", "specific_time", "both"]
                                                 if (currentIndex >= 0) backendController.updateSetting("athkarMethod", opts[currentIndex])
                                             }
@@ -930,18 +931,18 @@ Dialog {
                                 ColumnLayout { width: parent.width; spacing: 6
                                     CheckBox { id: popupEnabledCb; text: backendController.translate("تفعيل النافذة المنبثقة")
                                         ToolTip.text: backendController.translate("عرض نافذة منبثقة بالأذكار بعد كل صلاة")
-                                        onCheckedChanged: backendController.updateSetting("athkar_popup_enabled", checked) }
+                                        onCheckedChanged: { if (_populating) return; backendController.updateSetting("athkar_popup_enabled", checked) } }
                                     RowLayout {
                                         Layout.fillWidth: true; visible: popupEnabledCb.checked
                                         Label { text: backendController.translate("مدة العرض (ثوانٍ):"); color: textColor; ToolTip.text: backendController.translate("مدة بقاء النافذة المنبثقة ظاهرة قبل الإغلاق التلقائي") }
                                         SpinBox { id: popupDurSp; from: 5; to: 600
-                                            onValueChanged: backendController.updateSetting("athkar_popup_duration", value) }
+                                            onValueChanged: { if (_populating) return; backendController.updateSetting("athkar_popup_duration", value) } }
                                     }
                                     RowLayout {
                                         Layout.fillWidth: true; visible: popupEnabledCb.checked
                                         Label { text: backendController.translate("تأخير الظهور (ثوانٍ):"); color: textColor; ToolTip.text: backendController.translate("تأخير ظهور النافذة بعد انتهاء الصلاة") }
                                         SpinBox { id: popupDelaySp; from: 0; to: 300
-                                            onValueChanged: backendController.updateSetting("athkar_popup_delay", value) }
+                                            onValueChanged: { if (_populating) return; backendController.updateSetting("athkar_popup_delay", value) } }
                                     }
                                     Button {
                                         Layout.fillWidth: true; Layout.preferredHeight: 36; Layout.topMargin: 4; visible: popupEnabledCb.checked
@@ -1031,6 +1032,7 @@ Dialog {
                         model: backendController.getLanguages()
                         textRole: "name"
                         onCurrentIndexChanged: {
+                            if (_populating) return
                             if (currentIndex >= 0 && currentIndex < model.length) {
                                 var langCode = model[currentIndex].code
                                 backendController.updateSetting("language", langCode)
@@ -1052,7 +1054,6 @@ Dialog {
                                             if (index >= 0 && index < model.length) {
                                                 var themeCode = model[index].code
                                                 if (themeController) themeController.setTheme(themeCode)
-                                                backendController.updateSetting("theme", themeCode)
                                             }
                                         }
                                     }
@@ -1066,7 +1067,7 @@ Dialog {
                                 ColumnLayout { width: parent.width
                                     CheckBox { id: autostartCb; text: backendController.translate("تشغيل التطبيق تلقائياً عند بدء النظام")
                                         ToolTip.text: backendController.translate("إضافة التطبيق لبرامج بدء التشغيل")
-                                        onCheckedChanged: backendController.setAutostart(checked) }
+                                        onCheckedChanged: { if (_populating) return; backendController.setAutostart(checked) } }
                                 }
                             }
 
@@ -1077,7 +1078,7 @@ Dialog {
                                 ColumnLayout { width: parent.width
                                     CheckBox { id: sleepModeCbGeneral; text: backendController.translate("العمل في الخلفية عند الإغلاق (Sleep Mode)")
                                         ToolTip.text: backendController.translate("إبقاء التطبيق يعمل في علبة النظام عند إغلاق النافذة")
-                                        onCheckedChanged: backendController.updateSetting("sleep_mode", checked) }
+                                        onCheckedChanged: { if (_populating) return; backendController.updateSetting("sleep_mode", checked) } }
                                 }
                             }
 
@@ -1088,7 +1089,7 @@ Dialog {
                                 ColumnLayout { width: parent.width
                                     CheckBox { id: backgroundEnabledCb; text: backendController.translate("إظهار صورة الخلفية")
                                         ToolTip.text: backendController.translate("تفعيل/تعطيل صورة المسجد النبوي في الخلفية")
-                                        onCheckedChanged: backendController.updateSetting("background_enabled", checked) }
+                                        onCheckedChanged: { if (_populating) return; backendController.updateSetting("background_enabled", checked) } }
                                 }
                             }
 
@@ -1179,7 +1180,13 @@ Dialog {
         Label { text: backendController.translate("هل أنت متأكد من إعادة تعيين جميع الإعدادات؟"); color: _pal.text }
         onAccepted: {
             backendController.resetAllSettings()
-            populate()
+            locationTab.populate()
+            offsetsTab.populate()
+            muezzinsTab.populate()
+            audioTab.populate()
+            notificationsTab.populate()
+            athkarTab.populate()
+            generalTab.populate()
         }
     }
 

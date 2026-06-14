@@ -7,7 +7,7 @@ import logging
 from PySide6.QtCore import QObject, Signal, Slot
 
 from .translations import get_athkar
-from .i18n import t, t_prayer
+from .i18n import t
 
 logger = logging.getLogger(__name__)
 

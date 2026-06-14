@@ -8,7 +8,6 @@ import os
 import subprocess
 import threading
 from datetime import date, datetime, timedelta
-from typing import Optional
 
 from PySide6.QtCore import QObject, Signal, Slot, QTimer, QMetaObject, Q_ARG, Qt
 
@@ -463,7 +462,7 @@ class PrayerEngine(QObject):
                      self._settings.get("time_format", "12h"))
         if self._prayer_times_cache is not None and self._prayer_times_cache_key == cache_key:
             return self._prayer_times_cache
-        
+
         times = self._result.as_dict()
         result = []
         next_key = self._cached_next[0] if self._cached_next else ""
@@ -550,6 +549,7 @@ class PrayerEngine(QObject):
                 return
             if cities:
                 self._settings = self._update_settings_batch({"latitude": cities[0][1], "longitude": cities[0][2]})
+                return
 
     def _apply_auto_coords(self, country: str, city: str, latitude: float, longitude: float,
                           timezone: str | None = None, clear_custom: bool = True) -> None:
@@ -617,7 +617,7 @@ class PrayerEngine(QObject):
 
     def _save_theme(self, theme_code: str, emit_signal: bool = True) -> None:
         """Internal method to save theme setting.
-        
+
         Args:
             theme_code: Theme code to save
             emit_signal: Whether to emit themeChanged signal
@@ -1095,7 +1095,6 @@ class PrayerEngine(QObject):
     def importSettings(self, path: str):
         import json
         from .settings import save as save_settings, validate_and_coerce, _run_migrations, DEFAULT_SETTINGS
-        from .settings import SETTINGS_VERSION
         try:
             # Validate file size (max 1MB)
             file_size = os.path.getsize(path)

@@ -91,7 +91,13 @@ class AudioPlayer:
         self.stop()
         self._stop_event.clear()
 
+        # Capture old thread reference before starting new one
+        _old_thread = self._playback_thread
+
         def _play():
+            # Join old thread to prevent leak
+            if _old_thread is not None and _old_thread is not threading.current_thread():
+                _old_thread.join(timeout=3.0)
             # Use RLock with timeout - if we can't acquire, another playback is in progress
             acquired = self._play_lock.acquire(timeout=5.0)
             if not acquired:
@@ -196,7 +202,7 @@ class AudioPlayer:
                         )
                         self._current_device = device
                         self._device_config = new_config
-                device.start(gen)
+                    device.start(gen)
 
                 self._done_event.wait()
 
@@ -224,7 +230,7 @@ class AudioPlayer:
 
     def stop(self, wait: bool = True, timeout: float = 2.0) -> None:
         """Stop current playback.
-        
+
         Args:
             wait: If True, wait for playback thread to finish
             timeout: Maximum time to wait for playback thread to finish
@@ -235,6 +241,8 @@ class AudioPlayer:
         with self._current_lock:
             gen = self._current_gen
             dev = self._current_device
+            self._current_gen = None
+            self._current_device = None
         if gen is not None:
             try:
                 gen.close()
@@ -245,7 +253,7 @@ class AudioPlayer:
                 dev.stop()
             except (AttributeError, RuntimeError, OSError) as exc:
                 logger.debug("Error stopping audio device: %s", exc)
-        
+
         # Wait for playback thread to finish and release the lock
         if wait and self._playback_thread is not None and self._playback_thread.is_alive():
             if self._playback_thread is threading.current_thread():
@@ -259,10 +267,10 @@ class AudioPlayer:
         """Check if audio is currently playing."""
         if not _MINIAUDIO_AVAILABLE:
             return False
-        if self._play_lock.locked():
-            return True
         if self._done_event.is_set():
             return False
+        if self._play_lock.locked():
+            return True
         if self._playback_thread is not None and self._playback_thread.is_alive():
             return True
         return False

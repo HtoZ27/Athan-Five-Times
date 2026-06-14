@@ -6,8 +6,6 @@ Memory Profiler for Athan Five Times Prayer App.
 
 import tracemalloc
 import gc
-import sys
-import os
 import threading
 import time
 from typing import Dict, List, Optional, Tuple

@@ -14,19 +14,18 @@ os.environ.setdefault("QT_QPA_PLATFORMTHEME", "qt5ct")
 os.environ["QT_ACCESSIBILITY"] = "0"
 os.environ["QT_QUICK_CONTROLS_STYLE"] = "Fusion"
 
-from PySide6.QtCore import QUrl, QTimer, QCoreApplication, Qt, QMetaObject, Q_ARG
+from PySide6.QtCore import QUrl, QTimer, Qt
 from PySide6.QtGui import QIcon, QFont, QFontDatabase
 from PySide6.QtWidgets import QApplication
 from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterSingletonType
 from PySide6.QtQuickControls2 import QQuickStyle
 
 from .settings import load as load_settings, save as save_settings, APP_VERSION
-from .location import detect as detect_location, detect_async
-from .i18n import t, set_lang, LANGS
+from .location import detect_async
+from .i18n import t, set_lang
 from .backend_controller import PrayerEngine
 from .theme_controller import ThemeController
 from .audio import set_volume
-from ._constants import THEME_IDS
 
 # Memory profiler اختياري (لتشغيله: python -m backend.memory_profiler)
 try:
@@ -104,10 +103,9 @@ class QmlAthanApp:
         ctx.setContextProperty("themeController", self._theme_controller)
         ctx.setContextProperty("appVersion", APP_VERSION)
 
-        # Connect theme changes both ways (QueuedConnection for thread safety)
-        from PySide6.QtCore import Qt
-        self._prayer_engine.themeChanged.connect(self._on_prayer_theme_changed, Qt.ConnectionType.QueuedConnection)
-        self._theme_controller.themeChanged.connect(self._prayer_engine.saveTheme, Qt.ConnectionType.QueuedConnection)
+        # Connect theme changes both ways
+        self._prayer_engine.themeChanged.connect(self._on_prayer_theme_changed)
+        self._theme_controller.themeChanged.connect(self._prayer_engine.saveTheme)
 
         qml_file = os.path.join(QML_DIR, "main.qml")
         if not os.path.isfile(qml_file):
@@ -125,10 +123,10 @@ class QmlAthanApp:
 
         self._restore_window_geometry()
         self._prayer_engine.languageChanged.connect(self._on_language_changed)
-        
+
         # Connect azanPlayingChanged signal immediately for tray flash
         self._prayer_engine.azanPlayingChanged.connect(self._on_azan_playing_changed)
-        
+
         QTimer.singleShot(0, self._delayed_init)
         QTimer.singleShot(0, self._setup_tray)
 

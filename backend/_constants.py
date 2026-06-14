@@ -2,12 +2,9 @@
 Shared constants and helper functions used across modules.
 Imports only from prayer_calc (PRAYER_ORDER). Safe to import without circular deps.
 """
-import logging
 from datetime import date
 
 from .prayer_calc import PRAYER_ORDER
-
-logger = logging.getLogger(__name__)
 
 PRAYERS_WITH_AZAN = [k for k in PRAYER_ORDER if k != "sunrise"]
 THEME_IDS = ["auto", "light", "dark", "ottoman_gold", "catppuccin_mocha", "catppuccin_latte"]

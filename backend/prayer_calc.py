@@ -154,40 +154,6 @@ def _get_methods_for(name: str) -> dict | None:
 # Keep small data as module-level constants
 SUNRISE_ANGLE = 0.833
 
-PRESET_CITIES: Dict[str, Tuple[float, float]] = {
-    "مكة المكرمة": (21.4225, 39.8262),
-    "المدينة المنورة": (24.4672, 39.6112),
-    "الرياض": (24.7136, 46.6753),
-    "جدة": (21.5433, 39.1728),
-    "القاهرة": (30.0444, 31.2357),
-    "دمشق": (33.5138, 36.2765),
-    "بغداد": (33.3152, 44.3661),
-    "القدس": (31.7683, 35.2137),
-    "الدوحة": (25.2854, 51.5310),
-    "أبو ظبي": (24.4539, 54.3773),
-    "مسقط": (23.5880, 58.3829),
-    "الخرطوم": (15.5007, 32.5599),
-    "الرباط": (34.0209, -6.8416),
-    "تونس العاصمة": (36.8065, 10.1815),
-    "صفاقس": (34.7400, 10.7600),
-    "سوسة": (35.8300, 10.6300),
-    "القيروان": (35.6800, 10.1000),
-    "بنزرت": (37.2700, 9.8700),
-    "قابس": (33.8800, 10.1000),
-    "نابل": (36.4500, 10.7300),
-    "المنستير": (35.7700, 10.8300),
-    "مدنين": (33.3500, 10.4900),
-    "توزر": (33.9200, 8.1300),
-    "الكاف": (36.1800, 8.7100),
-    "قفصة": (34.4200, 8.7800),
-    "تطاوين": (32.9300, 10.4500),
-    "الحمامات": (36.4000, 10.6100),
-    "الجزائر": (36.7538, 3.0588),
-    "إسطنبول": (41.0082, 28.9784),
-    "كوالالمبور": (3.1390, 101.6869),
-    "جاكرتا": (-6.2088, 106.8456),
-}
-
 PRAYER_NAMES: Dict[str, str] = {
     "fajr": "الفجر",
     "sunrise": "الشروق",
@@ -401,14 +367,14 @@ def calculate(
     # Round coordinates to 6 decimal places (~0.1m accuracy) for cache key stability
     lat_key = f"{latitude:.6f}"
     lon_key = f"{longitude:.6f}"
-    
+
     if target_date is None:
         if tz_name:
             tz = _resolve_timezone(tz_name, longitude)
             target_date = datetime.now(tz).date()
         else:
             target_date = date.today()
-    
+
     # Cache offsets tuple creation - offsets dict is small and rarely changes
     # Use hash of tuple for stable cache key regardless of object identity
     offsets_tuple = ()
@@ -421,7 +387,7 @@ def calculate(
             # Limit cache size
             if len(_OFFSETS_CACHE) > 32:
                 _OFFSETS_CACHE.pop(next(iter(_OFFSETS_CACHE)))
-    
+
     return _calculate_cached(
         lat_key, lon_key, target_date.isoformat(),
         method_name, madhab, tz_name, offsets_tuple,
