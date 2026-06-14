@@ -308,6 +308,17 @@ class QmlAthanApp:
     def _quit(self):
         self._azan_flash_timer.stop()
         self._prayer_engine.stopAzan()
+        # Disconnect signals to prevent stale callbacks during teardown
+        try: self._prayer_engine.themeChanged.disconnect()
+        except (RuntimeError, TypeError): pass
+        try: self._theme_controller.themeChanged.disconnect()
+        except (RuntimeError, TypeError): pass
+        try: self._prayer_engine.languageChanged.disconnect()
+        except (RuntimeError, TypeError): pass
+        try: self._prayer_engine.azanPlayingChanged.disconnect()
+        except (RuntimeError, TypeError): pass
+        try: self._prayer_engine.trayInfoChanged.disconnect()
+        except (RuntimeError, TypeError): pass
         self._prayer_engine.cleanup()
         self._theme_controller.cleanup()
         root = self._engine.rootObjects()

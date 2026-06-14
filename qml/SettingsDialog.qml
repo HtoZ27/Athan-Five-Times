@@ -182,17 +182,20 @@ Dialog {
                         id: locationTab
                         function populate() {
                             _populating = true
-                            var s = backendController.getSettings()
-                            useCustomCoords = s.custom_coords || false
-                            _setCountryCombo(s.country)
-                            _setCityCombo(s.country, s.city)
-                            if (s.latitude) latField.text = String(s.latitude)
-                            if (s.longitude) lonField.text = String(s.longitude)
-                            methodCombo.model = backendController.getCalcMethods()
-                            methodCombo.currentIndex = Math.max(0, methodCombo.find(s.method))
-                            madhabCombo.model = backendController.getMadhabs()
-                            madhabCombo.currentIndex = Math.max(0, madhabCombo.find(s.madhab))
-                            _populating = false
+                            try {
+                                var s = backendController.getSettings()
+                                useCustomCoords = s.custom_coords || false
+                                _setCountryCombo(s.country)
+                                _setCityCombo(s.country, s.city)
+                                if (s.latitude) latField.text = String(s.latitude)
+                                if (s.longitude) lonField.text = String(s.longitude)
+                                methodCombo.model = backendController.getCalcMethods()
+                                methodCombo.currentIndex = Math.max(0, methodCombo.find(s.method))
+                                madhabCombo.model = backendController.getMadhabs()
+                                madhabCombo.currentIndex = Math.max(0, madhabCombo.find(s.madhab))
+                            } finally {
+                                _populating = false
+                            }
                         }
 
                     function _setCountryCombo(code) {
@@ -449,16 +452,19 @@ Dialog {
                     id: offsetsTab
                     function populate() {
                         _populating = true
-                        var s = backendController.getSettings()
-                        var o = s.offsets || {}
-                        fajrSp.value = o.fajr !== undefined ? o.fajr : 0
-                        sunriseSp.value = o.sunrise !== undefined ? o.sunrise : 0
-                        dhuhrSp.value = o.dhuhr !== undefined ? o.dhuhr : 0
-                        asrSp.value = o.asr !== undefined ? o.asr : 0
-                        maghribSp.value = o.maghrib !== undefined ? o.maghrib : 0
-                        ishaSp.value = o.isha !== undefined ? o.isha : 0
-                        hijriSp.value = s.hijri_day_offset !== undefined ? s.hijri_day_offset : 0
-                        _populating = false
+                        try {
+                            var s = backendController.getSettings()
+                            var o = s.offsets || {}
+                            fajrSp.value = o.fajr !== undefined ? o.fajr : 0
+                            sunriseSp.value = o.sunrise !== undefined ? o.sunrise : 0
+                            dhuhrSp.value = o.dhuhr !== undefined ? o.dhuhr : 0
+                            asrSp.value = o.asr !== undefined ? o.asr : 0
+                            maghribSp.value = o.maghrib !== undefined ? o.maghrib : 0
+                            ishaSp.value = o.isha !== undefined ? o.isha : 0
+                            hijriSp.value = s.hijri_day_offset !== undefined ? s.hijri_day_offset : 0
+                        } finally {
+                            _populating = false
+                        }
                     }
 
                     function resetOffsets() {
@@ -663,18 +669,21 @@ Dialog {
 
                     function populate() {
                         _populating = true
-                        audioFilesModel.clear()
-                        var list = ["fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha"]
-                        for (var i = 0; i < list.length; i++) {
-                            var p = backendController.getPrayerAudio(list[i])
-                            audioFilesModel.append({ prayer: list[i], path: p || "" })
+                        try {
+                            audioFilesModel.clear()
+                            var list = ["fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha"]
+                            for (var i = 0; i < list.length; i++) {
+                                var p = backendController.getPrayerAudio(list[i])
+                                audioFilesModel.append({ prayer: list[i], path: p || "" })
+                            }
+                            var s = backendController.getSettings()
+                            volumeSp.value = s.volume !== undefined ? s.volume : 1.0
+                            fadeInCb.checked = s.fade_in !== false
+                            fadeDurSp.value = s.fade_in_duration !== undefined ? s.fade_in_duration : 3
+                            takbeerCb.checked = s.takbeer_only || false
+                        } finally {
+                            _populating = false
                         }
-                        var s = backendController.getSettings()
-                        volumeSp.value = s.volume !== undefined ? s.volume : 1.0
-                        fadeInCb.checked = s.fade_in !== false
-                        fadeDurSp.value = s.fade_in_duration !== undefined ? s.fade_in_duration : 3
-                        takbeerCb.checked = s.takbeer_only || false
-                        _populating = false
                     }
 
                     ScrollView {
@@ -802,15 +811,18 @@ Dialog {
                     id: notificationsTab
                     function populate() {
                         _populating = true
-                        var s = backendController.getSettings()
-                        preAzanCb.checked = s.pre_azan_enabled !== false
-                        preAzanSp.value = s.pre_azan_minutes !== undefined ? s.pre_azan_minutes : 10
-                        dndCb.checked = s.dnd_enabled !== undefined ? s.dnd_enabled : false
-                        dndFromSp.value = s.dnd_from !== undefined ? s.dnd_from : 22
-                        dndToSp.value = s.dnd_to !== undefined ? s.dnd_to : 6
-                        dndDurSp.value = s.dnd_duration !== undefined ? s.dnd_duration : 20
-                        silentCb.checked = s.silent_mode || false
-                        _populating = false
+                        try {
+                            var s = backendController.getSettings()
+                            preAzanCb.checked = s.pre_azan_enabled !== false
+                            preAzanSp.value = s.pre_azan_minutes !== undefined ? s.pre_azan_minutes : 10
+                            dndCb.checked = s.dnd_enabled !== undefined ? s.dnd_enabled : false
+                            dndFromSp.value = s.dnd_from !== undefined ? s.dnd_from : 22
+                            dndToSp.value = s.dnd_to !== undefined ? s.dnd_to : 6
+                            dndDurSp.value = s.dnd_duration !== undefined ? s.dnd_duration : 20
+                            silentCb.checked = s.silent_mode || false
+                        } finally {
+                            _populating = false
+                        }
                     }
 
                     ScrollView {
@@ -880,16 +892,19 @@ Dialog {
                     id: athkarTab
                     function populate() {
                         _populating = true
-                        var s = backendController.getSettings()
-                        athkarCountSp.value = s.athkarCount !== undefined ? s.athkarCount : 33
-                        var m = s.athkarMethod || "after_prayer"
-                        var opts = ["after_prayer", "specific_time", "both"]
-                        var idx = opts.indexOf(m)
-                        athkarMethodCb.currentIndex = idx >= 0 ? idx : 0
-                        popupEnabledCb.checked = s.athkar_popup_enabled !== false
-                        popupDurSp.value = s.athkar_popup_duration !== undefined ? s.athkar_popup_duration : 300
-                        popupDelaySp.value = s.athkar_popup_delay !== undefined ? s.athkar_popup_delay : 600
-                        _populating = false
+                        try {
+                            var s = backendController.getSettings()
+                            athkarCountSp.value = s.athkarCount !== undefined ? s.athkarCount : 33
+                            var m = s.athkarMethod || "after_prayer"
+                            var opts = ["after_prayer", "specific_time", "both"]
+                            var idx = opts.indexOf(m)
+                            athkarMethodCb.currentIndex = idx >= 0 ? idx : 0
+                            popupEnabledCb.checked = s.athkar_popup_enabled !== false
+                            popupDurSp.value = s.athkar_popup_duration !== undefined ? s.athkar_popup_duration : 300
+                            popupDelaySp.value = s.athkar_popup_delay !== undefined ? s.athkar_popup_delay : 600
+                        } finally {
+                            _populating = false
+                        }
                     }
 
                     ScrollView {
@@ -965,39 +980,42 @@ Dialog {
                         id: generalTab
                             function populate() {
                                 _populating = true
-                                var s = backendController.getSettings()
-                                langCombo.model = backendController.getLanguages()
-                                var langIdx = -1
-                                for (var i = 0; i < langCombo.model.length; i++) {
-                                    if (langCombo.model[i].code === s.language) {
-                                        langIdx = i
-                                        break
+                                try {
+                                    var s = backendController.getSettings()
+                                    langCombo.model = backendController.getLanguages()
+                                    var langIdx = -1
+                                    for (var i = 0; i < langCombo.model.length; i++) {
+                                        if (langCombo.model[i].code === s.language) {
+                                            langIdx = i
+                                            break
+                                        }
                                     }
-                                }
-                                langCombo.currentIndex = langIdx >= 0 ? langIdx : 0
-                                var theme = s.theme || "dark"
-                                var themeModel = backendController.getThemes()
-                                var themeIdx = -1
-                                for (var i = 0; i < themeModel.length; i++) {
-                                    if (themeModel[i].code === theme) {
-                                        themeIdx = i
-                                        break
+                                    langCombo.currentIndex = langIdx >= 0 ? langIdx : 0
+                                    var theme = s.theme || "dark"
+                                    var themeModel = backendController.getThemes()
+                                    var themeIdx = -1
+                                    for (var i = 0; i < themeModel.length; i++) {
+                                        if (themeModel[i].code === theme) {
+                                            themeIdx = i
+                                            break
+                                        }
                                     }
-                                }
-                                themeCombo.currentIndex = themeIdx >= 0 ? themeIdx : 0
-                                timezoneCombo.model = backendController.getTimezones()
-                                var tzIdx = -1
-                                for (var i = 0; i < timezoneCombo.model.length; i++) {
-                                    if (timezoneCombo.model[i].code === s.timezone) {
-                                        tzIdx = i
-                                        break
+                                    themeCombo.currentIndex = themeIdx >= 0 ? themeIdx : 0
+                                    timezoneCombo.model = backendController.getTimezones()
+                                    var tzIdx = -1
+                                    for (var i = 0; i < timezoneCombo.model.length; i++) {
+                                        if (timezoneCombo.model[i].code === s.timezone) {
+                                            tzIdx = i
+                                            break
+                                        }
                                     }
+                                    timezoneCombo.currentIndex = tzIdx >= 0 ? tzIdx : 0
+                                    autostartCb.checked = s.autostart || false
+                                    sleepModeCbGeneral.checked = s.sleep_mode !== false
+                                    backgroundEnabledCb.checked = s.background_enabled !== false
+                                } finally {
+                                    _populating = false
                                 }
-                                timezoneCombo.currentIndex = tzIdx >= 0 ? tzIdx : 0
-                                autostartCb.checked = s.autostart || false
-                                sleepModeCbGeneral.checked = s.sleep_mode !== false
-                                backgroundEnabledCb.checked = s.background_enabled !== false
-                                _populating = false
                             }
 
                         function resetAllSettings() {

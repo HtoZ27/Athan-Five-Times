@@ -2,7 +2,6 @@
 Backend Controller - Python-QML bridge for the Athan application.
 """
 
-import gc
 import logging
 import os
 import subprocess
@@ -271,7 +270,6 @@ class PrayerEngine(QObject):
     def _on_azan_done(self):
         QMetaObject.invokeMethod(self, "_set_azan_playing",
             Qt.ConnectionType.QueuedConnection, Q_ARG(bool, False))
-        gc.collect()
 
     def _schedule_next_prayer(self):
         if not self._result:
@@ -288,6 +286,7 @@ class PrayerEngine(QObject):
         ms = int((next_time - now).total_seconds() * 1000)
         if self._scheduled_timer:
             self._scheduled_timer.stop()
+            self._scheduled_timer.deleteLater()
         self._scheduled_timer = QTimer(self)
         self._scheduled_timer.setSingleShot(True)
         self._scheduled_timer.timeout.connect(self._on_scheduled_timeout)
@@ -296,7 +295,7 @@ class PrayerEngine(QObject):
 
     @Slot()
     def _on_scheduled_timeout(self):
-        if self._scheduled_next_prayer:
+        if self._scheduled_next_prayer and self._scheduled_next_prayer not in self._notified_prayers:
             self._trigger_azan(self._scheduled_next_prayer)
             self._scheduled_next_prayer = None
 
@@ -326,6 +325,7 @@ class PrayerEngine(QObject):
         threading.Thread(target=self._run_dnd_cmds, args=(True,), daemon=True).start()
         if self._dnd_timer:
             self._dnd_timer.stop()
+            self._dnd_timer.deleteLater()
         self._dnd_timer = QTimer(self)
         self._dnd_timer.setSingleShot(True)
         self._dnd_timer.timeout.connect(self._disable_dnd)
@@ -672,7 +672,19 @@ class PrayerEngine(QObject):
 
     @Slot(str, "QVariant")
     def updateSetting(self, key: str, value):
-        if key in self._settings and self._settings[key] == value:
+        # Resolve current value for dot-notation keys (e.g. "azan_enabled.fajr")
+        if "." in key:
+            parts = key.split(".")
+            cur = self._settings
+            for p in parts:
+                if isinstance(cur, dict):
+                    cur = cur.get(p)
+                else:
+                    cur = None
+                    break
+            if cur is not None and cur == value:
+                return
+        elif key in self._settings and self._settings[key] == value:
             return
         # Handle theme validation and persistence
         if key == "theme":
