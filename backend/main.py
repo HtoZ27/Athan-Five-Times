@@ -23,6 +23,7 @@ from PySide6.QtQuickControls2 import QQuickStyle
 from .settings import load as load_settings, save as save_settings, APP_VERSION
 from .location import detect_async
 from .i18n import t, set_lang
+from .l10n import LanguageManager
 from .backend_controller import PrayerEngine
 from .theme_controller import ThemeController
 from .audio import set_volume
@@ -96,11 +97,13 @@ class QmlAthanApp:
 
         self._theme_controller = ThemeController()
         self._prayer_engine = PrayerEngine()
+        self._l10n = LanguageManager(initial_lang=settings.get("language", "ar"))
 
         ctx = self._engine.rootContext()
         ctx.setContextProperty("prayerEngine", self._prayer_engine)
         ctx.setContextProperty("backendController", self._prayer_engine)
         ctx.setContextProperty("themeController", self._theme_controller)
+        ctx.setContextProperty("l10n", self._l10n)
         ctx.setContextProperty("appVersion", APP_VERSION)
 
         # Connect theme changes both ways
@@ -122,7 +125,7 @@ class QmlAthanApp:
         self._app.setApplicationName(t("app_name"))
 
         self._restore_window_geometry()
-        self._prayer_engine.languageChanged.connect(self._on_language_changed)
+        self._l10n.languageChanged.connect(self._on_language_changed)
 
         # Connect azanPlayingChanged signal immediately for tray flash
         self._prayer_engine.azanPlayingChanged.connect(self._on_azan_playing_changed)
@@ -232,8 +235,8 @@ class QmlAthanApp:
             self._tray.setToolTip(t("app_name"))
             menu = QMenu()
             menu.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
-            show_act = menu.addAction(t("tray_show"))
-            show_act.triggered.connect(self._show_window)
+            self._tray_show_act = menu.addAction(t("tray_show"))
+            self._tray_show_act.triggered.connect(self._show_window)
             menu.addSeparator()
             self._tray_info_act = QAction(t("tray_loading"), menu)
             self._tray_info_act.setEnabled(False)
@@ -242,8 +245,8 @@ class QmlAthanApp:
             self._tray_pre_act.setEnabled(False)
             menu.addAction(self._tray_pre_act)
             menu.addSeparator()
-            quit_act = menu.addAction(t("tray_quit"))
-            quit_act.triggered.connect(self._quit)
+            self._tray_quit_act = menu.addAction(t("tray_quit"))
+            self._tray_quit_act.triggered.connect(self._quit)
             self._tray.setContextMenu(menu)
             self._tray.show()
             self._tray.activated.connect(self._on_tray_activated)
@@ -267,12 +270,39 @@ class QmlAthanApp:
 
     def _on_language_changed(self):
         self._app.setApplicationName(t("app_name"))
+        self._retranslate_tray()
+        self._backend.clearCaches()
         root = self._engine.rootObjects()
         if root:
             try:
                 root[0].retranslate()
             except (AttributeError, RuntimeError):
                 pass
+
+    def _retranslate_tray(self):
+        if not hasattr(self, '_tray') or self._tray is None:
+            return
+        try:
+            self._tray.setToolTip(t("app_name"))
+            if hasattr(self, '_tray_show_act') and self._tray_show_act:
+                self._tray_show_act.setText(t("tray_show"))
+            if hasattr(self, '_tray_quit_act') and self._tray_quit_act:
+                self._tray_quit_act.setText(t("tray_quit"))
+            if hasattr(self, '_tray_info_act') and self._tray_info_act:
+                prayer_engine = getattr(self, '_prayer_engine', None)
+                if prayer_engine:
+                    info = prayer_engine.getTrayInfo() if hasattr(prayer_engine, 'getTrayInfo') else None
+                    if info and info.get("next"):
+                        name = info["next"]
+                        remaining = info.get("remaining", "")
+                        self._tray_info_act.setText(t("tray_next", name=name, remaining=remaining))
+                        self._tray.setToolTip(t("tray_tooltip", name=name, remaining=remaining))
+                    else:
+                        self._tray_info_act.setText(t("tray_loading"))
+                else:
+                    self._tray_info_act.setText(t("tray_loading"))
+        except (AttributeError, RuntimeError):
+            pass
 
     def _on_azan_playing_changed(self, playing: bool):
         # Tray might not be initialized yet, guard against that
@@ -312,6 +342,8 @@ class QmlAthanApp:
         try: self._prayer_engine.themeChanged.disconnect()
         except (RuntimeError, TypeError): pass
         try: self._theme_controller.themeChanged.disconnect()
+        except (RuntimeError, TypeError): pass
+        try: self._l10n.languageChanged.disconnect()
         except (RuntimeError, TypeError): pass
         try: self._prayer_engine.languageChanged.disconnect()
         except (RuntimeError, TypeError): pass

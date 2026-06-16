@@ -14,15 +14,25 @@ ApplicationWindow {
     width: 500
     height: 800
 
-    title: backendController.translate("أذان الأوقات الخمس")
+    title: tr("أذان الأوقات الخمس")
     flags: Qt.FramelessWindowHint | Qt.Window
     color: "transparent"
 
-    property bool isRtl: true
+    property bool isRtl: l10n ? l10n.isRtl : true
     LayoutMirroring.enabled: isRtl
     LayoutMirroring.childrenInherit: true
 
     property bool backgroundEnabled: true
+
+    function tr(key) {
+        var _ = l10n.currentLanguage
+        return backendController.translate(key)
+    }
+
+    function trPrayer(key) {
+        var _ = l10n.currentLanguage
+        return backendController.translatePrayer(key)
+    }
 
     Connections {
         target: prayerEngine
@@ -106,18 +116,22 @@ ApplicationWindow {
     }
 
     function retranslate() {
-        title = backendController.translate("أذان الأوقات الخمس")
-        tab0.text = backendController.translate("أوقات الصلاة")
-        tab0.ToolTip.text = backendController.translate("أوقات الصلاة")
-        tab1.text = backendController.translate("أذكار الصلاة")
-        tab1.ToolTip.text = backendController.translate("أذكار الصلاة")
-        tab2.text = backendController.translate("الأذكار العامة")
-        tab2.ToolTip.text = backendController.translate("الأذكار العامة")
-        isRtl = prayerEngine ? prayerEngine.isRtl() : true
+        title = tr("أذان الأوقات الخمس")
+        tab0.text = tr("أوقات الصلاة")
+        tab0.ToolTip.text = tr("أوقات الصلاة")
+        tab1.text = tr("أذكار الصلاة")
+        tab1.ToolTip.text = tr("أذكار الصلاة")
+        tab2.text = tr("الأذكار العامة")
+        tab2.ToolTip.text = tr("الأذكار العامة")
+        titleText.text = tr("أذان الأوقات الخمس")
+        nextPrayerLabel.text = tr("الصلاة القادمة")
+        azanStopBtn.text = tr("إيقاف الأذان")
+        creditsBtn.text = tr("عن البرنامج")
+        settingsBtn.text = tr("الإعدادات")
     }
 
     Connections {
-        target: prayerEngine
+        target: l10n
         function onLanguageChanged() { retranslate() }
     }
 
@@ -178,7 +192,8 @@ ApplicationWindow {
                 }
 
                 Text {
-                    text: backendController.translate("أذان الأوقات الخمس")
+                    id: titleText
+                    text: tr("أذان الأوقات الخمس")
                     font.pixelSize: 15
                     font.bold: true
                     color: textMutedColor
@@ -309,7 +324,8 @@ ApplicationWindow {
                     spacing: 2
 
                     Text {
-                        text: backendController.translate("الصلاة القادمة")
+                        id: nextPrayerLabel
+                        text: tr("الصلاة القادمة")
                         font.pixelSize: 12
                         font.bold: true
                         horizontalAlignment: Text.AlignHCenter
@@ -373,10 +389,10 @@ ApplicationWindow {
 
                 TabButton {
                     id: tab0
-                    text: backendController.translate("أوقات الصلاة")
+                    text: tr("أوقات الصلاة")
                     font.pixelSize: 13
                     hoverEnabled: true
-                    ToolTip.text: backendController.translate("أوقات الصلاة")
+                    ToolTip.text: tr("أوقات الصلاة")
                     ToolTip.visible: hovered
                     background: Rectangle { color: mainTabBar.currentIndex === 0 ? accentColor : "transparent"; radius: rMed }
                     contentItem: Text {
@@ -390,10 +406,10 @@ ApplicationWindow {
                 }
                 TabButton {
                     id: tab1
-                    text: backendController.translate("أذكار الصلاة")
+                    text: tr("أذكار الصلاة")
                     font.pixelSize: 13
                     hoverEnabled: true
-                    ToolTip.text: backendController.translate("أذكار الصلاة")
+                    ToolTip.text: tr("أذكار الصلاة")
                     ToolTip.visible: hovered
                     background: Rectangle { color: mainTabBar.currentIndex === 1 ? accentColor : "transparent"; radius: rMed }
                     contentItem: Text {
@@ -407,10 +423,10 @@ ApplicationWindow {
                 }
                 TabButton {
                     id: tab2
-                    text: backendController.translate("الأذكار العامة")
+                    text: tr("الأذكار العامة")
                     font.pixelSize: 13
                     hoverEnabled: true
-                    ToolTip.text: backendController.translate("الأذكار العامة")
+                    ToolTip.text: tr("الأذكار العامة")
                     ToolTip.visible: hovered
                     background: Rectangle { color: mainTabBar.currentIndex === 2 ? accentColor : "transparent"; radius: rMed }
                     contentItem: Text {
@@ -449,7 +465,7 @@ ApplicationWindow {
 
                     Button {
                         id: azanStopBtn
-                        text: backendController.translate("إيقاف الأذان")
+                        text: tr("إيقاف الأذان")
                         visible: prayerEngine ? prayerEngine.isAzanPlaying() : false
                         onClicked: prayerEngine.stopAzan()
                         font.pixelSize: 14
@@ -458,7 +474,8 @@ ApplicationWindow {
                     }
 
                     Button {
-                        text: backendController.translate("عن البرنامج")
+                        id: creditsBtn
+                        text: tr("عن البرنامج")
                         onClicked: creditsDialog.open()
                         font.pixelSize: 14
                         background: Rectangle { color: "transparent"; border.color: accentColor; border.width: 1; radius: 8 }
@@ -466,7 +483,8 @@ ApplicationWindow {
                     }
 
                     Button {
-                        text: backendController.translate("الإعدادات")
+                        id: settingsBtn
+                        text: tr("الإعدادات")
                         onClicked: settingsDialog.open()
                         font.pixelSize: 14
                         background: Rectangle { color: accentColor; radius: 8 }
@@ -485,8 +503,6 @@ ApplicationWindow {
     SettingsDialog { id: settingsDialog }
 
     Component.onCompleted: {
-        var rtl = prayerEngine ? prayerEngine.isRtl() : true
-        isRtl = rtl
         if (prayerEngine) {
             backgroundEnabled = prayerEngine.getSetting("background_enabled") !== false
         }

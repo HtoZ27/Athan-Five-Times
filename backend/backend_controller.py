@@ -16,6 +16,7 @@ from .translations import get_athkar
 from .settings import load as load_settings, save as save_settings, resolve_azan_path, set_autostart as _set_autostart
 from .settings import invalidate_cache as invalidate_settings_cache
 from .i18n import t, t_prayer, set_lang, format_date, country_name, city_name, credits_html, credits_title
+from .translations import calc_method_name, madhab_name, timezone_name, theme_name, u
 from ._constants import PRAYERS_WITH_AZAN, DARK_THEMES, LANGS, THEME_IDS, _display_key
 from .prayer_calc import CALCULATION_METHODS, COUNTRY_CITIES, COUNTRIES, COUNTRY_METHODS
 from .athkar_provider import AthkarProvider
@@ -759,7 +760,10 @@ class PrayerEngine(QObject):
     def getCalcMethods(self):
         global _CALC_METHODS_CACHE
         if _CALC_METHODS_CACHE is None:
-            _CALC_METHODS_CACHE = list(CALCULATION_METHODS.keys())
+            _CALC_METHODS_CACHE = [
+                {"display": calc_method_name(k), "key": k}
+                for k in CALCULATION_METHODS
+            ]
         return _CALC_METHODS_CACHE
 
     @Slot(str, result="QString")
@@ -770,7 +774,10 @@ class PrayerEngine(QObject):
     def getMadhabs(self):
         global _MADHABS_CACHE
         if _MADHABS_CACHE is None:
-            _MADHABS_CACHE = ["shafi", "hanafi"]
+            _MADHABS_CACHE = [
+                {"display": madhab_name("shafi"), "key": "shafi"},
+                {"display": madhab_name("hanafi"), "key": "hanafi"},
+            ]
         return _MADHABS_CACHE
 
     @Slot(result="QVariantList")
@@ -799,19 +806,21 @@ class PrayerEngine(QObject):
             _LANGUAGES_CACHE = [{"code": code, "name": lang_names.get(code, code)} for code in LANGS]
         return _LANGUAGES_CACHE
 
+    @Slot()
+    def clearCaches(self):
+        global _COUNTRY_LIST_CACHE, _CALC_METHODS_CACHE, _MADHABS_CACHE
+        global _TIMEZONES_CACHE, _THEMES_CACHE
+        _COUNTRY_LIST_CACHE = None
+        _CALC_METHODS_CACHE = None
+        _MADHABS_CACHE = None
+        _TIMEZONES_CACHE = None
+        _THEMES_CACHE = None
+
     @Slot(result="QVariantList")
     def getThemes(self):
         global _THEMES_CACHE
         if _THEMES_CACHE is None:
-            theme_names = {
-                "auto": "تلقائي",
-                "light": "فاتح",
-                "dark": "داكن",
-                "ottoman_gold": "ذهبي عثماني",
-                "catppuccin_mocha": "كاتبوتشين موكا",
-                "catppuccin_latte": "كاتبوتشين لاتيه",
-            }
-            _THEMES_CACHE = [{"code": code, "name": theme_names.get(code, code)} for code in THEME_IDS]
+            _THEMES_CACHE = [{"code": code, "name": theme_name(code)} for code in THEME_IDS]
         return _THEMES_CACHE
 
     def getTrayInfo(self):
@@ -864,10 +873,13 @@ class PrayerEngine(QObject):
 
     @Slot(result="QVariantList")
     def getMuezzins(self):
-        muezzins = self._settings.get("muezzins", {"افتراضي": ""})
+        muezzins = self._settings.get("muezzins", {})
         result = []
         for name, path in muezzins.items():
-            result.append({"name": name, "path": path})
+            if not path and name == "افتراضي":
+                continue
+            display_name = u(name) if name == "افتراضي" else name
+            result.append({"name": display_name, "path": path})
         return result
 
     @Slot(str, str)
@@ -1019,7 +1031,7 @@ class PrayerEngine(QObject):
                 ("America/Toronto", "تورنتو (أمريكا/تورنتو)"),
                 ("UTC", "توقيت عالمي منسق (UTC)"),
             ]
-            _TIMEZONES_CACHE = [{"code": code, "name": name} for code, name in common]
+            _TIMEZONES_CACHE = [{"code": code, "name": timezone_name(code, name)} for code, name in common]
         return _TIMEZONES_CACHE
 
     @Slot()

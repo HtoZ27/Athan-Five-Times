@@ -35,6 +35,20 @@ Rectangle {
     property string prayerKey: ""
     property string prayerTitle: ""
 
+    function tr(key) {
+        var _ = l10n.currentLanguage
+        return backendController.translate(key)
+    }
+
+    function retranslate() {
+        titleLabel.text = prayerTitle || tr("أذكار بعد الصلاة")
+    }
+
+    Connections {
+        target: l10n
+        function onLanguageChanged() { retranslate() }
+    }
+
     Rectangle {
         anchors.fill: parent
         radius: 10
@@ -48,7 +62,7 @@ Rectangle {
 
             Label {
                 id: titleLabel
-                text: prayerTitle || backendController.translate("أذكار بعد الصلاة")
+                text: prayerTitle || tr("أذكار بعد الصلاة")
                 font.pixelSize: 20
                 font.bold: true
                 horizontalAlignment: Text.AlignHCenter

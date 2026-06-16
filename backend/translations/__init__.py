@@ -156,6 +156,15 @@ def _country_name_cached(code: str, _lang: str) -> str:
     return val
 
 
+def calc_method_name(key: str) -> str:
+    """Return the translated display name of a calculation method."""
+    d = _get_dict().get("calc_methods", {})
+    val = d.get(key)
+    if val is None:
+        val = _get_fallback().get("calc_methods", {}).get(key, key)
+    return val
+
+
 def city_name(name: str) -> str:
     """Return the translated name of a city (English key)."""
     return _city_name_cached(name, current_code())
@@ -169,6 +178,33 @@ def _city_name_cached(name: str, _lang: str) -> str:
         val = _get_fallback().get("cities", {}).get(name)
     if val is None:
         val = name
+    return val
+
+
+def theme_name(key: str) -> str:
+    """Return the translated display name of a theme code."""
+    d = _get_dict().get("themes", {})
+    val = d.get(key)
+    if val is None:
+        val = _get_fallback().get("themes", {}).get(key, key)
+    return val
+
+
+def madhab_name(key: str) -> str:
+    """Return the translated display name of a madhab."""
+    d = _get_dict().get("madhab", {})
+    val = d.get(key)
+    if val is None:
+        val = _get_fallback().get("madhab", {}).get(key, key)
+    return val
+
+
+def timezone_name(code: str, display: str) -> str:
+    """Return the translated timezone display name."""
+    d = _get_dict().get("timezones", {})
+    val = d.get(code)
+    if val is None:
+        val = _get_fallback().get("timezones", {}).get(code, display)
     return val
 
 

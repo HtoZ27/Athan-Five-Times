@@ -36,11 +36,14 @@ class AudioConfig:
 
 class AudioPlayer:
     """Thread-safe streaming audio player for Azan playback.
+
+    Singleton PlaybackDevice — created once, reused across calls.
     Uses miniaudio.stream_file() to decode on the fly — no full decode into RAM.
     """
 
     def __init__(self):
-        self._current_device = None
+        self._device = None
+        self._device_config: tuple | None = None
         self._current_gen = None
         self._current_lock = threading.Lock()
         self._play_lock = threading.RLock()
@@ -48,7 +51,28 @@ class AudioPlayer:
         self._done_event = threading.Event()
         self._volume = 1.0
         self._playback_thread: threading.Thread | None = None
-        self._device_config: tuple | None = None
+
+    def _ensure_device(self, sample_rate: int, nchannels: int):
+        """Return singleton device, creating it on first call.
+        If format changes, old device is stopped and replaced.
+        """
+        new_config = (sample_rate, nchannels, miniaudio.SampleFormat.SIGNED16)
+        if self._device is not None and self._device_config == new_config:
+            return self._device
+        if self._device is not None:
+            try:
+                self._device.stop()
+            except Exception:
+                pass
+            self._device = None
+        self._device = miniaudio.PlaybackDevice(
+            sample_rate=sample_rate,
+            nchannels=nchannels,
+            output_format=miniaudio.SampleFormat.SIGNED16,
+            buffersize_msec=500,
+        )
+        self._device_config = new_config
+        return self._device
 
     def _create_stream(self, path: str, config: AudioConfig,
                         stop_flag: Optional[threading.Event] = None):
@@ -80,7 +104,6 @@ class AudioPlayer:
                     chunk = array.array("h", raw_chunk)
                     frames = len(chunk) // nchannels
 
-                    # Fade-in
                     if frame_counter < fade_frames:
                         for i in range(min(frames, fade_frames - frame_counter)):
                             scale = (frame_counter + i) / fade_frames
@@ -89,12 +112,10 @@ class AudioPlayer:
                                     chunk[i * nchannels + c] * scale
                                 )
 
-                    # Volume
                     if config.volume < 1.0:
                         for i in range(len(chunk)):
                             chunk[i] = int(chunk[i] * config.volume)
 
-                    # Takbeer-only truncation
                     if takbeer_frames is not None:
                         if frame_counter + frames >= takbeer_frames:
                             remaining = takbeer_frames - frame_counter
@@ -105,9 +126,8 @@ class AudioPlayer:
 
                     frame_counter += frames
                     nframes = yield chunk.tobytes()
-                    # nframes from device ignored — file_stream handles its own chunking
                     if nframes is not None:
-                        pass  # device hint, not needed for streaming
+                        pass
             finally:
                 self._done_event.set()
 
@@ -117,7 +137,6 @@ class AudioPlayer:
         """Preload — no-op with streaming (file is read on demand)."""
         if not _MINIAUDIO_AVAILABLE:
             return
-        # Verify file exists; actual decoding happens during playback
         if not os.path.isfile(path):
             logger.warning("Audio file not found for preload: %s", path)
 
@@ -128,7 +147,7 @@ class AudioPlayer:
         on_done: Optional[Callable] = None,
         stop_flag: Optional[threading.Event] = None,
     ) -> None:
-        """Play azan with given configuration using streaming."""
+        """Play azan with given configuration using streaming + singleton device."""
         if not _MINIAUDIO_AVAILABLE:
             logger.warning("Audio playback skipped: miniaudio unavailable")
             if on_done:
@@ -159,30 +178,36 @@ class AudioPlayer:
                 self._done_event.clear()
                 if not os.path.isfile(azan_path):
                     logger.warning("Azan file not found: %s", azan_path)
+                    self._done_event.set()
                     return
 
                 gen, sample_rate, nchannels = self._create_stream(azan_path, config, stop_flag)
                 next(gen)
 
                 if self._stop_event.is_set() or (stop_flag and stop_flag.is_set()):
+                    gen.close()
+                    self._done_event.set()
                     return
 
-                new_config = (sample_rate, nchannels, miniaudio.SampleFormat.SIGNED16)
+                device = self._ensure_device(sample_rate, nchannels)
 
                 with self._current_lock:
                     self._current_gen = gen
-                    if self._current_device is not None and self._device_config == new_config:
-                        device = self._current_device
-                    else:
-                        device = miniaudio.PlaybackDevice(
-                            sample_rate=sample_rate,
-                            nchannels=nchannels,
-                            output_format=miniaudio.SampleFormat.SIGNED16,
-                            buffersize_msec=500,
-                        )
-                        self._current_device = device
-                        self._device_config = new_config
-                    device.start(gen)
+
+                try:
+                    device.stop()
+                except Exception:
+                    pass
+
+                # Race guard: stop() may have closed gen between _current_gen and device.stop()
+                if self._stop_event.is_set() or (stop_flag and stop_flag.is_set()):
+                    with self._current_lock:
+                        self._current_gen = None
+                    gen.close()
+                    self._done_event.set()
+                    return
+
+                device.start(gen)
 
                 if not self._done_event.wait(timeout=300.0):
                     logger.warning("Playback timed out after 300s, forcing stop")
@@ -192,22 +217,19 @@ class AudioPlayer:
                                 self._current_gen.close()
                             except Exception:
                                 pass
-                        if self._current_device is not None:
-                            try:
-                                self._current_device.stop()
-                            except Exception:
-                                pass
                         self._current_gen = None
-                        self._current_device = None
+                    try:
+                        device.stop()
+                    except Exception:
+                        pass
 
             except (RuntimeError, ValueError, AttributeError, KeyError, TypeError):
                 logger.exception("Playback error")
-                self._done_event.set()
             finally:
                 _cb = on_done
                 with self._current_lock:
-                    self._current_device = None
                     self._current_gen = None
+                self._done_event.set()
                 if _cb:
                     try:
                         _cb()
@@ -222,23 +244,21 @@ class AudioPlayer:
         self._playback_thread.start()
 
     def stop(self, wait: bool = True, timeout: float = 2.0) -> None:
-        """Stop current playback."""
+        """Stop current playback. Singleton device is stopped but kept for reuse."""
         if not _MINIAUDIO_AVAILABLE:
             return
         self._stop_event.set()
         with self._current_lock:
             gen = self._current_gen
-            dev = self._current_device
             self._current_gen = None
-            self._current_device = None
         if gen is not None:
             try:
                 gen.close()
             except (AttributeError, RuntimeError, OSError) as exc:
                 logger.debug("Error closing audio generator: %s", exc)
-        if dev is not None:
+        if self._device is not None:
             try:
-                dev.stop()
+                self._device.stop()
             except (AttributeError, RuntimeError, OSError) as exc:
                 logger.debug("Error stopping audio device: %s", exc)
 

@@ -5,7 +5,7 @@ import Theme 1.0
 
 Dialog {
     id: root
-    title: backendController.translate("عن البرنامج")
+    title: tr("عن البرنامج")
 
     width: 460
     height: 560
@@ -36,6 +36,24 @@ Dialog {
             secondaryTextColor = __pal.textMuted
             borderColor = __pal.border
         }
+    }
+
+    function tr(key) {
+        var _ = l10n.currentLanguage
+        return backendController.translate(key)
+    }
+
+    function retranslate() {
+        root.title = tr("عن البرنامج")
+        appNameLabel.text = tr("أذان الصلاة")
+        appDescLabel.text = tr("تطبيق مفتوح المصدر لأوقات الصلاة والأذان")
+        libsLabel.text = tr("المكتبات المستخدمة")
+        versionLabel.text = tr("الإصدار") + " " + (typeof appVersion !== 'undefined' ? appVersion : "1.0.0")
+    }
+
+    Connections {
+        target: l10n
+        function onLanguageChanged() { retranslate() }
     }
 
     background: Rectangle {
@@ -71,16 +89,18 @@ Dialog {
             }
 
             Label {
+                id: appNameLabel
                 Layout.alignment: Qt.AlignHCenter
-                text: backendController.translate("أذان الصلاة")
+                text: tr("أذان الصلاة")
                 font.pixelSize: 22
                 font.bold: true
                 color: textColor
             }
 
             Label {
+                id: appDescLabel
                 Layout.alignment: Qt.AlignHCenter
-                text: backendController.translate("تطبيق مفتوح المصدر لأوقات الصلاة والأذان")
+                text: tr("تطبيق مفتوح المصدر لأوقات الصلاة والأذان")
                 font.pixelSize: 13
                 color: secondaryTextColor
             }
@@ -114,8 +134,9 @@ Dialog {
                 spacing: 12
 
                 Label {
+                    id: libsLabel
                     Layout.fillWidth: true
-                    text: backendController.translate("المكتبات المستخدمة")
+                    text: tr("المكتبات المستخدمة")
                     font.pixelSize: 14
                     font.bold: true
                     color: accentColor
@@ -150,8 +171,9 @@ Dialog {
             spacing: 4
 
             Label {
+                id: versionLabel
                 Layout.alignment: Qt.AlignHCenter
-                text: backendController.translate("الإصدار") + " " + (typeof appVersion !== 'undefined' ? appVersion : "1.0.0")
+                text: tr("الإصدار") + " " + (typeof appVersion !== 'undefined' ? appVersion : "1.0.0")
                 font.pixelSize: 13
                 font.bold: true
                 color: accentColor
@@ -159,7 +181,7 @@ Dialog {
 
             Label {
                 Layout.alignment: Qt.AlignHCenter
-                text: "Created by H.Z.Tun"
+                text: tr("من صنع") + " H.Z.Tun"
                 font.pixelSize: 12
                 color: secondaryTextColor
             }

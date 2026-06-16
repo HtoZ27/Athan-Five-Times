@@ -7,7 +7,7 @@ import Theme 1.0
 Dialog {
     id: root
 
-    title: backendController.translate("إعدادات التطبيق")
+    title: tr("إعدادات التطبيق")
     width: Math.min(parent ? parent.width : 800, 800)
     height: Math.min(parent ? parent.height : 720, 720)
     x: (parent.width - width) / 2
@@ -53,6 +53,59 @@ Dialog {
     property string searchText: ""
     property int currentTabIndex: 0
     property bool _populating: true
+
+    property var _tabNames: [
+        tr("الموقع"),
+        tr("الإزاحة"),
+        tr("المؤذنون"),
+        tr("الصوت"),
+        tr("الإشعارات"),
+        tr("الأذكار"),
+        tr("عام")
+    ]
+
+    function tr(key) {
+        var _ = l10n.currentLanguage
+        return backendController.translate(key)
+    }
+
+    function trPrayer(key) {
+        var _ = l10n.currentLanguage
+        return backendController.translatePrayer(key)
+    }
+
+    function retranslate() {
+        root.title = tr("إعدادات التطبيق")
+        _tabNames = [
+            tr("الموقع"),
+            tr("الإزاحة"),
+            tr("المؤذنون"),
+            tr("الصوت"),
+            tr("الإشعارات"),
+            tr("الأذكار"),
+            tr("عام")
+        ]
+        saveBtn.text = tr("💾 حفظ")
+        cancelBtn.text = tr("❌ إلغاء")
+        resetConfirmDlg.title = tr("🔄 إعادة تعيين")
+        if (resetConfirmDlgLabel) resetConfirmDlgLabel.text = tr("هل أنت متأكد من إعادة تعيين جميع الإعدادات؟")
+        importDialog.title = tr("اختر ملف إعدادات")
+        importDialog.nameFilters = [tr("ملفات JSON (*.json)")]
+        _populating = true
+        locationTab.populate()
+        offsetsTab.populate()
+        muezzinsTab.populate()
+        audioTab.populate()
+        notificationsTab.populate()
+        athkarTab.populate()
+        generalTab.populate()
+        _populating = false
+    }
+
+    Connections {
+        target: l10n
+        function onLanguageChanged() { retranslate() }
+    }
 
     Component.onCompleted: {
         _populating = true
@@ -132,15 +185,8 @@ Dialog {
                 Item { Layout.fillWidth: true }
 
                 Repeater {
-                    model: [
-                        backendController.translate("الموقع"),
-                        backendController.translate("الإزاحة"),
-                        backendController.translate("المؤذنون"),
-                        backendController.translate("الصوت"),
-                        backendController.translate("الإشعارات"),
-                        backendController.translate("الأذكار"),
-                        backendController.translate("عام")
-                    ]
+                    id: tabRepeater
+                    model: _tabNames
 
                     delegate: Rectangle {
                         id: tabRect
@@ -190,13 +236,29 @@ Dialog {
                                 if (s.latitude) latField.text = String(s.latitude)
                                 if (s.longitude) lonField.text = String(s.longitude)
                                 methodCombo.model = backendController.getCalcMethods()
-                                methodCombo.currentIndex = Math.max(0, methodCombo.find(s.method))
+                                methodCombo.currentIndex = _findMethodIndex(s.method)
                                 madhabCombo.model = backendController.getMadhabs()
-                                madhabCombo.currentIndex = Math.max(0, madhabCombo.find(s.madhab))
+                                madhabCombo.currentIndex = _findMadhabIndex(s.madhab)
                             } finally {
                                 _populating = false
                             }
                         }
+
+                    function _findMethodIndex(key) {
+                        if (!key || !methodCombo.model) return 0
+                        for (var i = 0; i < methodCombo.model.length; i++) {
+                            if (methodCombo.model[i].key === key) return i
+                        }
+                        return 0
+                    }
+
+                    function _findMadhabIndex(key) {
+                        if (!key || !madhabCombo.model) return 0
+                        for (var i = 0; i < madhabCombo.model.length; i++) {
+                            if (madhabCombo.model[i].key === key) return i
+                        }
+                        return 0
+                    }
 
                     function _setCountryCombo(code) {
                         countryCombo.model = backendController.getCountryList()
@@ -256,13 +318,13 @@ Dialog {
 
                                 GroupBox {
                                     Layout.fillWidth: true
-                                    label: Label { text: backendController.translate("تحديد الموقع تلقائياً"); color: textColor; font.bold: true; ToolTip.text: backendController.translate("تحديد موقعك الحالي عبر الإنترنت") }
+                                    label: Label { text: tr("تحديد الموقع تلقائياً"); color: textColor; font.bold: true; ToolTip.text: tr("تحديد موقعك الحالي عبر الإنترنت") }
                                     background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
                                     ColumnLayout { width: parent.width; spacing: 6
                                         Button {
                                             Layout.fillWidth: true
                                             Layout.preferredHeight: 40
-                                            text: backendController.translate("🌍 تحديد موقعي تلقائياً عبر الإنترنت")
+                                            text: tr("🌍 تحديد موقعي تلقائياً عبر الإنترنت")
                                             enabled: !useCustomCoords
                                             onClicked: {
                                                 if (useCustomCoords) {
@@ -276,7 +338,7 @@ Dialog {
 
                                 GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: backendController.translate("الموقع"); color: textColor; font.bold: true }
+                                label: Label { text: tr("الموقع"); color: textColor; font.bold: true }
 
                                 background: Rectangle {
                                     color: cardColor
@@ -303,8 +365,7 @@ Dialog {
                                             cityCombo.currentIndex = -1
                                             var defaultMethod = backendController.getDefaultMethod(item.code)
                                             if (defaultMethod) {
-                                                var idx = methodCombo.find(defaultMethod)
-                                                if (idx >= 0) methodCombo.currentIndex = idx
+                                                methodCombo.currentIndex = _findMethodIndex(defaultMethod)
                                             }
                                         }
                                         onAccepted: {
@@ -342,7 +403,7 @@ Dialog {
 
                                     CheckBox {
                                         id: customCoordsCheck
-                                        text: backendController.translate("🌐 استخدام إحداثيات مخصصة")
+                                        text: tr("🌐 استخدام إحداثيات مخصصة")
                                         checked: useCustomCoords
                                         onCheckedChanged: {
                                             if (_populating) return
@@ -366,7 +427,7 @@ Dialog {
                                         TextField {
                                             id: latField
                                             Layout.fillWidth: true
-                                            placeholderText: backendController.translate("العرض (Latitude)")
+                                            placeholderText: tr("العرض (Latitude)")
                                             color: textColor
                                             placeholderTextColor: secondaryTextColor
                                             validator: DoubleValidator { bottom: -90; top: 90; decimals: 6 }
@@ -385,7 +446,7 @@ Dialog {
                                         TextField {
                                             id: lonField
                                             Layout.fillWidth: true
-                                            placeholderText: backendController.translate("الطول (Longitude)")
+                                            placeholderText: tr("الطول (Longitude)")
                                             color: textColor
                                             placeholderTextColor: secondaryTextColor
                                             validator: DoubleValidator { bottom: -180; top: 180; decimals: 6 }
@@ -407,7 +468,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: backendController.translate("طريقة الحساب"); color: textColor; font.bold: true }
+                                label: Label { text: tr("طريقة الحساب"); color: textColor; font.bold: true }
                                 background: Rectangle {
                                     color: cardColor; radius: 8
                                     border.color: borderColor; border.width: 1
@@ -417,9 +478,10 @@ Dialog {
                                     ComboBox {
                                         id: methodCombo
                                         Layout.fillWidth: true
+                                        textRole: "display"
                                         onCurrentIndexChanged: {
-                                            if (_populating || currentIndex < 0 || !currentText) return
-                                            backendController.updateSetting("method", currentText)
+                                            if (_populating || currentIndex < 0 || currentIndex >= model.length) return
+                                            backendController.updateSetting("method", model[currentIndex].key)
                                         }
                                     }
                                 }
@@ -427,7 +489,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: backendController.translate("المذهب"); color: textColor; font.bold: true }
+                                label: Label { text: tr("المذهب"); color: textColor; font.bold: true }
                                 background: Rectangle {
                                     color: cardColor; radius: 8
                                     border.color: borderColor; border.width: 1
@@ -437,9 +499,10 @@ Dialog {
                                     ComboBox {
                                         id: madhabCombo
                                         Layout.fillWidth: true
+                                        textRole: "display"
                                         onCurrentIndexChanged: {
-                                            if (_populating || currentIndex < 0 || !currentText) return
-                                            backendController.updateSetting("madhab", currentText)
+                                            if (_populating || currentIndex < 0 || currentIndex >= model.length) return
+                                            backendController.updateSetting("madhab", model[currentIndex].key)
                                         }
                                     }
                                 }
@@ -483,42 +546,42 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: backendController.translate("إزاحة أوقات الصلاة (دقائق)"); color: textColor }
+                                label: Label { text: tr("إزاحة أوقات الصلاة (دقائق)"); color: textColor }
                                 background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 4
                                     RowLayout { Layout.fillWidth: true
-                                        Label { text: backendController.translate("الفجر"); color: textColor; Layout.fillWidth: true }
+                                        Label { text: tr("الفجر"); color: textColor; Layout.fillWidth: true }
                                         SpinBox { id: fajrSp; from: -60; to: 60
                                             onValueChanged: { if (_populating) return; backendController.setOffset("fajr", value) } }
                                     }
                                     RowLayout { Layout.fillWidth: true
-                                        Label { text: backendController.translate("الشروق"); color: textColor; Layout.fillWidth: true }
+                                        Label { text: tr("الشروق"); color: textColor; Layout.fillWidth: true }
                                         SpinBox { id: sunriseSp; from: -60; to: 60
                                             onValueChanged: { if (_populating) return; backendController.setOffset("sunrise", value) } }
                                     }
                                     RowLayout { Layout.fillWidth: true
-                                        Label { text: backendController.translate("الظهر"); color: textColor; Layout.fillWidth: true }
+                                        Label { text: tr("الظهر"); color: textColor; Layout.fillWidth: true }
                                         SpinBox { id: dhuhrSp; from: -60; to: 60
                                             onValueChanged: { if (_populating) return; backendController.setOffset("dhuhr", value) } }
                                     }
                                     RowLayout { Layout.fillWidth: true
-                                        Label { text: backendController.translate("العصر"); color: textColor; Layout.fillWidth: true }
+                                        Label { text: tr("العصر"); color: textColor; Layout.fillWidth: true }
                                         SpinBox { id: asrSp; from: -60; to: 60
                                             onValueChanged: { if (_populating) return; backendController.setOffset("asr", value) } }
                                     }
                                     RowLayout { Layout.fillWidth: true
-                                        Label { text: backendController.translate("المغرب"); color: textColor; Layout.fillWidth: true }
+                                        Label { text: tr("المغرب"); color: textColor; Layout.fillWidth: true }
                                         SpinBox { id: maghribSp; from: -60; to: 60
                                             onValueChanged: { if (_populating) return; backendController.setOffset("maghrib", value) } }
                                     }
                                     RowLayout { Layout.fillWidth: true
-                                        Label { text: backendController.translate("العشاء"); color: textColor; Layout.fillWidth: true }
+                                        Label { text: tr("العشاء"); color: textColor; Layout.fillWidth: true }
                                         SpinBox { id: ishaSp; from: -60; to: 60
                                             onValueChanged: { if (_populating) return; backendController.setOffset("isha", value) } }
                                     }
                                     Button {
                                         Layout.fillWidth: true; Layout.preferredHeight: 36; Layout.topMargin: 4
-                                        text: backendController.translate("🔄 إعادة تعيين جميع الإزاحات")
+                                        text: tr("🔄 إعادة تعيين جميع الإزاحات")
                                         onClicked: resetOffsets()
                                     }
                                 }
@@ -526,7 +589,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: backendController.translate("إزاحة التاريخ الهجري"); color: textColor }
+                                label: Label { text: tr("إزاحة التاريخ الهجري"); color: textColor }
                                 background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
                                     SpinBox {
@@ -579,7 +642,7 @@ Dialog {
                     function duplicateMuezzin(idx) {
                         var m = muezzinsModel.get(idx)
                         if (!m) return
-                        var newName = m.name + " (نسخة)"
+                        var newName = m.name + tr(" (نسخة)")
                         var counter = 2
                         while (true) {
                             var exists = false
@@ -587,7 +650,7 @@ Dialog {
                                 if (muezzinsModel.get(i).name === newName) { exists = true; break }
                             }
                             if (!exists) break
-                            newName = m.name + " (نسخة " + counter + ")"
+                            newName = m.name + tr(" (نسخة)") + " " + counter
                             counter++
                         }
                         muezzinsModel.append({ name: newName, path: m.path })
@@ -617,19 +680,19 @@ Dialog {
                                                          elide: Text.ElideMiddle; Layout.fillWidth: true }
                                                  }
                                                   Button {
-                                                      text: backendController.translate("🔊"); implicitWidth: 36; implicitHeight: 36
+                                                      text: tr("🔊"); implicitWidth: 36; implicitHeight: 36
                                                        enabled: modelData && modelData.path !== ""
                                                       onClicked: muezzinsTab.previewMuezzin(index)
                                                   }
                                                  Button {
-                                                     text: backendController.translate("⏹"); implicitWidth: 36; implicitHeight: 36
-                                                     ToolTip.text: backendController.translate("إيقاف المعاينة")
+                                                     text: tr("⏹"); implicitWidth: 36; implicitHeight: 36
+                                                     ToolTip.text: tr("إيقاف المعاينة")
                                                      onClicked: backendController.stopPreview()
                                                  }
                                                   Button {
                                                        text: modelData.path === muezzinsTab.defaultPath ? "⭐" : "☆"
                                                        implicitWidth: 36; implicitHeight: 36
-                                                       ToolTip.text: modelData.path === muezzinsTab.defaultPath ? backendController.translate("المؤذن الافتراضي") : backendController.translate("تعيين كافتراضي")
+                                                       ToolTip.text: modelData.path === muezzinsTab.defaultPath ? tr("المؤذن الافتراضي") : tr("تعيين كافتراضي")
                                                        onClicked: {
                                                            if (modelData.path) {
                                                                backendController.setDefaultMuezzin(modelData.path)
@@ -638,16 +701,16 @@ Dialog {
                                                        }
                                                    }
                                                   Button {
-                                                      text: backendController.translate("📋"); implicitWidth: 36; implicitHeight: 36
-                                                      ToolTip.text: backendController.translate("نسخ المؤذن")
+                                                      text: tr("📋"); implicitWidth: 36; implicitHeight: 36
+                                                      ToolTip.text: tr("نسخ المؤذن")
                                                       onClicked: muezzinsTab.duplicateMuezzin(index)
                                                   }
                                                   Button {
-                                                      text: backendController.translate("📁"); implicitWidth: 36; implicitHeight: 36
+                                                      text: tr("📁"); implicitWidth: 36; implicitHeight: 36
                                                       onClicked: browseMuezzinAudio(index)
                                                   }
                                                   Button {
-                                                      text: backendController.translate("❌"); implicitWidth: 36; implicitHeight: 36
+                                                      text: tr("❌"); implicitWidth: 36; implicitHeight: 36
                                                       onClicked: removeMuezzin(index)
                                                   }
                                              }
@@ -656,7 +719,7 @@ Dialog {
 
                             Button {
                                 Layout.fillWidth: true; Layout.preferredHeight: 40
-                                text: backendController.translate("➕ إضافة مؤذن")
+                                text: tr("➕ إضافة مؤذن")
                                 onClicked: browseMuezzinAudio(-1)
                             }
                         }
@@ -693,7 +756,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: backendController.translate("ملفات الصوت لكل صلاة"); color: textColor; font.bold: true }
+                                label: Label { text: tr("ملفات الصوت لكل صلاة"); color: textColor; font.bold: true }
                                 background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 4
                                     Repeater {
@@ -703,29 +766,29 @@ Dialog {
                                             required property int index
                                             Layout.fillWidth: true
                                             Label { 
-                                                text: modelData && modelData.prayer ? backendController.translatePrayer(modelData.prayer) : ""
+                                                text: modelData && modelData.prayer ? trPrayer(modelData.prayer) : ""
                                                 color: textColor
                                                 Layout.preferredWidth: 60
                                                 font.bold: true
                                             }
                                             Label {
-                                                text: modelData && modelData.path ? modelData.path : backendController.translate("(غير محدد)")
+                                                text: modelData && modelData.path ? modelData.path : tr("(غير محدد)")
                                                 color: modelData && modelData.path ? textColor : secondaryTextColor
                                                 elide: Text.ElideMiddle; Layout.fillWidth: true
                                                 font.pixelSize: 12
                                             }
                                             Button {
-                                                text: backendController.translate("🔊"); implicitWidth: 36; implicitHeight: 36
+                                                text: tr("🔊"); implicitWidth: 36; implicitHeight: 36
                                                 enabled: modelData && modelData.path !== ""
                                                 onClicked: backendController.previewAudio(modelData.path)
                                             }
                                             Button {
-                                                text: backendController.translate("⏹"); implicitWidth: 36; implicitHeight: 36
-                                                ToolTip.text: backendController.translate("إيقاف المعاينة")
+                                                text: tr("⏹"); implicitWidth: 36; implicitHeight: 36
+                                                ToolTip.text: tr("إيقاف المعاينة")
                                                 onClicked: backendController.stopPreview()
                                             }
                                             Button {
-                                                text: backendController.translate("📁"); implicitWidth: 36; implicitHeight: 36
+                                                text: tr("📁"); implicitWidth: 36; implicitHeight: 36
                                                 onClicked: browsePrayerAudio(modelData.prayer)
                                             }
                                         }
@@ -733,7 +796,7 @@ Dialog {
 
                                     Button {
                                         Layout.fillWidth: true; Layout.preferredHeight: 36; Layout.topMargin: 4
-                                        text: backendController.translate("🔊 اختبار الأذان الافتراضي")
+                                        text: tr("🔊 اختبار الأذان الافتراضي")
                                         onClicked: {
                                             var s = backendController.getSettings()
                                             var path = s.audio?.default || s.muezzins?.["افتراضي"] || ""
@@ -745,13 +808,13 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: backendController.translate("الصوت العام"); color: textColor; font.bold: true; ToolTip.text: backendController.translate("إعدادات الصوت العامة للأذان") }
+                                label: Label { text: tr("الصوت العام"); color: textColor; font.bold: true; ToolTip.text: tr("إعدادات الصوت العامة للأذان") }
                                 background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 6
 
                                     RowLayout {
                                         Layout.fillWidth: true
-                                        Label { text: backendController.translate("مستوى الصوت:"); color: textColor; ToolTip.text: backendController.translate("ضبط مستوى صوت الأذان (0-100%)") }
+                                        Label { text: tr("مستوى الصوت:"); color: textColor; ToolTip.text: tr("ضبط مستوى صوت الأذان (0-100%)") }
                                         Slider {
                                             id: volumeSp; Layout.fillWidth: true; from: 0; to: 1; stepSize: 0.05
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("volume", value) }
@@ -760,26 +823,26 @@ Dialog {
                                     }
 
                                     CheckBox {
-                                        id: fadeInCb; text: backendController.translate("تلاشي الدخول (Fade In)")
-                                        ToolTip.text: backendController.translate("يبدأ الأذان بصوت منخفض ويزداد تدريجياً")
+                                        id: fadeInCb; text: tr("تلاشي الدخول (Fade In)")
+                                        ToolTip.text: tr("يبدأ الأذان بصوت منخفض ويزداد تدريجياً")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("fade_in", checked) }
                                     }
 
                                     RowLayout {
                                         Layout.fillWidth: true; visible: fadeInCb.checked
-                                        Label { text: backendController.translate("مدة التلاشي (ثوانٍ):"); color: textColor; Layout.fillWidth: true; ToolTip.text: backendController.translate("مدة الزيادة التدريجية للصوت عند بداية الأذان") }
+                                        Label { text: tr("مدة التلاشي (ثوانٍ):"); color: textColor; Layout.fillWidth: true; ToolTip.text: tr("مدة الزيادة التدريجية للصوت عند بداية الأذان") }
                                         SpinBox { id: fadeDurSp; from: 1; to: 10
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("fade_in_duration", value) } }
                                     }
 
                                     CheckBox {
-                                        id: takbeerCb; text: backendController.translate("تكبير فقط (بدون أذان كامل)")
-                                        ToolTip.text: backendController.translate("يشغل التكبير فقط بدلاً من الأذان الكامل")
+                                        id: takbeerCb; text: tr("تكبير فقط (بدون أذان كامل)")
+                                        ToolTip.text: tr("يشغل التكبير فقط بدلاً من الأذان الكامل")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("takbeer_only", checked) }
                                     }
 
                                     Label {
-                                        text: backendController.translate("ملاحظة: تفعيل \"تكبير فقط\" يشغل التكبير بدلاً من الأذان الكامل")
+                                        text: tr("ملاحظة: تفعيل \"تكبير فقط\" يشغل التكبير بدلاً من الأذان الكامل")
                                         color: secondaryTextColor; font.pixelSize: 11; wrapMode: Text.WordWrap
                                         Layout.fillWidth: true
                                     }
@@ -788,16 +851,16 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: backendController.translate("تفعيل الأذان لكل صلاة"); color: textColor; font.bold: true; ToolTip.text: backendController.translate("تفعيل/إيقاف الأذان لكل صلاة على حدة") }
+                                label: Label { text: tr("تفعيل الأذان لكل صلاة"); color: textColor; font.bold: true; ToolTip.text: tr("تفعيل/إيقاف الأذان لكل صلاة على حدة") }
                                 background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 4
 
                                     Repeater {
                                         model: ["fajr", "dhuhr", "asr", "maghrib", "isha"]
                                         delegate: CheckBox {
-                                            text: backendController.translatePrayer(modelData)
+                                            text: trPrayer(modelData)
                                             checked: backendController.getNestedSetting("azan_enabled." + modelData) !== false
-                                            ToolTip.text: backendController.translate("تفعيل الأذان لصلاة ") + backendController.translatePrayer(modelData)
+                                            ToolTip.text: tr("تفعيل الأذان لصلاة ") + trPrayer(modelData)
                                             onCheckedChanged: backendController.updateSetting("azan_enabled." + modelData, checked)
                                         }
                                     }
@@ -832,15 +895,15 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: backendController.translate("الأذان المبكر"); color: textColor; font.bold: true; ToolTip.text: backendController.translate("إعدادات التنبيه المبكر قبل الأذان") }
+                                label: Label { text: tr("الأذان المبكر"); color: textColor; font.bold: true; ToolTip.text: tr("إعدادات التنبيه المبكر قبل الأذان") }
                                 background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 4
-                                    CheckBox { id: preAzanCb; text: backendController.translate("تفعيل التنبيه المبكر")
-                                        ToolTip.text: backendController.translate("تفعيل التنبيه المبكر قبل الأذان بالدقائق المحددة")
+                                    CheckBox { id: preAzanCb; text: tr("تفعيل التنبيه المبكر")
+                                        ToolTip.text: tr("تفعيل التنبيه المبكر قبل الأذان بالدقائق المحددة")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("pre_azan_enabled", checked) } }
                                     RowLayout {
                                         Layout.leftMargin: 20; visible: preAzanCb.checked
-                                        Label { text: backendController.translate("دقائق قبل الأذان:"); color: textColor; ToolTip.text: backendController.translate("عدد الدقائق قبل الأذان للتنبيه المبكر") }
+                                        Label { text: tr("دقائق قبل الأذان:"); color: textColor; ToolTip.text: tr("عدد الدقائق قبل الأذان للتنبيه المبكر") }
                                         SpinBox { id: preAzanSp; from: 1; to: 60
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("pre_azan_minutes", value) } }
                                     }
@@ -849,24 +912,24 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: backendController.translate("عدم الإزعاج (DND)"); color: textColor; font.bold: true; ToolTip.text: backendController.translate("إيقاف الإشعارات النظامية في أوقات محددة") }
+                                label: Label { text: tr("عدم الإزعاج (DND)"); color: textColor; font.bold: true; ToolTip.text: tr("إيقاف الإشعارات النظامية في أوقات محددة") }
                                 background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 4
-                                    CheckBox { id: dndCb; text: backendController.translate("تفعيل DND")
-                                        ToolTip.text: backendController.translate("إيقاف إشعارات النظام خلال فترة DND")
+                                    CheckBox { id: dndCb; text: tr("تفعيل DND")
+                                        ToolTip.text: tr("إيقاف إشعارات النظام خلال فترة DND")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("dnd_enabled", checked) } }
                                     RowLayout {
                                         Layout.leftMargin: 20; visible: dndCb.checked
-                                        Label { text: backendController.translate("من الساعة:"); color: textColor; ToolTip.text: backendController.translate("ساعة بداية فترة DND") }
+                                        Label { text: tr("من الساعة:"); color: textColor; ToolTip.text: tr("ساعة بداية فترة DND") }
                                         SpinBox { id: dndFromSp; from: 0; to: 23
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("dnd_from", value) } }
-                                        Label { text: backendController.translate("إلى الساعة:"); color: textColor; ToolTip.text: backendController.translate("ساعة نهاية فترة DND") }
+                                        Label { text: tr("إلى الساعة:"); color: textColor; ToolTip.text: tr("ساعة نهاية فترة DND") }
                                         SpinBox { id: dndToSp; from: 0; to: 23
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("dnd_to", value) } }
                                     }
                                     RowLayout {
                                         Layout.leftMargin: 20; visible: dndCb.checked
-                                        Label { text: backendController.translate("مدة بعد الصلاة (دقيقة):"); color: textColor; ToolTip.text: backendController.translate("مدة تفعيل DND بعد كل صلاة") }
+                                        Label { text: tr("مدة بعد الصلاة (دقيقة):"); color: textColor; ToolTip.text: tr("مدة تفعيل DND بعد كل صلاة") }
                                         SpinBox { id: dndDurSp; from: 5; to: 120
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("dnd_duration", value) } }
                                     }
@@ -875,11 +938,11 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: backendController.translate("الوضع الصامت"); color: textColor; font.bold: true; ToolTip.text: backendController.translate("كتم جميع الأصوات والتنبيهات") }
+                                label: Label { text: tr("الوضع الصامت"); color: textColor; font.bold: true; ToolTip.text: tr("كتم جميع الأصوات والتنبيهات") }
                                 background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
-                                    CheckBox { id: silentCb; text: backendController.translate("الوضع الصامت")
-                                        ToolTip.text: backendController.translate("كتم جميع أصوات الأذان والإشعارات")
+                                    CheckBox { id: silentCb; text: tr("الوضع الصامت")
+                                        ToolTip.text: tr("كتم جميع أصوات الأذان والإشعارات")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("silent_mode", checked) } }
                                 }
                             }
@@ -914,21 +977,21 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: backendController.translate("الأذكار"); color: textColor; font.bold: true; ToolTip.text: backendController.translate("إعدادات الأذكار بعد الصلاة") }
+                                label: Label { text: tr("الأذكار"); color: textColor; font.bold: true; ToolTip.text: tr("إعدادات الأذكار بعد الصلاة") }
                                 background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 6
                                     RowLayout {
                                         Layout.fillWidth: true
-                                        Label { text: backendController.translate("عدد مرات التكرار:"); color: textColor; ToolTip.text: backendController.translate("عدد مرات تكرار كل ذكر") }
+                                        Label { text: tr("عدد مرات التكرار:"); color: textColor; ToolTip.text: tr("عدد مرات تكرار كل ذكر") }
                                         SpinBox { id: athkarCountSp; from: 1; to: 99
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("athkarCount", value) } }
                                     }
                                     RowLayout {
                                         Layout.fillWidth: true
-                                        Label { text: backendController.translate("طريقة العرض:"); color: textColor; ToolTip.text: backendController.translate("متى تظهر الأذكار: بعد كل صلاة، في وقت محدد، أو كلاهما") }
+                                        Label { text: tr("طريقة العرض:"); color: textColor; ToolTip.text: tr("متى تظهر الأذكار: بعد كل صلاة، في وقت محدد، أو كلاهما") }
                                         ComboBox {
                                             id: athkarMethodCb; Layout.fillWidth: true
-                                            model: [backendController.translate("بعد الصلاة"), backendController.translate("وقت محدد"), backendController.translate("كلاهما")]
+                                            model: [tr("بعد الصلاة"), tr("وقت محدد"), tr("كلاهما")]
                                             onCurrentIndexChanged: {
                                                 if (_populating) return
                                                 var opts = ["after_prayer", "specific_time", "both"]
@@ -941,32 +1004,32 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: backendController.translate("النافذة المنبثقة للأذكار"); color: textColor; font.bold: true; ToolTip.text: backendController.translate("إعدادات النافذة المنبثقة التي تظهر الأذكار") }
+                                label: Label { text: tr("النافذة المنبثقة للأذكار"); color: textColor; font.bold: true; ToolTip.text: tr("إعدادات النافذة المنبثقة التي تظهر الأذكار") }
                                 background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 6
-                                    CheckBox { id: popupEnabledCb; text: backendController.translate("تفعيل النافذة المنبثقة")
-                                        ToolTip.text: backendController.translate("عرض نافذة منبثقة بالأذكار بعد كل صلاة")
+                                    CheckBox { id: popupEnabledCb; text: tr("تفعيل النافذة المنبثقة")
+                                        ToolTip.text: tr("عرض نافذة منبثقة بالأذكار بعد كل صلاة")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("athkar_popup_enabled", checked) } }
                                     RowLayout {
                                         Layout.fillWidth: true; visible: popupEnabledCb.checked
-                                        Label { text: backendController.translate("مدة العرض (ثوانٍ):"); color: textColor; ToolTip.text: backendController.translate("مدة بقاء النافذة المنبثقة ظاهرة قبل الإغلاق التلقائي") }
+                                        Label { text: tr("مدة العرض (ثوانٍ):"); color: textColor; ToolTip.text: tr("مدة بقاء النافذة المنبثقة ظاهرة قبل الإغلاق التلقائي") }
                                         SpinBox { id: popupDurSp; from: 5; to: 600
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("athkar_popup_duration", value) } }
                                     }
                                     RowLayout {
                                         Layout.fillWidth: true; visible: popupEnabledCb.checked
-                                        Label { text: backendController.translate("تأخير الظهور (ثوانٍ):"); color: textColor; ToolTip.text: backendController.translate("تأخير ظهور النافذة بعد انتهاء الصلاة") }
+                                        Label { text: tr("تأخير الظهور (ثوانٍ):"); color: textColor; ToolTip.text: tr("تأخير ظهور النافذة بعد انتهاء الصلاة") }
                                         SpinBox { id: popupDelaySp; from: 0; to: 300
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("athkar_popup_delay", value) } }
                                     }
                                     Button {
                                         Layout.fillWidth: true; Layout.preferredHeight: 36; Layout.topMargin: 4; visible: popupEnabledCb.checked
-                                        text: backendController.translate("🧪 اختبار النافذة المنبثقة")
+                                        text: tr("🧪 اختبار النافذة المنبثقة")
                                         onClicked: {
                                             var provider = prayerEngine ? prayerEngine.getAthkarProvider() : null
                                             if (provider) {
-                                                provider.setPrayerAthkar("fajr", backendController.translate("اختبار الأذكار"))
-                                                prayerEngine.athkarShown("fajr", backendController.translate("اختبار الأذكار"), 5000, backendController.translate("هذا اختبار للنافذة المنبثقة للأذكار"), true)
+                                                provider.setPrayerAthkar("fajr", tr("اختبار الأذكار"))
+                                                prayerEngine.athkarShown("fajr", tr("اختبار الأذكار"), 5000, tr("هذا اختبار للنافذة المنبثقة للأذكار"), true)
                                             }
                                         }
                                     }
@@ -982,10 +1045,10 @@ Dialog {
                                 _populating = true
                                 try {
                                     var s = backendController.getSettings()
-                                    langCombo.model = backendController.getLanguages()
+                                    langCombo.model = l10n ? l10n.languages : []
                                     var langIdx = -1
                                     for (var i = 0; i < langCombo.model.length; i++) {
-                                        if (langCombo.model[i].code === s.language) {
+                                        if (langCombo.model[i].code === (l10n ? l10n.currentLanguage : s.language)) {
                                             langIdx = i
                                             break
                                         }
@@ -1032,7 +1095,7 @@ Dialog {
                                 backendController.importSettings(path)
                                 populate()
                             }
-                            importDialog.nameFilters = [backendController.translate("ملفات JSON (*.json)")]
+                            importDialog.nameFilters = [tr("ملفات JSON (*.json)")]
                             importDialog.open()
                         }
 
@@ -1043,16 +1106,17 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: backendController.translate("اللغة"); color: textColor; font.bold: true; ToolTip.text: backendController.translate("اختيار لغة واجهة التطبيق") }
+                                label: Label { text: tr("اللغة"); color: textColor; font.bold: true; ToolTip.text: tr("اختيار لغة واجهة التطبيق") }
                                 background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
                     ComboBox { id: langCombo; Layout.fillWidth: true
-                        model: backendController.getLanguages()
+                        model: l10n ? l10n.languages : []
                         textRole: "name"
                         onCurrentIndexChanged: {
                             if (_populating) return
                             if (currentIndex >= 0 && currentIndex < model.length) {
                                 var langCode = model[currentIndex].code
+                                l10n.setLanguage(langCode)
                                 backendController.updateSetting("language", langCode)
                             }
                         }
@@ -1062,7 +1126,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: backendController.translate("المظهر"); color: textColor; font.bold: true; ToolTip.text: backendController.translate("اختيار سمة ألوان التطبيق") }
+                                label: Label { text: tr("المظهر"); color: textColor; font.bold: true; ToolTip.text: tr("اختيار سمة ألوان التطبيق") }
                                 background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
                                     ComboBox { id: themeCombo; Layout.fillWidth: true
@@ -1080,47 +1144,47 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: backendController.translate("بدء التشغيل التلقائي"); color: textColor; font.bold: true; ToolTip.text: backendController.translate("تشغيل التطبيق تلقائياً عند بدء تشغيل النظام") }
+                                label: Label { text: tr("بدء التشغيل التلقائي"); color: textColor; font.bold: true; ToolTip.text: tr("تشغيل التطبيق تلقائياً عند بدء تشغيل النظام") }
                                 background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
-                                    CheckBox { id: autostartCb; text: backendController.translate("تشغيل التطبيق تلقائياً عند بدء النظام")
-                                        ToolTip.text: backendController.translate("إضافة التطبيق لبرامج بدء التشغيل")
+                                    CheckBox { id: autostartCb; text: tr("تشغيل التطبيق تلقائياً عند بدء النظام")
+                                        ToolTip.text: tr("إضافة التطبيق لبرامج بدء التشغيل")
                                         onCheckedChanged: { if (_populating) return; backendController.setAutostart(checked) } }
                                 }
                             }
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: backendController.translate("وضع النوم"); color: textColor; font.bold: true; ToolTip.text: backendController.translate("إعدادات وضع النوم عند الإغلاق") }
+                                label: Label { text: tr("وضع النوم"); color: textColor; font.bold: true; ToolTip.text: tr("إعدادات وضع النوم عند الإغلاق") }
                                 background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
-                                    CheckBox { id: sleepModeCbGeneral; text: backendController.translate("العمل في الخلفية عند الإغلاق (Sleep Mode)")
-                                        ToolTip.text: backendController.translate("إبقاء التطبيق يعمل في علبة النظام عند إغلاق النافذة")
+                                    CheckBox { id: sleepModeCbGeneral; text: tr("العمل في الخلفية عند الإغلاق (Sleep Mode)")
+                                        ToolTip.text: tr("إبقاء التطبيق يعمل في علبة النظام عند إغلاق النافذة")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("sleep_mode", checked) } }
                                 }
                             }
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: backendController.translate("صورة الخلفية"); color: textColor; font.bold: true; ToolTip.text: backendController.translate("تفعيل أو تعطيل صورة الخلفية في الواجهة الرئيسية") }
+                                label: Label { text: tr("صورة الخلفية"); color: textColor; font.bold: true; ToolTip.text: tr("تفعيل أو تعطيل صورة الخلفية في الواجهة الرئيسية") }
                                 background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
-                                    CheckBox { id: backgroundEnabledCb; text: backendController.translate("إظهار صورة الخلفية")
-                                        ToolTip.text: backendController.translate("تفعيل/تعطيل صورة المسجد النبوي في الخلفية")
+                                    CheckBox { id: backgroundEnabledCb; text: tr("إظهار صورة الخلفية")
+                                        ToolTip.text: tr("تفعيل/تعطيل صورة المسجد النبوي في الخلفية")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("background_enabled", checked) } }
                                 }
                             }
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: backendController.translate("المنطقة الزمنية"); color: textColor; font.bold: true; ToolTip.text: backendController.translate("اختيار المنطقة الزمنية لحساب مواقيت الصلاة") }
+                                label: Label { text: tr("المنطقة الزمنية"); color: textColor; font.bold: true; ToolTip.text: tr("اختيار المنطقة الزمنية لحساب مواقيت الصلاة") }
                                 background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
                                     ComboBox { id: timezoneCombo; Layout.fillWidth: true
                                         model: backendController.getTimezones()
                                         textRole: "name"
                                         valueRole: "code"
-                                        ToolTip.text: backendController.translate("اختيار المنطقة الزمنية لحساب مواقيت الصلاة بدقة")
+                                        ToolTip.text: tr("اختيار المنطقة الزمنية لحساب مواقيت الصلاة بدقة")
                                         onCurrentIndexChanged: {
                                             if (_populating || currentIndex < 0 || currentIndex >= model.length) return
                                             var tz = model[currentIndex]
@@ -1132,22 +1196,22 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: backendController.translate("إدارة الإعدادات"); color: textColor; font.bold: true; ToolTip.text: backendController.translate("استيراد/تصدير/إعادة تعيين الإعدادات") }
+                                label: Label { text: tr("إدارة الإعدادات"); color: textColor; font.bold: true; ToolTip.text: tr("استيراد/تصدير/إعادة تعيين الإعدادات") }
                                 background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 6
                                     Button {
                                         Layout.fillWidth: true; Layout.preferredHeight: 36
-                                        text: backendController.translate("📤 تصدير الإعدادات")
+                                        text: tr("📤 تصدير الإعدادات")
                                         onClicked: exportSettings()
                                     }
                                     Button {
                                         Layout.fillWidth: true; Layout.preferredHeight: 36
-                                        text: backendController.translate("📥 استيراد الإعدادات")
+                                        text: tr("📥 استيراد الإعدادات")
                                         onClicked: importSettings()
                                     }
                                     Button {
                                         Layout.fillWidth: true; Layout.preferredHeight: 36
-                                        text: backendController.translate("🔄 إعادة تعيين للإعدادات الافتراضية")
+                                        text: tr("🔄 إعادة تعيين للإعدادات الافتراضية")
                                         onClicked: resetAllSettings()
                                     }
                                 }
@@ -1173,7 +1237,8 @@ Dialog {
             Item { Layout.fillWidth: true }
 
             Button {
-                text: backendController.translate("💾 حفظ")
+                id: saveBtn
+                text: tr("💾 حفظ")
                 Layout.preferredHeight: 36
                 onClicked: {
                     backendController.commitSettings()
@@ -1182,7 +1247,8 @@ Dialog {
             }
 
             Button {
-                text: backendController.translate("❌ إلغاء")
+                id: cancelBtn
+                text: tr("❌ إلغاء")
                 Layout.preferredHeight: 36
                 onClicked: root.close()
             }
@@ -1191,11 +1257,15 @@ Dialog {
 
     Dialog {
         id: resetConfirmDlg
-        title: backendController.translate("🔄 إعادة تعيين")
+        title: tr("🔄 إعادة تعيين")
         standardButtons: Dialog.Yes | Dialog.No
         modal: true
         anchors.centerIn: parent
-        Label { text: backendController.translate("هل أنت متأكد من إعادة تعيين جميع الإعدادات؟"); color: _pal.text }
+        Label {
+            id: resetConfirmDlgLabel
+            text: tr("هل أنت متأكد من إعادة تعيين جميع الإعدادات؟")
+            color: _pal.text
+        }
         onAccepted: {
             backendController.resetAllSettings()
             locationTab.populate()
@@ -1210,8 +1280,8 @@ Dialog {
 
     FileDialog {
         id: importDialog
-        title: backendController.translate("اختر ملف إعدادات")
-        nameFilters: [backendController.translate("ملفات JSON (*.json)")]
+        title: tr("اختر ملف إعدادات")
+        nameFilters: [tr("ملفات JSON (*.json)")]
         fileMode: FileDialog.OpenFile
         property var _callback: null
         onAccepted: {
