@@ -9,140 +9,182 @@ from datetime import date, datetime, timedelta, timezone
 from typing import Dict, Optional, Tuple
 import logging
 import math
+import threading
 
 logger = logging.getLogger(__name__)
 
-# ---------------------------------------------------------------------------
-# Lazy-loaded data
-# ---------------------------------------------------------------------------
 
 _CALCULATION_METHODS: dict | None = None
 _COUNTRY_DATA: tuple | None = None
 _OFFSETS_CACHE: dict[int, tuple] = {}
+_OFFSETS_LOCK = threading.Lock()
 
 
 def _get_calc_methods() -> Dict[str, dict]:
     global _CALCULATION_METHODS
     if _CALCULATION_METHODS is None:
         import adhan.methods as methods
+
         _CALCULATION_METHODS = {
-            # --- Methods with adhan built-in enums ---
             "رابطة العالم الإسلامي (MWL)": methods.MUSLIM_WORLD_LEAGUE,
             "أم القرى (Umm Al-Qura)": methods.MAKKAH,
             "الهيئة المصرية للمساحة": methods.EGYPT,
             "جامعة العلوم الإسلامية كراتشي": methods.KARACHI,
             "الجمعية الإسلامية لأمريكا الشمالية (ISNA)": methods.ISNA,
             "طهران": methods.TEHRAN,
-
-            # --- Custom parameter methods (for precise local conventions) ---
-            # Southeast Asia
             "إندونيسيا (وزارة الشؤون الدينية)": {
-                "fajr_angle": 20.0, "isha_angle": 18.0,
-                "dhuhr_interval": 0, "maghrib_interval": 2,
+                "fajr_angle": 20.0,
+                "isha_angle": 18.0,
+                "dhuhr_interval": 0,
+                "maghrib_interval": 2,
             },
             "ماليزيا (JAKIM)": {
-                "fajr_angle": 20.0, "isha_angle": 18.0,
-                "dhuhr_interval": 0, "maghrib_interval": 2,
+                "fajr_angle": 20.0,
+                "isha_angle": 18.0,
+                "dhuhr_interval": 0,
+                "maghrib_interval": 2,
             },
             "سنغافورة (MUIS)": {
-                "fajr_angle": 20.0, "isha_angle": 18.0,
-                "dhuhr_interval": 0, "maghrib_interval": 2,
+                "fajr_angle": 20.0,
+                "isha_angle": 18.0,
+                "dhuhr_interval": 0,
+                "maghrib_interval": 2,
             },
-
-            # North Africa / Maghreb
             "وزارة الشؤون الدينية التونسية": {
-                "fajr_angle": 18.0, "isha_angle": 18.0,
-                "dhuhr_interval": 0, "maghrib_interval": 2,
+                "fajr_angle": 18.0,
+                "isha_angle": 18.0,
+                "dhuhr_interval": 0,
+                "maghrib_interval": 2,
             },
             "الجزائر": {
-                "fajr_angle": 18.0, "isha_angle": 17.0,
-                "dhuhr_interval": 0, "maghrib_interval": 2,
+                "fajr_angle": 18.0,
+                "isha_angle": 17.0,
+                "dhuhr_interval": 0,
+                "maghrib_interval": 2,
             },
             "المغرب": {
-                "fajr_angle": 19.0, "isha_angle": 17.0,
-                "dhuhr_interval": 0, "maghrib_interval": 2,
+                "fajr_angle": 19.0,
+                "isha_angle": 17.0,
+                "dhuhr_interval": 0,
+                "maghrib_interval": 2,
             },
             "ليبيا": {
-                "fajr_angle": 18.5, "isha_angle": 17.5,
-                "dhuhr_interval": 0, "maghrib_interval": 2,
+                "fajr_angle": 18.5,
+                "isha_angle": 17.5,
+                "dhuhr_interval": 0,
+                "maghrib_interval": 2,
             },
             "موريتانيا": {
-                "fajr_angle": 18.0, "isha_angle": 18.0,
-                "dhuhr_interval": 0, "maghrib_interval": 2,
+                "fajr_angle": 18.0,
+                "isha_angle": 18.0,
+                "dhuhr_interval": 0,
+                "maghrib_interval": 2,
             },
             "السودان": {
-                "fajr_angle": 19.5, "isha_angle": 17.5,
-                "dhuhr_interval": 0, "maghrib_interval": 2,
+                "fajr_angle": 19.5,
+                "isha_angle": 17.5,
+                "dhuhr_interval": 0,
+                "maghrib_interval": 2,
             },
-
-            # Levant / Iraq
             "سوريا (وزارة الأوقاف)": {
-                "fajr_angle": 19.5, "isha_angle": 17.5,
-                "dhuhr_interval": 0, "maghrib_interval": 2,
+                "fajr_angle": 19.5,
+                "isha_angle": 17.5,
+                "dhuhr_interval": 0,
+                "maghrib_interval": 2,
             },
             "العراق": {
-                "fajr_angle": 17.5, "isha_angle": 17.5,
-                "dhuhr_interval": 0, "maghrib_interval": 2,
+                "fajr_angle": 17.5,
+                "isha_angle": 17.5,
+                "dhuhr_interval": 0,
+                "maghrib_interval": 2,
             },
             "فلسطين (وزارة الأوقاف)": {
-                "fajr_angle": 17.5, "isha_angle": 17.5,
-                "dhuhr_interval": 0, "maghrib_interval": 2,
+                "fajr_angle": 17.5,
+                "isha_angle": 17.5,
+                "dhuhr_interval": 0,
+                "maghrib_interval": 2,
             },
-
-            # Europe / Turkey / Russia
             "ديانة تركيا (Diyanet)": {
-                "fajr_angle": 18.0, "isha_angle": 17.0,
-                "dhuhr_interval": 0, "maghrib_interval": 2,
+                "fajr_angle": 18.0,
+                "isha_angle": 17.0,
+                "dhuhr_interval": 0,
+                "maghrib_interval": 2,
             },
             "روسيا (اتحاد المسلمين)": {
-                "fajr_angle": 16.0, "isha_angle": 15.0,
-                "dhuhr_interval": 0, "maghrib_interval": 2,
+                "fajr_angle": 16.0,
+                "isha_angle": 15.0,
+                "dhuhr_interval": 0,
+                "maghrib_interval": 2,
             },
             "اتحاد المنظمات الإسلامية في فرنسا (UOIF)": {
-                "fajr_angle": 12.0, "isha_angle": 12.0,
-                "dhuhr_interval": 0, "maghrib_interval": 2,
+                "fajr_angle": 12.0,
+                "isha_angle": 12.0,
+                "dhuhr_interval": 0,
+                "maghrib_interval": 2,
             },
-
-            # Arabian Peninsula
             "الهيئة العامة للشؤون الإسلامية (الإمارات)": {
-                "fajr_angle": 18.5, "isha_angle": 18.5,
-                "dhuhr_interval": 0, "maghrib_interval": 2,
+                "fajr_angle": 18.5,
+                "isha_angle": 18.5,
+                "dhuhr_interval": 0,
+                "maghrib_interval": 2,
                 "isha_interval": 90,
             },
             "وزارة الأوقاف القطرية": {
-                "fajr_angle": 18.0, "isha_angle": 18.0,
-                "dhuhr_interval": 0, "maghrib_interval": 2,
+                "fajr_angle": 18.0,
+                "isha_angle": 18.0,
+                "dhuhr_interval": 0,
+                "maghrib_interval": 2,
             },
             "وزارة الأوقاف الكويتية": {
-                "fajr_angle": 18.0, "isha_angle": 17.5,
-                "dhuhr_interval": 0, "maghrib_interval": 2,
+                "fajr_angle": 18.0,
+                "isha_angle": 17.5,
+                "dhuhr_interval": 0,
+                "maghrib_interval": 2,
             },
             "اليمن": {
-                "fajr_angle": 18.2, "isha_angle": 18.2,
-                "dhuhr_interval": 0, "maghrib_interval": 2,
+                "fajr_angle": 18.2,
+                "isha_angle": 18.2,
+                "dhuhr_interval": 0,
+                "maghrib_interval": 2,
             },
-
-            # South Asia
             "طريقة فاروقي (باكستان/شمال الهند)": {
-                "fajr_angle": 18.0, "isha_angle": 18.0,
-                "dhuhr_interval": 0, "maghrib_interval": 2,
+                "fajr_angle": 18.0,
+                "isha_angle": 18.0,
+                "dhuhr_interval": 0,
+                "maghrib_interval": 2,
             },
-
-            # Custom
             "مخصص": {
-                "fajr_angle": 18.0, "isha_angle": 17.0,
-                "dhuhr_interval": 0, "maghrib_interval": 2,
+                "fajr_angle": 18.0,
+                "isha_angle": 17.0,
+                "dhuhr_interval": 0,
+                "maghrib_interval": 2,
             },
         }
     return _CALCULATION_METHODS
+
+
+def clear_country_data():
+    """Clear the cached country data to free memory."""
+    global _COUNTRY_DATA
+    _COUNTRY_DATA = None
+
+
+def clear_calculation_cache():
+    """Clear the LRU cached prayer calculations and offsets cache."""
+    _calculate_cached.cache_clear()
+    with _OFFSETS_LOCK:
+        _OFFSETS_CACHE.clear()
 
 
 def _get_country_data():
     global _COUNTRY_DATA
     if _COUNTRY_DATA is None:
         from .countries_data import (
-            COUNTRY_METHODS, COUNTRIES, COUNTRY_CITIES,
+            COUNTRY_METHODS,
+            COUNTRIES,
+            COUNTRY_CITIES,
         )
+
         _COUNTRY_DATA = (COUNTRY_METHODS, COUNTRIES, COUNTRY_CITIES)
     return _COUNTRY_DATA
 
@@ -151,26 +193,12 @@ def _get_methods_for(name: str) -> dict | None:
     return _get_calc_methods().get(name)
 
 
-# Keep small data as module-level constants
 SUNRISE_ANGLE = 0.833
-
-PRAYER_NAMES: Dict[str, str] = {
-    "fajr": "الفجر",
-    "sunrise": "الشروق",
-    "dhuhr": "الظهر",
-    "jumuah": "الجمعة",
-    "asr": "العصر",
-    "maghrib": "المغرب",
-    "isha": "العشاء",
-}
 
 PRAYER_ORDER: list = ["fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha"]
 OFFSET_KEYS = {"fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha"}
 
 
-# ---------------------------------------------------------------------------
-# Module-level __getattr__ for backward compatibility
-# ---------------------------------------------------------------------------
 def __getattr__(name):
     if name == "CALCULATION_METHODS":
         return _get_calc_methods()
@@ -183,9 +211,6 @@ def __getattr__(name):
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
 def _utc_hour_to_local_dt(
     utc_hour: float,
     target_date: date,
@@ -197,20 +222,24 @@ def _utc_hour_to_local_dt(
     m = (remaining % 3600) // 60
     s = remaining % 60
     dt_utc = datetime(
-        target_date.year, target_date.month, target_date.day,
-        h, m, s, tzinfo=timezone.utc,
+        target_date.year,
+        target_date.month,
+        target_date.day,
+        h,
+        m,
+        s,
+        tzinfo=timezone.utc,
     ) + timedelta(days=days)
     if tz is None:
         return dt_utc.replace(tzinfo=None)
     return dt_utc.astimezone(tz).replace(tzinfo=None)
 
 
-def _resolve_timezone(
-    tz_name: str | None, longitude: float
-) -> timezone | None:
+def _resolve_timezone(tz_name: str | None, longitude: float) -> timezone | None:
     if tz_name:
         try:
             from zoneinfo import ZoneInfo
+
             return ZoneInfo(tz_name)
         except (KeyError, OSError, TypeError):
             logger.warning("ZoneInfo not found for '%s', falling back to longitude offset", tz_name)
@@ -218,9 +247,6 @@ def _resolve_timezone(
     return timezone(timedelta(hours=hours))
 
 
-# ---------------------------------------------------------------------------
-# Data container
-# ---------------------------------------------------------------------------
 @dataclass
 class PrayerTimesResult:
     fajr: datetime
@@ -237,16 +263,21 @@ class PrayerTimesResult:
     def as_dict(self) -> Dict[str, datetime]:
         if self._cached_dict is None:
             self._cached_dict = {
-                "fajr": self.fajr, "sunrise": self.sunrise,
-                "dhuhr": self.dhuhr, "asr": self.asr,
-                "maghrib": self.maghrib, "isha": self.isha,
+                "fajr": self.fajr,
+                "sunrise": self.sunrise,
+                "dhuhr": self.dhuhr,
+                "asr": self.asr,
+                "maghrib": self.maghrib,
+                "isha": self.isha,
             }
         return self._cached_dict
 
     def _ordered_prayers(self) -> list:
         return [(k, self.as_dict()[k]) for k in PRAYER_ORDER]
 
-    def next_prayer(self, now: Optional[datetime] = None) -> Tuple[str, datetime]:
+    def next_prayer(
+        self, now: Optional[datetime] = None, tomorrow_fajr: Optional[datetime] = None
+    ) -> Tuple[str, datetime]:
         if now is None:
             now = datetime.now()
         for name, time in self._ordered_prayers():
@@ -254,6 +285,8 @@ class PrayerTimesResult:
                 continue
             if time > now:
                 return name, time
+        if tomorrow_fajr is not None:
+            return "fajr", tomorrow_fajr
         return "fajr", self.fajr + timedelta(days=1)
 
     def remaining(self, now: Optional[datetime] = None) -> timedelta:
@@ -265,14 +298,9 @@ class PrayerTimesResult:
         return timedelta(0)
 
     def with_offsets(self, offsets: Dict[str, int]):
-        kwargs = {k: self.as_dict()[k] + timedelta(minutes=offsets.get(k, 0))
-                  for k in PRAYER_ORDER}
+        kwargs = {k: self.as_dict()[k] + timedelta(minutes=offsets.get(k, 0)) for k in PRAYER_ORDER}
         return PrayerTimesResult(**kwargs, calc_date=self.calc_date)
 
-
-# ---------------------------------------------------------------------------
-# Main calculation (cached)
-# ---------------------------------------------------------------------------
 
 @functools.lru_cache(maxsize=128)
 def _calculate_cached(
@@ -289,7 +317,6 @@ def _calculate_cached(
         import adhan.methods as methods
 
         target_date = date.fromisoformat(target_date_iso)
-        # Convert string keys back to floats
         latitude = float(lat_key)
         longitude = float(lon_key)
         tz = _resolve_timezone(tz_name, longitude)
@@ -315,18 +342,6 @@ def _calculate_cached(
 
         maghrib = _utc_hour_to_local_dt(zuhr_utc + abs(sr_offset), target_date, tz)
 
-        isha_angle = params.get("isha_angle")
-        if isha_angle is not None:
-            isha_offset = calc.compute_time_at_sun_angle(target_date, latitude, isha_angle)
-            isha = _utc_hour_to_local_dt(zuhr_utc + abs(isha_offset), target_date, tz)
-        elif "isha_interval" in params:
-            isha = maghrib + timedelta(minutes=params["isha_interval"])
-        elif "isha_delay" in params:
-            isha = maghrib + timedelta(hours=params["isha_delay"])
-        else:
-            isha = maghrib + timedelta(minutes=90)
-
-        # Apply Dhuhr and Maghrib adjustments if specified
         dhuhr_adj = params.get("dhuhr_interval", params.get("dhuhr", 0))
         maghrib_adj = params.get("maghrib_interval", params.get("maghrib", 0))
         if dhuhr_adj:
@@ -334,15 +349,27 @@ def _calculate_cached(
         if maghrib_adj:
             maghrib = maghrib + timedelta(minutes=maghrib_adj)
 
+        if "isha_interval" in params:
+            isha = maghrib + timedelta(minutes=params["isha_interval"])
+        else:
+            isha_angle = params.get("isha_angle")
+            if isha_angle is not None:
+                isha_offset = calc.compute_time_at_sun_angle(target_date, latitude, isha_angle)
+                isha = _utc_hour_to_local_dt(zuhr_utc + abs(isha_offset), target_date, tz)
+            elif "isha_delay" in params:
+                isha = maghrib + timedelta(hours=params["isha_delay"])
+            else:
+                isha = maghrib + timedelta(minutes=90)
+
         result = PrayerTimesResult(
-            fajr=fajr, sunrise=sunrise, dhuhr=zuhr,
-            asr=asr, maghrib=maghrib, isha=isha,
+            fajr=fajr,
+            sunrise=sunrise,
+            dhuhr=zuhr,
+            asr=asr,
+            maghrib=maghrib,
+            isha=isha,
             calc_date=target_date,
         )
-
-        method_offsets = {k: v for k, v in params.items() if k in OFFSET_KEYS}
-        if method_offsets:
-            result = result.with_offsets(method_offsets)
 
         offsets = dict(offsets_tuple) if offsets_tuple else {}
         if offsets:
@@ -359,12 +386,11 @@ def calculate(
     latitude: float,
     longitude: float,
     target_date: Optional[date] = None,
-    method_name: str = "تونس",
+    method_name: str = "ماليزيا (JAKIM)",
     madhab: str = "shafi",
     tz_name: Optional[str] = None,
     offsets: Optional[Dict[str, int]] = None,
 ) -> Optional[PrayerTimesResult]:
-    # Round coordinates to 6 decimal places (~0.1m accuracy) for cache key stability
     lat_key = f"{latitude:.6f}"
     lon_key = f"{longitude:.6f}"
 
@@ -375,20 +401,22 @@ def calculate(
         else:
             target_date = date.today()
 
-    # Cache offsets tuple creation - offsets dict is small and rarely changes
-    # Use hash of tuple for stable cache key regardless of object identity
     offsets_tuple = ()
     if offsets:
-        # Create a stable hash key from the offsets content
         offsets_key = tuple(sorted(offsets.items()))
-        offsets_tuple = _OFFSETS_CACHE.get(offsets_key, offsets_key)
-        if offsets_key not in _OFFSETS_CACHE:
-            _OFFSETS_CACHE[offsets_key] = offsets_key
-            # Limit cache size
-            if len(_OFFSETS_CACHE) > 32:
-                _OFFSETS_CACHE.pop(next(iter(_OFFSETS_CACHE)))
+        with _OFFSETS_LOCK:
+            offsets_tuple = _OFFSETS_CACHE.get(offsets_key, offsets_key)
+            if offsets_key not in _OFFSETS_CACHE:
+                _OFFSETS_CACHE[offsets_key] = offsets_key
+                if len(_OFFSETS_CACHE) > 32:
+                    _OFFSETS_CACHE.pop(next(iter(_OFFSETS_CACHE)))
 
     return _calculate_cached(
-        lat_key, lon_key, target_date.isoformat(),
-        method_name, madhab, tz_name, offsets_tuple,
+        lat_key,
+        lon_key,
+        target_date.isoformat(),
+        method_name,
+        madhab,
+        tz_name,
+        offsets_tuple,
     )

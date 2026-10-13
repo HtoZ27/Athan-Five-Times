@@ -2,12 +2,13 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Window
+import Qt5Compat.GraphicalEffects
 import Theme 1.0
 
 ApplicationWindow {
     id: appWindow
     visible: true
-    minimumWidth: 459
+    minimumWidth: 460
     minimumHeight: 795
     maximumWidth: 1590
     maximumHeight: 1080
@@ -25,13 +26,11 @@ ApplicationWindow {
     property bool backgroundEnabled: true
 
     function tr(key) {
+        if (typeof l10n === "undefined" || l10n === null
+                || typeof backendController === "undefined" || backendController === null)
+            return key
         var _ = l10n.currentLanguage
         return backendController.translate(key)
-    }
-
-    function trPrayer(key) {
-        var _ = l10n.currentLanguage
-        return backendController.translatePrayer(key)
     }
 
     Connections {
@@ -41,43 +40,15 @@ ApplicationWindow {
         }
     }
 
-    // Reactive palette - updates when themeController.resolvedTheme changes
-    property var _pal: Theme.resolvePalette(themeController ? themeController.resolvedTheme : "light")
-
-    // Color properties - updated when theme changes
-    property color bgColor: _pal.background
-    property color cardColor: _pal.surface
-    property color textColor: _pal.text
-    property color textMutedColor: _pal.textMuted
-    property color accentColor: _pal.primary
-    property color borderColor: _pal.border
-    property color warningColor: _pal.warning
-    property color dangerColor: _pal.error
-
-    // Force _pal and colors update when themeController.resolvedTheme changes
-    Connections {
-        target: themeController
-        function onResolvedThemeChanged(resolvedTheme) {
-            _pal = Theme.resolvePalette(resolvedTheme)
-            bgColor = _pal.background
-            cardColor = _pal.surface
-            textColor = _pal.text
-            textMutedColor = _pal.textMuted
-            accentColor = _pal.primary
-            borderColor = _pal.border
-            warningColor = _pal.warning
-            dangerColor = _pal.error
-        }
-    }
+    ThemeColors { id: theme }
     readonly property int rMed: Theme.radiusMedium
     readonly property int rLrg: Theme.radiusLarge
     readonly property int af: Theme.animFast
     readonly property int am: Theme.animMedium
 
-    onClosing: function(close) {
-        close.accepted = false
+    onClosing: {
         saveGeometry()
-        hide()
+        if (prayerEngine) prayerEngine.quitApp()
     }
 
     function saveGeometry() {
@@ -102,7 +73,20 @@ ApplicationWindow {
         sequence: "Escape"
         onActivated: {
             saveGeometry()
-            appWindow.hide()
+            var showTray = prayerEngine ? prayerEngine.getSetting("show_tray") : true
+            if (showTray === undefined || showTray === null) showTray = true
+            var trayOk = (typeof trayAvailable !== "undefined") && trayAvailable
+            if (trayOk && showTray) appWindow.hide()
+            else appWindow.showMinimized()
+        }
+    }
+
+    Shortcut {
+        sequence: "Ctrl+Q"
+        onActivated: {
+            saveGeometry()
+            if (prayerEngine) prayerEngine.quitApp()
+            else Qt.quit()
         }
     }
 
@@ -141,27 +125,45 @@ ApplicationWindow {
         id: windowBackground
         anchors.fill: parent
         radius: 20
-        color: bgColor
+        color: theme.bgColor
         clip: true
 
-        Image {
+        // Full-bleed static layers clipped to the same rounded shape as
+        // the window background (like the compositor-side rounded rect of
+        // COSMIC panels): without this mask the square photo/gradient
+        // would paint over the rounded outer corners. Static content, so
+        // the layer is cached and costs nothing per frame.
+        Item {
             anchors.fill: parent
-            source: "../assets/nabawi.webp"
-            fillMode: Image.PreserveAspectCrop
-            mipmap: false
-            sourceSize.width: 960
-            sourceSize.height: 560
-            cache: false
-            visible: backgroundEnabled
-        }
-
-        Rectangle {
-            anchors.fill: parent
-            gradient: Gradient {
-                GradientStop { position: 0.0; color: Qt.rgba(bgColor.r, bgColor.g, bgColor.b, 0.55) }
-                GradientStop { position: 1.0; color: Qt.rgba(bgColor.r, bgColor.g, bgColor.b, 0.25) }
+            layer.enabled: true
+            layer.smooth: true
+            layer.effect: OpacityMask {
+                maskSource: Rectangle {
+                    width: windowBackground.width
+                    height: windowBackground.height
+                    radius: windowBackground.radius
+                }
             }
-            visible: backgroundEnabled
+
+            Image {
+                anchors.fill: parent
+                source: backgroundEnabled ? "../assets/nabawi.webp" : ""
+                fillMode: Image.PreserveAspectCrop
+                mipmap: false
+                sourceSize.width: 640
+                sourceSize.height: 373
+                cache: true
+                asynchronous: true
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                gradient: Gradient {
+                    GradientStop { position: 0.0; color: Qt.rgba(theme.bgColor.r, theme.bgColor.g, theme.bgColor.b, 0.55) }
+                    GradientStop { position: 1.0; color: Qt.rgba(theme.bgColor.r, theme.bgColor.g, theme.bgColor.b, 0.25) }
+                }
+                visible: backgroundEnabled
+            }
         }
 
         ColumnLayout {
@@ -170,17 +172,28 @@ ApplicationWindow {
             spacing: 0
 
             RowLayout {
-                Layout.fillWidth: true; Layout.preferredHeight: 30
+                Layout.fillWidth: true
+                Layout.preferredHeight: 30
+                Layout.minimumHeight: 30
+                Layout.maximumHeight: 30
                 spacing: 4
 
                 MouseArea {
-                    anchors.fill: parent
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
                     acceptedButtons: Qt.LeftButton
-                    property point clickPos: Qt.point(0, 0)
-                    onPressed: clickPos = Qt.point(mouse.x, mouse.y)
+                    property point pressGlobal: Qt.point(0, 0)
+                    property point winPos: Qt.point(0, 0)
+                    onPressed: {
+                        pressGlobal = mapToGlobal(mouse.x, mouse.y)
+                        winPos = Qt.point(appWindow.x, appWindow.y)
+                    }
                     onPositionChanged: {
-                        appWindow.x += mouse.x - clickPos.x
-                        appWindow.y += mouse.y - clickPos.y
+                        if (pressed) {
+                            var g = mapToGlobal(mouse.x, mouse.y)
+                            appWindow.x = winPos.x + g.x - pressGlobal.x
+                            appWindow.y = winPos.y + g.y - pressGlobal.y
+                        }
                     }
                 }
 
@@ -196,7 +209,7 @@ ApplicationWindow {
                     text: tr("أذان الأوقات الخمس")
                     font.pixelSize: 15
                     font.bold: true
-                    color: textMutedColor
+                    color: theme.textMutedColor
                     verticalAlignment: Text.AlignVCenter
                     Layout.alignment: Qt.AlignVCenter
                 }
@@ -206,15 +219,29 @@ ApplicationWindow {
                 Button {
                     id: minimizeBtn
                     width: 26; height: 22
-                    background: Rectangle { color: cardColor; border.color: borderColor; border.width: 1; radius: 4 }
-                    contentItem: Text { text: "—"; font.pixelSize: 12; font.bold: true; color: textMutedColor; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                    background: Rectangle { color: theme.cardColor; border.color: theme.borderColor; border.width: 1; radius: 4 }
+                    contentItem: Text { text: "—"; font.pixelSize: 12; font.bold: true; color: theme.textMutedColor; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
                     onClicked: appWindow.showMinimized()
+                }
+
+                Button {
+                    id: maxRestoreBtn
+                    width: 26; height: 22
+                    background: Rectangle { color: theme.cardColor; border.color: theme.borderColor; border.width: 1; radius: 4 }
+                    contentItem: Text { id: maxRestoreText; text: "□"; font.pixelSize: 12; font.bold: true; color: theme.textMutedColor; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                    onClicked: {
+                        if (appWindow.visibility === Window.Maximized) {
+                            appWindow.showNormal()
+                        } else {
+                            appWindow.showMaximized()
+                        }
+                    }
                 }
 
                 Button {
                     id: closeBtn
                     width: 26; height: 22
-                    background: Rectangle { color: dangerColor; radius: 4 }
+                    background: Rectangle { color: theme.dangerColor; radius: 4 }
                     contentItem: Text { text: "×"; font.pixelSize: 14; font.bold: true; color: "#fff"; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
                     onClicked: { saveGeometry(); appWindow.close() }
                 }
@@ -225,7 +252,7 @@ ApplicationWindow {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 200
                 radius: rLrg
-                border.color: borderColor
+                border.color: theme.borderColor
                 border.width: 1
                 color: "transparent"
 
@@ -242,13 +269,13 @@ ApplicationWindow {
                         font.bold: true
                         horizontalAlignment: Text.AlignHCenter
                         Layout.alignment: Qt.AlignHCenter
-                        color: accentColor
+                        color: theme.accentColor
                     }
 
                     Rectangle {
                         Layout.fillWidth: true
                         height: 1
-                        color: Qt.rgba(accentColor.r, accentColor.g, accentColor.b, 0.3)
+                        color: Qt.rgba(theme.accentColor.r, theme.accentColor.g, theme.accentColor.b, 0.3)
                         Layout.margins: 8
                     }
 
@@ -259,7 +286,7 @@ ApplicationWindow {
                         font.bold: true
                         horizontalAlignment: Text.AlignHCenter
                         Layout.alignment: Qt.AlignHCenter
-                        color: textColor
+                        color: theme.textColor
                     }
 
                     Text {
@@ -269,7 +296,7 @@ ApplicationWindow {
                         font.bold: true
                         horizontalAlignment: Text.AlignHCenter
                         Layout.alignment: Qt.AlignHCenter
-                        color: accentColor
+                        color: theme.accentColor
                     }
 
                     Text {
@@ -279,7 +306,7 @@ ApplicationWindow {
                         font.bold: true
                         horizontalAlignment: Text.AlignHCenter
                         Layout.alignment: Qt.AlignHCenter
-                        color: textMutedColor
+                        color: theme.textMutedColor
                         visible: text.length > 0
                     }
                 }
@@ -303,9 +330,9 @@ ApplicationWindow {
                 Layout.leftMargin: 16
                 Layout.rightMargin: 16
                 Layout.topMargin: 8
-                color: Qt.rgba(cardColor.r, cardColor.g, cardColor.b, 0.55)
+                color: Qt.rgba(theme.cardColor.r, theme.cardColor.g, theme.cardColor.b, 0.55)
                 radius: 14
-                border.color: accentColor
+                border.color: theme.accentColor
                 border.width: 1
 
                 Rectangle {
@@ -314,7 +341,7 @@ ApplicationWindow {
                     width: 60
                     height: 3
                     radius: 2
-                    color: accentColor
+                    color: theme.accentColor
                     anchors.topMargin: -1
                 }
 
@@ -330,17 +357,33 @@ ApplicationWindow {
                         font.bold: true
                         horizontalAlignment: Text.AlignHCenter
                         Layout.alignment: Qt.AlignHCenter
-                        color: textMutedColor
+                        color: theme.textMutedColor
                     }
 
-                    Text {
-                        id: nextNameText
-                        text: prayerEngine ? prayerEngine.getNextPrayerName() : "--"
-                        font.pixelSize: 16
-                        font.bold: true
-                        horizontalAlignment: Text.AlignHCenter
+                    RowLayout {
                         Layout.alignment: Qt.AlignHCenter
-                        color: accentColor
+                        spacing: 10
+
+                        PrayerIcon {
+                            id: nextPrayerIcon
+                            prayerKey: prayerEngine ? prayerEngine.getNextPrayerKey() : "fajr"
+                            active: true
+                            iconSize: 44
+                            Layout.preferredWidth: 44
+                            Layout.preferredHeight: 44
+                            Layout.alignment: Qt.AlignVCenter
+                        }
+
+                        Text {
+                            id: nextNameText
+                            text: prayerEngine ? prayerEngine.getNextPrayerName() : "--"
+                            font.pixelSize: 18
+                            font.bold: true
+                            horizontalAlignment: Text.AlignHCenter
+                            Layout.alignment: Qt.AlignVCenter
+                            color: theme.accentColor
+                            Behavior on opacity { NumberAnimation { duration: 200 } }
+                        }
                     }
 
                     Text {
@@ -350,7 +393,7 @@ ApplicationWindow {
                         font.family: "IBM Plex Sans Arabic"
                         horizontalAlignment: Text.AlignHCenter
                         Layout.alignment: Qt.AlignHCenter
-                        color: textColor
+                        color: theme.textColor
                     }
 
                     Text {
@@ -360,7 +403,7 @@ ApplicationWindow {
                         font.bold: true
                         horizontalAlignment: Text.AlignHCenter
                         Layout.alignment: Qt.AlignHCenter
-                        color: warningColor
+                        color: theme.warningColor
                         visible: text.length > 0
                     }
                 }
@@ -369,13 +412,13 @@ ApplicationWindow {
                     target: prayerEngine
                     function onNextPrayerChanged() {
                         nextNameText.text = prayerEngine.getNextPrayerName()
+                        nextPrayerIcon.prayerKey = prayerEngine.getNextPrayerKey()
                         nextNameText.opacity = 0.0
                         nextNameText.opacity = 1.0
                     }
                     function onCountdownChanged(text) { countdownText.text = text }
                     function onPreAlertChanged(text) {
                         preAlertText.text = text
-                        preAlertText.visible = text.length > 0
                     }
                 }
             }
@@ -385,7 +428,7 @@ ApplicationWindow {
                 Layout.fillWidth: true
                 Layout.topMargin: 8
                 Layout.preferredHeight: 38
-                background: Rectangle { color: Qt.rgba(cardColor.r, cardColor.g, cardColor.b, 0.55); radius: rMed; border.color: borderColor; border.width: 1 }
+                background: Rectangle { color: Qt.rgba(theme.cardColor.r, theme.cardColor.g, theme.cardColor.b, 0.55); radius: rMed; border.color: theme.borderColor; border.width: 1 }
 
                 TabButton {
                     id: tab0
@@ -394,10 +437,10 @@ ApplicationWindow {
                     hoverEnabled: true
                     ToolTip.text: tr("أوقات الصلاة")
                     ToolTip.visible: hovered
-                    background: Rectangle { color: mainTabBar.currentIndex === 0 ? accentColor : "transparent"; radius: rMed }
+                    background: Rectangle { color: mainTabBar.currentIndex === 0 ? theme.accentColor : "transparent"; radius: rMed }
                     contentItem: Text {
                         text: parent.text
-                        color: mainTabBar.currentIndex === 0 ? "#fff" : textColor
+                        color: mainTabBar.currentIndex === 0 ? "#fff" : theme.textColor
                         font.pixelSize: 13
                         font.bold: mainTabBar.currentIndex === 0
                         horizontalAlignment: Text.AlignHCenter
@@ -411,10 +454,10 @@ ApplicationWindow {
                     hoverEnabled: true
                     ToolTip.text: tr("أذكار الصلاة")
                     ToolTip.visible: hovered
-                    background: Rectangle { color: mainTabBar.currentIndex === 1 ? accentColor : "transparent"; radius: rMed }
+                    background: Rectangle { color: mainTabBar.currentIndex === 1 ? theme.accentColor : "transparent"; radius: rMed }
                     contentItem: Text {
                         text: parent.text
-                        color: mainTabBar.currentIndex === 1 ? "#fff" : textColor
+                        color: mainTabBar.currentIndex === 1 ? "#fff" : theme.textColor
                         font.pixelSize: 13
                         font.bold: mainTabBar.currentIndex === 1
                         horizontalAlignment: Text.AlignHCenter
@@ -428,10 +471,10 @@ ApplicationWindow {
                     hoverEnabled: true
                     ToolTip.text: tr("الأذكار العامة")
                     ToolTip.visible: hovered
-                    background: Rectangle { color: mainTabBar.currentIndex === 2 ? accentColor : "transparent"; radius: rMed }
+                    background: Rectangle { color: mainTabBar.currentIndex === 2 ? theme.accentColor : "transparent"; radius: rMed }
                     contentItem: Text {
                         text: parent.text
-                        color: mainTabBar.currentIndex === 2 ? "#fff" : textColor
+                        color: mainTabBar.currentIndex === 2 ? "#fff" : theme.textColor
                         font.pixelSize: 13
                         font.bold: mainTabBar.currentIndex === 2
                         horizontalAlignment: Text.AlignHCenter
@@ -443,6 +486,7 @@ ApplicationWindow {
             StackLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                Layout.minimumHeight: 150
                 currentIndex: mainTabBar.currentIndex
 
                 PrayerTimesTab {}
@@ -453,7 +497,7 @@ ApplicationWindow {
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: 48
-                color: Qt.rgba(bgColor.r, bgColor.g, bgColor.b, 0.55)
+                color: Qt.rgba(theme.bgColor.r, theme.bgColor.g, theme.bgColor.b, 0.55)
                 radius: rMed
 
                 RowLayout {
@@ -466,10 +510,10 @@ ApplicationWindow {
                     Button {
                         id: azanStopBtn
                         text: tr("إيقاف الأذان")
-                        visible: prayerEngine ? prayerEngine.isAzanPlaying() : false
+                        visible: false
                         onClicked: prayerEngine.stopAzan()
                         font.pixelSize: 14
-                        background: Rectangle { color: dangerColor; radius: 8 }
+                        background: Rectangle { color: theme.dangerColor; radius: 8 }
                         contentItem: Text { text: parent.text; color: "#fff"; font.pixelSize: 14; font.bold: true; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
                     }
 
@@ -478,8 +522,8 @@ ApplicationWindow {
                         text: tr("عن البرنامج")
                         onClicked: creditsDialog.open()
                         font.pixelSize: 14
-                        background: Rectangle { color: "transparent"; border.color: accentColor; border.width: 1; radius: 8 }
-                        contentItem: Text { text: parent.text; color: accentColor; font.pixelSize: 14; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                        background: Rectangle { color: "transparent"; border.color: theme.accentColor; border.width: 1; radius: 8 }
+                        contentItem: Text { text: parent.text; color: theme.accentColor; font.pixelSize: 14; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
                     }
 
                     Button {
@@ -487,7 +531,7 @@ ApplicationWindow {
                         text: tr("الإعدادات")
                         onClicked: settingsDialog.open()
                         font.pixelSize: 14
-                        background: Rectangle { color: accentColor; radius: 8 }
+                        background: Rectangle { color: theme.accentColor; radius: 8 }
                         contentItem: Text { text: parent.text; color: "#fff"; font.pixelSize: 14; font.bold: true; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
                     }
                 }

@@ -2,11 +2,18 @@ import os
 import tempfile
 from copy import deepcopy
 
-import pytest
 
+import backend.settings as S
 from backend.settings import (
-    resolve_azan_path, load, save, set_autostart, SETTINGS_VERSION,
-    validate_and_coerce, _run_migrations, MIGRATIONS, SettingsSchema,
+    resolve_azan_path,
+    load,
+    save,
+    set_autostart,
+    SETTINGS_VERSION,
+    validate_and_coerce,
+    _run_migrations,
+    MIGRATIONS,
+    SettingsSchema,
     schema_to_dict,
 )
 
@@ -25,13 +32,9 @@ class TestResolveAzanPath:
         finally:
             os.unlink(tmp)
 
-    def test_nonexistent_falls_back_to_first_muezzin(self):
-        result = resolve_azan_path("/nonexistent/no_match.mp3")
-        from backend.settings import MUEZZINS_DIR
-        if os.path.isdir(MUEZZINS_DIR):
-            assert os.path.isfile(result)
-        else:
-            assert result == "/nonexistent/no_match.mp3"
+    def test_nonexistent_returns_empty_not_another_muezzin(self):
+        # Must never substitute a different muezzin for a missing file.
+        assert resolve_azan_path("/nonexistent/no_match.mp3") == ""
 
     def test_known_muezzin_name_resolves(self):
         result = resolve_azan_path("قطامي")
@@ -39,7 +42,7 @@ class TestResolveAzanPath:
 
     def test_alternate_muezzin_name(self):
         result = resolve_azan_path("نعيم")
-        assert os.path.isfile(result) or result == "نعيم"
+        assert result == "" or os.path.isfile(result)
 
 
 class TestLoadSave:
@@ -81,6 +84,7 @@ class TestLoadSave:
         try:
             s2 = load()
             assert "_test_temp_key" in s2
+            assert original_keys <= set(s2.keys())
         finally:
             del s["_test_temp_key"]
             save(s)
@@ -89,26 +93,17 @@ class TestLoadSave:
 class TestSetAutostart:
     def test_set_autostart_true_creates_file(self):
         set_autostart(True)
-        autostart_file = os.path.join(
-            os.path.expanduser("~"), ".config", "autostart", "athan-five-times.desktop"
-        )
-        assert os.path.isfile(autostart_file)
+        assert os.path.isfile(S.AUTOSTART_FILE)
 
     def test_set_autostart_false_removes_file(self):
         set_autostart(True)
-        autostart_file = os.path.join(
-            os.path.expanduser("~"), ".config", "autostart", "athan-five-times.desktop"
-        )
         set_autostart(False)
-        assert not os.path.isfile(autostart_file)
+        assert not os.path.isfile(S.AUTOSTART_FILE)
 
     def test_autostart_file_contains_desktop_entry(self):
-        autostart_file = os.path.join(
-            os.path.expanduser("~"), ".config", "autostart", "athan-five-times.desktop"
-        )
         set_autostart(True)
         try:
-            with open(autostart_file) as f:
+            with open(S.AUTOSTART_FILE) as f:
                 content = f.read()
             assert "[Desktop Entry]" in content
             assert "Exec=" in content

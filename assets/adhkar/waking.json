@@ -1,0 +1,45 @@
+{
+  "id": "waking",
+  "name_ar": "أذكار الاستيقاظ",
+  "name_en": "Waking Up Adhkar",
+  "icon": "waking",
+  "total": 5,
+  "tags": ["morning", "daily"],
+  "items": [
+    {
+      "id": "w01",
+      "arabic": "الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ",
+      "count": 1,
+      "reference_id": "bukhari",
+      "reference_detail": "7/159"
+    },
+    {
+      "id": "w02",
+      "arabic": "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+      "count": 1,
+      "reference_id": "bukhari",
+      "reference_detail": "7/182"
+    },
+    {
+      "id": "w03",
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا، وَرِزْقًا طَيِّبًا، وَعَمَلًا مُتَقَبَّلًا",
+      "count": 1,
+      "reference_id": "ibnmajah",
+      "reference_detail": "2/1228"
+    },
+    {
+      "id": "w04",
+      "arabic": "الْحَمْدُ لِلَّهِ الَّذِي عَافَانِي فِي جَسَدِي، وَرَدَّ عَلَيَّ رُوحِي، وَأَذِنَ لِي بِذِكْرِهِ",
+      "count": 1,
+      "reference_id": "tirmidhi",
+      "reference_detail": "5/473"
+    },
+    {
+      "id": "w05",
+      "arabic": "سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
+      "count": 100,
+      "reference_id": "muslim",
+      "reference_detail": "4/2071"
+    }
+  ]
+}

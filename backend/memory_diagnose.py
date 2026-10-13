@@ -15,6 +15,7 @@ import time
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, BASE_DIR)
 
+
 def measure_rss():
     gc.collect()
     with open(f"/proc/{os.getpid()}/status") as f:
@@ -22,6 +23,7 @@ def measure_rss():
             if line.startswith("VmRSS:"):
                 return int(line.split()[1])
     return 0
+
 
 def measure_pss():
     try:
@@ -33,126 +35,132 @@ def measure_pss():
         pass
     return 0
 
+
 times = []
+
 
 def phase(name):
     rss = measure_rss()
     pss = measure_pss()
     times.append((name, rss, pss))
-    print(f"  [{name:58s}]  RSS={rss/1024:7.2f} MB  PSS={pss/1024:7.2f} MB")
+    print(f"  [{name:58s}]  RSS={rss / 1024:7.2f} MB  PSS={pss / 1024:7.2f} MB")
 
-platform = os.environ.get("QT_QPA_PLATFORM", "offscreen")
 
-print("=" * 82)
-print(f"  Athan Five Times - Memory Diagnosis  (platform={platform})")
-print("=" * 82)
+def main():
+    platform = os.environ.get("QT_QPA_PLATFORM", "offscreen")
 
-# ── Phase 1: Pure Python ──
-phase("1. Python interpreter + stdlib")
+    print("=" * 82)
+    print(f"  Athan Five Times - Memory Diagnosis  (platform={platform})")
+    print("=" * 82)
 
-# ── Phase 2: PySide6 imports (no QApp) ──
-from PySide6.QtCore import QUrl, QTimer, QCoreApplication, Qt
-phase("2. PySide6.QtCore")
+    phase("1. Python interpreter + stdlib")
 
-from PySide6.QtGui import QIcon, QFont, QFontDatabase
-phase("3. PySide6.QtGui")
+    from PySide6.QtCore import QUrl, QCoreApplication
 
-from PySide6.QtWidgets import QApplication
-phase("4. PySide6.QtWidgets")
+    phase("2. PySide6.QtCore")
 
-from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterSingletonType
-from PySide6.QtQuickControls2 import QQuickStyle
-phase("5. PySide6.QtQml + QtQuickControls2")
+    from PySide6.QtGui import QFont, QFontDatabase
 
-# ── Phase 3: App modules ──
-from backend.settings import load as load_settings, APP_VERSION
-phase("6. backend.settings")
+    phase("3. PySide6.QtGui")
 
-from backend.location import detect_async
-phase("7. backend.location")
+    from PySide6.QtWidgets import QApplication
 
-from backend.backend_controller import PrayerEngine
-from backend.theme_controller import ThemeController
-from backend.audio import set_volume
-phase("8. backend.controllers + audio")
+    phase("4. PySide6.QtWidgets")
 
-# ── Phase 4: QApplication + Qt init ──
-QQuickStyle.setStyle("Fusion")
-app = QApplication(sys.argv[:1])
-phase("9. QApplication() created")
+    from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterSingletonType
+    from PySide6.QtQuickControls2 import QQuickStyle
 
-assets_dir = os.path.join(BASE_DIR, "assets")
-fonts_dir = os.path.join(assets_dir, "fonts")
-if os.path.isdir(fonts_dir):
-    for fname in sorted(os.listdir(fonts_dir)):
-        if fname.lower().endswith(".ttf"):
-            QFontDatabase.addApplicationFont(os.path.join(fonts_dir, fname))
-phase("10. Fonts loaded")
+    phase("5. PySide6.QtQml + QtQuickControls2")
 
-font = QFont("Cairo", 14)
-if not font.exactMatch():
-    font = QFont("Sans", 14)
-app.setFont(font)
-phase("11. Default font set")
+    from backend.settings import load as load_settings, APP_VERSION
 
-settings = load_settings()
-phase("12. Settings loaded (+ PrayerTimes calc init)")
+    phase("6. backend.settings")
 
-# ── Phase 5: QML engine ──
-qml_dir = os.path.join(BASE_DIR, "qml")
-engine = QQmlApplicationEngine()
-engine.addImportPath(qml_dir)
-phase("13. QQmlApplicationEngine created")
+    phase("7. backend.location")
 
-qmlRegisterSingletonType(
-    QUrl.fromLocalFile(os.path.join(qml_dir, "Theme.qml")),
-    "Theme", 1, 0, "Theme"
-)
-phase("14. Theme singleton registered")
+    from backend.backend_controller import PrayerEngine
+    from backend.theme_controller import ThemeController
 
-theme_controller = ThemeController()
-prayer_engine = PrayerEngine()
-phase("15. Controllers instantiated")
+    phase("8. backend.controllers + audio")
 
-ctx = engine.rootContext()
-ctx.setContextProperty("prayerEngine", prayer_engine)
-ctx.setContextProperty("backendController", prayer_engine)
-ctx.setContextProperty("themeController", theme_controller)
-ctx.setContextProperty("appVersion", APP_VERSION)
-phase("16. Context properties set")
+    QQuickStyle.setStyle("Fusion")
+    app = QApplication(sys.argv[:1])
+    phase("9. QApplication() created")
 
-# ── Phase 6: QML load ──
-qml_file = os.path.join(qml_dir, "main.qml")
-engine.load(QUrl.fromLocalFile(qml_file))
-gc.collect()
-QCoreApplication.processEvents()
-time.sleep(0.2)
-QCoreApplication.processEvents()
-gc.collect()
-phase("17. QML loaded (window ready, offscreen)")
+    assets_dir = os.path.join(BASE_DIR, "assets")
+    fonts_dir = os.path.join(assets_dir, "fonts")
+    if os.path.isdir(fonts_dir):
+        for fname in sorted(os.listdir(fonts_dir)):
+            if fname.lower().endswith(".ttf"):
+                QFontDatabase.addApplicationFont(os.path.join(fonts_dir, fname))
+    phase("10. Fonts loaded")
 
-root = engine.rootObjects()[0]
-root.show()
-QCoreApplication.processEvents()
-gc.collect()
-QCoreApplication.processEvents()
-phase("18. Window shown")
+    font = QFont("Cairo", 14)
+    if not font.exactMatch():
+        font = QFont("Sans", 14)
+    app.setFont(font)
+    phase("11. Default font set")
 
-# ── Summary ──
-print()
-print("-" * 82)
-print(f"  {'Phase':58s}  {'RSS MB':>8s}  {'Δ MB':>7s}  {'PSS MB':>7s}")
-print("-" * 82)
-prev_rss = times[0][1]
-for name, rss, pss in times:
-    delta = rss - prev_rss
-    if name.startswith("1."):
-        delta_str = "   --"
-    else:
-        delta_str = f"+{delta/1024:6.2f}"
-    print(f"  {name:58s}  {rss/1024:8.2f}  {delta_str:>7s}  {pss/1024:8.2f}")
-    prev_rss = rss
+    load_settings()
+    phase("12. Settings loaded (+ PrayerTimes calc init)")
 
-print("-" * 82)
-print(f"\n  Total RSS: {times[-1][1]/1024:.1f} MB  |  Total PSS: {times[-1][2]/1024:.1f} MB")
-print(f"  X11 overhead: run again with QT_QPA_PLATFORM=xcb to measure\n")
+    qml_dir = os.path.join(BASE_DIR, "qml")
+    engine = QQmlApplicationEngine()
+    engine.addImportPath(qml_dir)
+    phase("13. QQmlApplicationEngine created")
+
+    qmlRegisterSingletonType(
+        QUrl.fromLocalFile(os.path.join(qml_dir, "Theme.qml")), "Theme", 1, 0, "Theme"
+    )
+    phase("14. Theme singleton registered")
+
+    theme_controller = ThemeController()
+    prayer_engine = PrayerEngine()
+    phase("15. Controllers instantiated")
+
+    ctx = engine.rootContext()
+    ctx.setContextProperty("prayerEngine", prayer_engine)
+    ctx.setContextProperty("backendController", prayer_engine)
+    ctx.setContextProperty("themeController", theme_controller)
+    ctx.setContextProperty("appVersion", APP_VERSION)
+    phase("16. Context properties set")
+
+    qml_file = os.path.join(qml_dir, "main.qml")
+    engine.load(QUrl.fromLocalFile(qml_file))
+    gc.collect()
+    QCoreApplication.processEvents()
+    time.sleep(0.2)
+    QCoreApplication.processEvents()
+    gc.collect()
+    phase("17. QML loaded (window ready, offscreen)")
+
+    root = engine.rootObjects()[0]
+    root.show()
+    QCoreApplication.processEvents()
+    gc.collect()
+    QCoreApplication.processEvents()
+    phase("18. Window shown")
+
+    print()
+    print("-" * 82)
+    print(f"  {'Phase':58s}  {'RSS MB':>8s}  {'Δ MB':>7s}  {'PSS MB':>7s}")
+    print("-" * 82)
+    prev_rss = times[0][1]
+    for name, rss, pss in times:
+        delta = rss - prev_rss
+        if name.startswith("1."):
+            delta_str = "   --"
+        else:
+            delta_str = f"+{delta / 1024:6.2f}"
+        print(f"  {name:58s}  {rss / 1024:8.2f}  {delta_str:>7s}  {pss / 1024:8.2f}")
+        prev_rss = rss
+
+    print("-" * 82)
+    print(
+        f"\n  Total RSS: {times[-1][1] / 1024:.1f} MB  |  Total PSS: {times[-1][2] / 1024:.1f} MB"
+    )
+    print("  X11 overhead: run again with QT_QPA_PLATFORM=xcb to measure\n")
+
+
+if __name__ == "__main__":
+    main()

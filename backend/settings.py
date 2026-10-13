@@ -15,14 +15,20 @@ from typing import Any, Dict, List, get_type_hints
 
 logger = logging.getLogger(__name__)
 
+
+def _config_home() -> str:
+    return os.environ.get("XDG_CONFIG_HOME", os.path.join(os.path.expanduser("~"), ".config"))
+
+
 SETTINGS_DIR: str = os.path.join(
-    os.environ.get("XDG_CONFIG_HOME", os.path.join(os.path.expanduser("~"), ".config")),
+    _config_home(),
     "athan-five-times",
 )
 SETTINGS_FILE: str = os.path.join(SETTINGS_DIR, "settings.json")
 SETTINGS_BACKUP: str = SETTINGS_FILE + ".bak"
 
 from . import __version__
+
 APP_VERSION: str = __version__
 
 MUEZZINS_DIR: str = os.path.join(os.path.dirname(__file__), "assets", "muezzins")
@@ -47,21 +53,38 @@ class SettingsSchema:
     madhab: str = "shafi"
     language: str = "ar"
     timezone: str = "Africa/Tunis"
-    offsets: Dict[str, int] = field(default_factory=lambda: {
-        "fajr": 0, "sunrise": 0, "dhuhr": 0,
-        "asr": 0, "maghrib": 0, "isha": 0,
-    })
+    offsets: Dict[str, int] = field(
+        default_factory=lambda: {
+            "fajr": 0,
+            "sunrise": 0,
+            "dhuhr": 0,
+            "asr": 0,
+            "maghrib": 0,
+            "isha": 0,
+        }
+    )
     hijri_day_offset: int = 0
-    audio: Dict[str, str] = field(default_factory=lambda: {
-        "fajr": "", "sunrise": "", "dhuhr": "",
-        "asr": "", "maghrib": "", "isha": "",
-        "default": "",
-    })
+    audio: Dict[str, str] = field(
+        default_factory=lambda: {
+            "fajr": "",
+            "sunrise": "",
+            "dhuhr": "",
+            "asr": "",
+            "maghrib": "",
+            "isha": "",
+            "default": "",
+        }
+    )
     muezzins: Dict[str, str] = field(default_factory=dict)
-    azan_enabled: Dict[str, bool] = field(default_factory=lambda: {
-        "fajr": True, "dhuhr": True,
-        "asr": True, "maghrib": True, "isha": True,
-    })
+    azan_enabled: Dict[str, bool] = field(
+        default_factory=lambda: {
+            "fajr": True,
+            "dhuhr": True,
+            "asr": True,
+            "maghrib": True,
+            "isha": True,
+        }
+    )
     pre_azan_minutes: int = 10
     pre_azan_enabled: bool = True
     fade_in: bool = True
@@ -75,19 +98,23 @@ class SettingsSchema:
     dnd_duration: int = 20
     sleep_mode: bool = True
     silent_mode: bool = False
+    show_tray: bool = True
     first_run: bool = True
     last_version: str = ""
     athkar_popup_enabled: bool = True
     athkar_popup_duration: int = 300
     autostart: bool = False
     window_geometry: List[int] = field(default_factory=lambda: [100, 100, 800, 600])
-    athkar_popup_delay: int = 600
+    athkar_popup_delay: int = 60
     athkarCount: int = 33
     athkarMethod: str = "after_prayer"
     update_url: str = ""
+    time_format: str = "12h"
     schema_version: int = SETTINGS_VERSION
     custom_coords: bool = False
     background_enabled: bool = True
+    render_backend: str = "auto"
+    render_loop: str = "auto"
 
 
 def schema_to_dict() -> Dict[str, Any]:
@@ -178,12 +205,12 @@ def validate_and_coerce(data: Dict[str, Any]) -> Dict[str, Any]:
         elif expected is str:
             if not isinstance(value, str):
                 value = str(value) if value is not None else getattr(schema, key)
-        elif getattr(expected, '__origin__', None) is dict:
+        elif getattr(expected, "__origin__", None) is dict:
             if not isinstance(value, dict):
                 value = getattr(schema, key)
             else:
                 value = _deep_freeze(value)
-        elif getattr(expected, '__origin__', None) is list:
+        elif getattr(expected, "__origin__", None) is list:
             if not isinstance(value, list):
                 value = getattr(schema, key)
             else:
@@ -211,16 +238,16 @@ def _validate_nested(settings: dict) -> dict:
     return result
 
 
-# ── Migration system ──────────────────────────────────────────────────
-
 MIGRATIONS: Dict[int, Any] = {}
 
 
 def _register_migration(from_version: int):
     """Decorator to register a settings migration function."""
+
     def decorator(func):
         MIGRATIONS[from_version] = func
         return func
+
     return decorator
 
 
@@ -278,13 +305,19 @@ def _run_migrations(settings: Dict[str, Any]) -> Dict[str, Any]:
     while current_version < SETTINGS_VERSION:
         migration = MIGRATIONS.get(current_version)
         if migration:
-            logger.info("Running settings migration v%d -> v%d", current_version, current_version + 1)
+            logger.info(
+                "Running settings migration v%d -> v%d", current_version, current_version + 1
+            )
             result = migration(result)
+        else:
+            logger.warning(
+                "No migration registered for schema v%d -> v%d",
+                current_version,
+                current_version + 1,
+            )
         current_version += 1
     return result
 
-
-# ── Path resolution ───────────────────────────────────────────────────
 
 _RESOLVE_CACHE: dict = {}
 _RESOLVE_CACHE_ORDER: list = []
@@ -301,7 +334,6 @@ def invalidate_resolve_cache():
 
 def _cache_put(path: str, resolved: str):
     with _RESOLVE_LOCK:
-        global _RESOLVE_CACHE, _RESOLVE_CACHE_ORDER
         if len(_RESOLVE_CACHE) >= _RESOLVE_CACHE_MAX:
             oldest = _RESOLVE_CACHE_ORDER.pop(0)
             _RESOLVE_CACHE.pop(oldest, None)
@@ -351,9 +383,8 @@ def resolve_azan_path(path: str) -> str:
         if f.lower().endswith(".mp3"):
             candidate = os.path.join(MUEZZINS_DIR, f)
             if os.path.isfile(candidate):
-                _cache_put(path, candidate)
-                return candidate
-    return path
+                logger.warning("Azan file not found: %s (not substituting another muezzin)", path)
+                return ""
 
 
 def discover_builtin_muezzins() -> dict:
@@ -408,7 +439,9 @@ def load() -> Dict[str, Any]:
         merged_muezzins: Dict[str, str] = dict(merged.get("muezzins", {}))
         for k, v in builtin.items():
             merged_muezzins[k] = v
-        default_azan: str = os.path.join(os.path.dirname(__file__), "assets", "muezzins", "قطامي.mp3")
+        default_azan: str = os.path.join(
+            os.path.dirname(__file__), "assets", "muezzins", "قطامي.mp3"
+        )
         if os.path.isfile(default_azan):
             merged_muezzins["افتراضي"] = default_azan
         merged_muezzins = {k: resolve_azan_path(v) for k, v in merged_muezzins.items()}
@@ -427,7 +460,6 @@ def load() -> Dict[str, Any]:
 def get_cached() -> Dict[str, Any]:
     """Return current cached settings without reloading (or load if needed)."""
     with _SETTINGS_LOCK:
-        global _SETTINGS_CACHE
         if _SETTINGS_CACHE is None:
             return load()
         return _SETTINGS_CACHE
@@ -458,17 +490,17 @@ def save(settings: Dict[str, Any]) -> bool:
             invalidate_cache()
             invalidate_resolve_cache()
             return True
-        except (OSError, json.JSONEncodeError, TypeError, ValueError) as exc:
+        except (OSError, TypeError, ValueError) as exc:
             logger.error("Failed to save settings: %s", exc)
             if os.path.isfile(tmp):
-                    try:
-                        os.remove(tmp)
-                    except OSError:
-                        pass
+                try:
+                    os.remove(tmp)
+                except OSError:
+                    pass
             return False
 
 
-AUTOSTART_DIR: str = os.path.join(os.path.expanduser("~"), ".config", "autostart")
+AUTOSTART_DIR: str = os.path.join(_config_home(), "autostart")
 AUTOSTART_FILE: str = os.path.join(AUTOSTART_DIR, "athan-five-times.desktop")
 
 
@@ -479,9 +511,9 @@ def set_autostart(enabled: bool) -> None:
         base: str = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
         script: str = os.path.join(base, "run.sh")
         if os.path.isfile(script):
-            cmd: str = f"\"{script}\""
+            cmd: str = f'"{script}"'
         else:
-            cmd = f"python3 \"{os.path.join(base, 'prayer_app', '__main__.py')}\""
+            cmd = "python3 -m backend.main"
         icon_png: str = "/app/share/icons/hicolor/scalable/apps/com.azanprayer.app.svg"
         icon_local: str = os.path.join(os.path.dirname(__file__), "assets", "kaaba.svg")
         icon_path: str = icon_png if os.path.isfile(icon_png) else icon_local
@@ -490,6 +522,7 @@ def set_autostart(enabled: bool) -> None:
             "Type=Application\n"
             f"Name=أذان الأوقات الخمس\n"
             f"Exec={cmd}\n"
+            f"Path={base}\n"
             f"Icon={icon_path}\n"
             "Comment=تطبيق أذان الأوقات الخمس\n"
             "Terminal=false\n"
@@ -498,7 +531,7 @@ def set_autostart(enabled: bool) -> None:
         with open(AUTOSTART_FILE, "w", encoding="utf-8") as f:
             f.write(desktop)
         try:
-            os.chmod(AUTOSTART_FILE, 0o755)
+            os.chmod(AUTOSTART_FILE, 0o644)
         except OSError as exc:
             logger.warning("Could not set executable permission on autostart file: %s", exc)
     else:

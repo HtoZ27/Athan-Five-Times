@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libgl1 libegl1 libxkbcommon0 libdbus-1-3
+          python -m pip install --upgrade pip
+          pip install -e .[test]
+      - name: Run tests
+        run: python -m pytest tests/ -q --tb=short
+      - name: Check imports
+        run: |
+          python -c "
+          from backend.main import QmlAthanApp
+          from backend.backend_controller import PrayerEngine
+          from backend.prayer_calc import calculate, clear_calculation_cache
+          from backend.settings import load, save
+          from backend.translations import load as load_tr, city_name, country_name
+          from backend.theme_controller import ThemeController
+          from backend.l10n import LanguageManager
+          from backend.hijri import gregorian_to_hijri, format_hijri
+          from backend._constants import LANG_NAMES, LANGS
+          print('All imports OK')
+          "
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[test] ruff
+      - name: Run ruff
+        run: ruff check backend/ tests/
+      - name: Check formatting
+        run: ruff format --check backend/ tests/
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [test, lint]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install build deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install build
+      - name: Build wheel
+        run: python -m build --wheel
+      - name: Upload wheel
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  qml-gates:
+    runs-on: ubuntu-latest
+    needs: [test]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libgl1 libegl1 libxkbcommon0 libdbus-1-3
+          python -m pip install --upgrade pip
+          pip install -e .[test]
+      - name: AppDir sync check
+        run: bash scripts/sync-appdir.sh --check-only
+      - name: QML zero-error gate
+        run: QT_QPA_PLATFORM=offscreen python3 scripts/smoke-qml.py

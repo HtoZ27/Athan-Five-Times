@@ -1,6 +1,5 @@
 from datetime import date, datetime
 
-import pytest
 
 from backend.prayer_calc import calculate, PrayerTimesResult
 
@@ -93,12 +92,16 @@ class TestCalculate:
     def test_offsets_produce_shifted_times(self):
         r = calculate(36.8065, 10.1815, offsets={"fajr": 10, "dhuhr": -5})
         r_base = calculate(36.8065, 10.1815)
-        from datetime import timedelta
         assert abs((r.fajr - r_base.fajr).total_seconds() - 600) < 2
         assert abs((r.dhuhr - r_base.dhuhr).total_seconds() - (-300)) < 2
 
     def test_cached_result(self):
         from backend.prayer_calc import _calculate_cached
-        r1 = _calculate_cached(36.8, 10.18, "2025-06-15", "وزارة الشؤون الدينية التونسية", "shafi", None, ())
-        r2 = _calculate_cached(36.8, 10.18, "2025-06-15", "وزارة الشؤون الدينية التونسية", "shafi", None, ())
+
+        r1 = _calculate_cached(
+            36.8, 10.18, "2025-06-15", "وزارة الشؤون الدينية التونسية", "shafi", None, ()
+        )
+        r2 = _calculate_cached(
+            36.8, 10.18, "2025-06-15", "وزارة الشؤون الدينية التونسية", "shafi", None, ()
+        )
         assert r1 is r2

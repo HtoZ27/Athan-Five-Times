@@ -1,10 +1,7 @@
-// Theme.qml
-// Fusion-compatible theme singleton with static design tokens
 pragma Singleton
 import QtQuick
 
 QtObject {
-    // Design Tokens - Static, zero-cost abstractions
     readonly property int radiusSmall: 6
     readonly property int radiusMedium: 10
     readonly property int radiusLarge: 16
@@ -19,7 +16,6 @@ QtObject {
     readonly property int animMedium: 200
     readonly property int animSlow: 300
 
-    // Static color palettes - Fusion compatible (readonly for zero-copy)
     readonly property var darkPalette: {
         "background": "#1a1a1e",
         "surface": "#2c2c30",
@@ -135,16 +131,12 @@ QtObject {
         "info": "#4F46E5"
     }
 
-    // Internal cache for resolved palettes
     property var _paletteCache: ({})
 
-    // Resolved palette getter with caching and robust undefined handling
     function resolvePalette(themeId) {
-        // Handle undefined/null themeId - default to dark
         var tid = (themeId === undefined || themeId === null) ? "dark" : themeId
         
         var cache = _paletteCache
-        // Ensure cache is an object
         if (cache === undefined || cache === null) {
             cache = {}
         }

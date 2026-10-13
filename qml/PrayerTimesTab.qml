@@ -6,32 +6,9 @@ import Theme 1.0
 Rectangle {
     id: root
 
-    // Reactive palette - updates when themeController.resolvedTheme changes
-    property var _pal: Theme.resolvePalette(
-        typeof themeController !== 'undefined' && themeController
-            ? themeController.resolvedTheme : "light")
+    ThemeColors { id: theme }
 
-    // Color properties - updated when theme changes
-    property color bgColor: _pal.background
-    property color cardColor: _pal.surface
-    property color textColor: _pal.text
-    property color accentColor: _pal.primary
-    property color borderColor: _pal.border
-
-    // Force _pal and colors update when themeController.resolvedTheme changes
-    Connections {
-        target: themeController
-        function onResolvedThemeChanged(resolvedTheme) {
-            _pal = Theme.resolvePalette(resolvedTheme)
-            bgColor = _pal.background
-            cardColor = _pal.surface
-            textColor = _pal.text
-            accentColor = _pal.primary
-            borderColor = _pal.border
-        }
-    }
-
-    color: Qt.rgba(bgColor.r, bgColor.g, bgColor.b, 0.55)
+    color: Qt.rgba(theme.bgColor.r, theme.bgColor.g, theme.bgColor.b, 0.55)
     radius: 10
     clip: true
 
@@ -46,6 +23,7 @@ Rectangle {
     Connections {
         target: prayerEngine
         function onPrayerTimesChanged() { refresh() }
+        function onLanguageChanged() { refresh() }
     }
 
     ListView {
@@ -63,25 +41,35 @@ Rectangle {
             width: listView.width - listView.leftMargin - listView.rightMargin
             height: 52
             radius: 12
-            color: modelData && modelData.isNext ? accentColor : Qt.rgba(cardColor.r, cardColor.g, cardColor.b, 0.55)
-            border.color: modelData && modelData.isNext ? "transparent" : borderColor
+            color: modelData && modelData.isNext ? theme.accentColor : Qt.rgba(theme.cardColor.r, theme.cardColor.g, theme.cardColor.b, 0.55)
+            border.color: modelData && modelData.isNext ? "transparent" : theme.borderColor
             border.width: 1
 
             RowLayout {
                 anchors.fill: parent
-                anchors.leftMargin: 16
+                anchors.leftMargin: 12
                 anchors.rightMargin: 16
+                spacing: 12
+
+                PrayerIcon {
+                    prayerKey: modelData ? modelData.key : "fajr"
+                    active: modelData ? modelData.isNext : false
+                    iconSize: 32
+                    Layout.preferredWidth: 32
+                    Layout.preferredHeight: 32
+                    Layout.alignment: Qt.AlignVCenter
+                }
 
                 Label {
                     text: modelData ? modelData.name : ""
-                    color: modelData && modelData.isNext ? "#ffffff" : textColor
+                    color: modelData && modelData.isNext ? "#ffffff" : theme.textColor
                     font.bold: modelData && modelData.isNext
                     font.pixelSize: 16
                 }
                 Item { Layout.fillWidth: true }
                 Label {
                     text: modelData ? modelData.time : ""
-                    color: modelData && modelData.isNext ? "#ffffff" : accentColor
+                    color: modelData && modelData.isNext ? "#ffffff" : theme.accentColor
                     font.bold: true
                     font.pixelSize: 16
                 }

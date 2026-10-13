@@ -1,0 +1,14 @@
+{
+  "categories": [
+    {"id": "morning", "name_ar": "أذكار الصباح", "name_en": "Morning Adhkar", "asset": "assets/data/adhkar/morning.json", "icon": "morning", "order": 1},
+    {"id": "evening", "name_ar": "أذكار المساء", "name_en": "Evening Adhkar", "asset": "assets/data/adhkar/evening.json", "icon": "evening", "order": 2},
+    {"id": "after_prayer", "name_ar": "أذكار بعد الصلاة", "name_en": "After Prayer Adhkar", "asset": "assets/data/adhkar/after_prayer.json", "icon": "after_prayer", "order": 3},
+    {"id": "sleep", "name_ar": "أذكار النوم", "name_en": "Sleeping Adhkar", "asset": "assets/data/adhkar/sleep.json", "icon": "sleep", "order": 4},
+    {"id": "waking", "name_ar": "أذكار الاستيقاظ", "name_en": "Waking Up Adhkar", "asset": "assets/data/adhkar/waking.json", "icon": "waking", "order": 5},
+    {"id": "home", "name_ar": "أذكار المنزل", "name_en": "Home Adhkar", "asset": "assets/data/adhkar/home.json", "icon": "home", "order": 6},
+    {"id": "eating", "name_ar": "أذكار الأكل والشرب", "name_en": "Eating & Drinking Adhkar", "asset": "assets/data/adhkar/eating.json", "icon": "eating", "order": 7},
+    {"id": "mosque", "name_ar": "أذكار المسجد", "name_en": "Mosque Adhkar", "asset": "assets/data/adhkar/mosque.json", "icon": "mosque", "order": 8},
+    {"id": "travel", "name_ar": "أذكار السفر", "name_en": "Travel Adhkar", "asset": "assets/data/adhkar/travel.json", "icon": "travel", "order": 9},
+    {"id": "misc", "name_ar": "أدعية متنوعة", "name_en": "Various Duas", "asset": "assets/data/adhkar/misc.json", "icon": "dua", "order": 10}
+  ]
+}

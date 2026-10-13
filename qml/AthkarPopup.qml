@@ -14,24 +14,7 @@ Popup {
     closePolicy: Popup.CloseOnEscape
     padding: 20
 
-    // Reactive palette - updates when themeController.resolvedTheme changes
-    property var _pal: Theme.resolvePalette(
-        typeof themeController !== 'undefined' && themeController
-            ? themeController.resolvedTheme : "light")
-
-    // Color properties - updated when theme changes
-    property color accentColor: _pal.primary
-    property color textColor: _pal.text
-
-    // Force _pal and colors update when themeController.resolvedTheme changes
-    Connections {
-        target: themeController
-        function onResolvedThemeChanged(resolvedTheme) {
-            _pal = Theme.resolvePalette(resolvedTheme)
-            accentColor = _pal.primary
-            textColor = _pal.text
-        }
-    }
+    ThemeColors { id: theme }
 
     property string prayerKey: ""
     property string popupTitle: ""
@@ -72,9 +55,9 @@ Popup {
     }
 
     background: Rectangle {
-        color: isDark ? "#1a1a1e" : "#f5f5f7"
+        color: theme.bgColor
         radius: 16
-        border.color: accentColor
+        border.color: theme.accentColor
         border.width: 2
 
         MouseArea {
@@ -92,7 +75,7 @@ Popup {
             font.bold: true
             horizontalAlignment: Text.AlignHCenter
             Layout.fillWidth: true
-            color: accentColor
+            color: theme.accentColor
         }
 
         Text {
@@ -103,7 +86,7 @@ Popup {
             Layout.fillWidth: true
             maximumLineCount: 6
             elide: Text.ElideNone
-            color: textColor
+            color: theme.textColor
         }
     }
 }

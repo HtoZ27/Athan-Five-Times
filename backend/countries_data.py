@@ -1,6 +1,6 @@
 """Auto-generated countries & cities data for prayer_calc.py"""
 
-from typing import Dict, List, Tuple
+from typing import Dict
 
 COUNTRY_METHODS: Dict[str, str] = {
     "AD": "رابطة العالم الإسلامي (MWL)",
@@ -244,18 +244,6 @@ COUNTRY_METHODS: Dict[str, str] = {
     "ZA": "رابطة العالم الإسلامي (MWL)",
     "ZM": "رابطة العالم الإسلامي (MWL)",
     "ZW": "رابطة العالم الإسلامي (MWL)",
-}
-
-
-
-COUNTRY_GROUPS: Dict[str, list[str]] = {
-    "Tunisia & Maghreb": ["TN", "DZ", "MA", "LY", "MR"],
-    "Middle East": ["SA", "AE", "QA", "KW", "BH", "OM", "YE", "IQ", "SY", "JO", "PS", "LB", "IR"],
-    "Africa": ["EG", "SD", "LY", "TN", "DZ", "MA", "MR", "SO", "DJ", "TD", "NE", "NG", "SN", "ML", "GM", "CI", "GH", "CM", "KE", "ET", "TZ", "UG", "RW", "ZM", "ZW", "MW", "MZ", "AO", "NA", "ZA", "BW", "CG", "CD", "GA", "GQ", "BJ", "BF", "SL", "LR", "GN", "GW", "TG", "CF", "ER", "SS", "MG", "MU", "SC", "KM", "CV", "ST", "BI", "LS", "RE", "SZ", "SH", "YT"],
-    "Europe": ["GB", "FR", "DE", "IT", "ES", "PT", "NL", "BE", "CH", "AT", "SE", "NO", "DK", "FI", "IS", "IE", "GR", "TR", "RU", "UA", "PL", "CZ", "SK", "HU", "RO", "BG", "RS", "HR", "BA", "AL", "MK", "ME", "XK", "SI", "LT", "LV", "EE", "BY", "MD", "LU", "MT", "CY", "MC", "LI", "SM", "AD", "VA", "GG", "JE", "IM", "GI", "FO", "GL", "AX", "XR"],
-    "Asia": ["IN", "PK", "BD", "AF", "ID", "MY", "PH", "TH", "VN", "MM", "NP", "LK", "KH", "LA", "SG", "BN", "TL", "MV", "BT", "MN", "KZ", "UZ", "TM", "KG", "TJ", "AZ", "GE", "AM", "CN", "JP", "KR", "TW", "HK", "MO", "KP", "XG", "XW"],
-    "Americas": ["US", "CA", "MX", "BR", "AR", "CO", "CL", "PE", "VE", "EC", "BO", "PY", "UY", "GY", "SR", "GF", "PA", "CR", "NI", "HN", "SV", "GT", "BZ", "CU", "DO", "HT", "JM", "TT", "BS", "BB", "GD", "LC", "VC", "DM", "AG", "KN", "AI", "AW", "BM", "BQ", "CW", "KY", "FK", "GP", "MQ", "MS", "PR", "TC", "VG", "VI", "BL", "MF", "PM", "SX", "GS"],
-    "Oceania": ["AU", "NZ", "PG", "FJ", "SB", "VU", "WS", "TO", "FM", "MH", "PW", "KI", "TV", "NR", "AS", "CK", "CX", "GU", "MP", "NC", "NF", "NU", "PF", "PN", "WF"],
 }
 
 

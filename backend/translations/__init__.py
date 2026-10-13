@@ -5,7 +5,9 @@ Translation manager — loads language files from JSON and provides lookup.
 import json
 import logging
 import os
+from datetime import date
 from functools import lru_cache
+
 logger = logging.getLogger(__name__)
 
 _PACKAGE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -15,11 +17,9 @@ _CURRENT: dict = {}
 _CURRENT_CODE: str = "ar"
 _FALLBACK_CACHE: dict | None = None
 
-from .._constants import LANGS
 FALLBACK = "ar"
 
 
-@lru_cache(maxsize=len(LANGS))
 def _load_file(code: str) -> dict:
     path = os.path.join(_LANG_DIR, f"{code}.json")
     try:
@@ -34,6 +34,8 @@ def _get_fallback() -> dict:
     global _FALLBACK_CACHE
     if _FALLBACK_CACHE is None:
         _FALLBACK_CACHE = _load_file(FALLBACK)
+        if _CURRENT_CODE != FALLBACK:
+            _FALLBACK_CACHE.pop("cities", None)
     return _FALLBACK_CACHE
 
 
@@ -42,11 +44,15 @@ def current_code() -> str:
 
 
 def load(code: str):
-    global _CURRENT, _CURRENT_CODE
+    global _CURRENT, _CURRENT_CODE, _FALLBACK_CACHE
     _CURRENT = _load_file(code)
     _CURRENT_CODE = code if _CURRENT else FALLBACK
     if not _CURRENT:
         _CURRENT = _load_file(FALLBACK)
+    if _CURRENT_CODE == FALLBACK:
+        _FALLBACK_CACHE = _CURRENT
+    elif _FALLBACK_CACHE is not None and "cities" in _FALLBACK_CACHE:
+        _FALLBACK_CACHE.pop("cities")
 
 
 def _get_dict() -> dict:
@@ -78,11 +84,26 @@ def prayer_name(key: str) -> str:
 
 
 def get_athkar(prayer_key: str) -> list[str]:
-    """Return athkar list for a given prayer/morning/evening key."""
+    """Return athkar list for a given prayer/morning/evening key.
+
+    Compat layer over the structured library (backend/adhkar_repo.py):
+    same list[str] shape as before, sourced from assets/adhkar/ so the
+    flat per-language copies can be deleted without breaking callers.
+    """
+    try:
+        from ..adhkar_repo import get_structured_texts
+
+        texts = get_structured_texts(prayer_key)
+        if texts:
+            return texts
+    except Exception as exc:
+        logger.warning("Adhkar library fallback for %s: %s", prayer_key, exc)
     d = _get_dict().get("athkar", {})
     val = d.get(prayer_key)
     if val is None:
         val = _get_fallback().get("athkar", {}).get(prayer_key, [])
+    if isinstance(val, str):
+        val = [val]
     return list(val)
 
 
@@ -104,8 +125,6 @@ def credits_title() -> str:
     return title
 
 
-# ── Date formatting with localization ────────────────────────────────
-
 def _calendar(key: str, default: list | None = None) -> list:
     d = _get_dict().get("calendar", {})
     val = d.get(key)
@@ -117,7 +136,6 @@ def _calendar(key: str, default: list | None = None) -> list:
 def day_name(weekday: int) -> str:
     """0=Monday … 6=Sunday → localized day name."""
     names = _calendar("days")
-    # Python weekday: Mon=0 … Sun=6 → Islamic: Sun=0 … Sat=6
     idx = (weekday + 1) % 7
     return names[idx] if idx < len(names) else ""
 
@@ -134,14 +152,12 @@ def hijri_month_name(month: int) -> str:
     return names[month - 1] if 1 <= month <= len(names) else ""
 
 
-# ── Country / City name lookup ────────────────────────────────────────
-
 def country_name(code: str) -> str:
     """Return the translated name of a country (ISO code)."""
     return _country_name_cached(code, current_code())
 
 
-@lru_cache(maxsize=512)
+@lru_cache(maxsize=4199)
 def _country_name_cached(code: str, _lang: str) -> str:
     d = _get_dict().get("countries", {})
     val = d.get(code)
@@ -150,6 +166,7 @@ def _country_name_cached(code: str, _lang: str) -> str:
     if val is None:
         try:
             from ..countries_data import COUNTRIES
+
             val = COUNTRIES.get(code, code)
         except Exception:
             val = code
@@ -166,19 +183,21 @@ def calc_method_name(key: str) -> str:
 
 
 def city_name(name: str) -> str:
-    """Return the translated name of a city (English key)."""
+    """Return the translated name of a city (English key).
+
+    City translations are only stored in ar.json. For non-Arabic languages
+    the English name itself is returned, avoiding ~3.7 MB of duplicated data
+    in every translation file.
+    """
     return _city_name_cached(name, current_code())
 
 
-@lru_cache(maxsize=512)
+@lru_cache(maxsize=8192)
 def _city_name_cached(name: str, _lang: str) -> str:
-    d = _get_dict().get("cities", {})
-    val = d.get(name)
-    if val is None:
-        val = _get_fallback().get("cities", {}).get(name)
-    if val is None:
-        val = name
-    return val
+    if _lang == FALLBACK:
+        d = _get_dict().get("cities", {})
+        return d.get(name, name)
+    return name
 
 
 def theme_name(key: str) -> str:
@@ -211,6 +230,7 @@ def timezone_name(code: str, display: str) -> str:
 def format_date(d: "date", offset_days: int = 0) -> tuple[str, str]:
     """Return (gregorian_line, hijri_line) localized to current language."""
     from ..hijri import gregorian_to_hijri
+
     wd = day_name(d.weekday())
     greg = f"{wd}، {d.day} {greg_month_name(d.month)} {d.year}"
     y, m, day_ = gregorian_to_hijri(d, offset_days)

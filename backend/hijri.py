@@ -1,6 +1,11 @@
 """
 Hijri (Islamic) calendar date calculation.
-Uses the Umm Al-Qura calendar approximation.
+Uses the tabular (arithmetic/Kuwaiti) calendar approximation.
+
+Note: this is NOT the official observational Umm Al-Qura calendar — tabular
+dates can differ by ±1-2 days from official Saudi announcements (inherent to
+any arithmetic calendar, not a bug in the implementation). Use the
+``hijri_day_offset`` setting to align with local moon-sighting announcements.
 """
 
 import math
@@ -8,39 +13,23 @@ from datetime import date
 from typing import Tuple
 
 
-MONTH_NAMES = [
-    "محرم", "صفر", "ربيع الأول", "ربيع الثاني",
-    "جمادى الأولى", "جمادى الآخرة", "رجب", "شعبان",
-    "رمضان", "شوال", "ذو القعدة", "ذو الحجة",
-]
-
-DAY_NAMES = [
-    "الأحد", "الإثنين", "الثلاثاء", "الأربعاء",
-    "الخميس", "الجمعة", "السبت",
-]
-
-
 def gregorian_to_hijri(d: date, offset_days: int = 0) -> Tuple[int, int, int]:
     """Convert a Gregorian date to (year, month, day) in the Hijri calendar."""
     y, m, day = d.year, d.month, d.day
 
-    # Approximate conversion using the tabular Islamic calendar
-    # Each Hijri year = 354.367 days
     julian_day = _to_julian(y, m, day)
 
-    # Islamic epoch (1 Muharram 1 AH) = July 16, 622 CE (Julian)
     islamic_epoch = 1948439.5
 
     hijri_day = math.floor(julian_day - islamic_epoch) + offset_days
     hijri_year = math.floor((30 * hijri_day + 10646) / 10631)
     hijri_month = min(
         12,
-        math.ceil((hijri_day - (29 * (hijri_year - 1) + _hijri_leap(hijri_year - 1) * 354)) / 29.5)
+        math.ceil((hijri_day - (29 * (hijri_year - 1) + _hijri_leap(hijri_year - 1) * 354)) / 29.5),
     )
 
-    # Refine month and day
     hijri_days_in_year = 354 + _hijri_leap(hijri_year)
-    day_of_year = hijri_day - (hijri_year - 1) * 354 - _hijri_leap_accum(hijri_year - 1)
+    day_of_year = hijri_day - (hijri_year - 1) * 354 - _hijri_leap_accum(hijri_year - 1) + 1
     day_of_year = max(1, min(day_of_year, hijri_days_in_year))
 
     month_day_acc = 0
@@ -64,16 +53,10 @@ def gregorian_to_hijri(d: date, offset_days: int = 0) -> Tuple[int, int, int]:
 
 def format_hijri(d: date) -> str:
     """Return the Hijri date as a formatted string."""
+    from .translations import hijri_month_name
+
     y, m, day = gregorian_to_hijri(d)
-    return f"{day} {MONTH_NAMES[m-1]} {y} هـ"
-
-
-def format_full(d: date) -> str:
-    """Return full date string with weekday, Gregorian, and Hijri."""
-    weekday = DAY_NAMES[(d.weekday() + 1) % 7]
-    greg_str = d.strftime("%d %B %Y")
-    hijri_str = format_hijri(d)
-    return f"{weekday}، {greg_str}\n{hijri_str}"
+    return f"{day} {hijri_month_name(m)} {y} هـ"
 
 
 def _hijri_leap(year: int) -> int:

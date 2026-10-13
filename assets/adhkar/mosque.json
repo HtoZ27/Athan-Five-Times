@@ -1,0 +1,45 @@
+{
+  "id": "mosque",
+  "name_ar": "أذكار المسجد",
+  "name_en": "Mosque Adhkar",
+  "icon": "mosque",
+  "total": 5,
+  "tags": ["mosque", "prayer"],
+  "items": [
+    {
+      "id": "mq01",
+      "arabic": "اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ",
+      "count": 1,
+      "reference_id": "muslim",
+      "reference_detail": "1/423"
+    },
+    {
+      "id": "mq02",
+      "arabic": "اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ",
+      "count": 1,
+      "reference_id": "muslim",
+      "reference_detail": "1/423"
+    },
+    {
+      "id": "mq03",
+      "arabic": "أَعُوذُ بِاللَّهِ الْعَظِيمِ، وَبِوَجْهِهِ الْكَرِيمِ، وَسُلْطَانِهِ الْقَدِيمِ، مِنَ الشَّيْطَانِ الرَّجِيمِ",
+      "count": 1,
+      "reference_id": "abudawud",
+      "reference_detail": "1/126"
+    },
+    {
+      "id": "mq04",
+      "arabic": "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى مُحَمَّدٍ",
+      "count": 1,
+      "reference_id": "quran",
+      "reference_detail": "الأحزاب:56"
+    },
+    {
+      "id": "mq05",
+      "arabic": "سُبْحَانَ اللَّهِ وَالْحَمْدُ لِلَّهِ وَلَا إِلَهَ إِلَّا اللَّهُ وَاللَّهُ أَكْبَرُ",
+      "count": 1,
+      "reference_id": "tirmidhi",
+      "reference_detail": "5/481"
+    }
+  ]
+}

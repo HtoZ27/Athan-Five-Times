@@ -7,6 +7,7 @@ import logging
 from PySide6.QtCore import QObject, Signal, Slot
 
 from .translations import get_athkar
+from .adhkar_repo import get_repository
 from .i18n import t
 
 logger = logging.getLogger(__name__)
@@ -59,3 +60,42 @@ class AthkarProvider(QObject):
     def getTitle(self) -> str:
         """Get current athkar title."""
         return self._title_text
+
+    @Slot(result="QVariantList")
+    def getCategories(self) -> list:
+        """Structured library index: [{id, name_ar, name_en, icon, order}]."""
+        try:
+            return get_repository().get_index()
+        except Exception as exc:
+            logger.warning("Adhkar index failed: %s", exc)
+            return []
+
+    @Slot(str, result="QVariantList")
+    def getCategoryItems(self, category_id: str) -> list:
+        """Structured items: [{arabic, count, reference_id, ...}]."""
+        try:
+            return get_repository().load_category(category_id)["items"]
+        except Exception as exc:
+            logger.warning("Adhkar category %s failed: %s", category_id, exc)
+            return []
+
+    @Slot(str, result=str)
+    def getCategoryName(self, category_id: str) -> str:
+        """Arabic display name of a category (empty on miss)."""
+        try:
+            for c in get_repository().get_index():
+                if c["id"] == category_id:
+                    return c["name_ar"]
+        except Exception as exc:
+            logger.warning("Adhkar name lookup failed: %s", exc)
+        return ""
+
+    _ARABIC_DIGITS = "٠١٢٣٤٥٦٧٨٩"
+
+    @Slot(int, result=str)
+    def toArabicNumeral(self, n: int) -> str:
+        """Latin digits -> Eastern Arabic digits (shared QML helper)."""
+        try:
+            return "".join(self._ARABIC_DIGITS[int(d)] for d in str(abs(int(n))))
+        except (ValueError, TypeError):
+            return str(n)

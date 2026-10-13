@@ -1,8 +1,8 @@
 from datetime import date
 
-import pytest
 
 from backend.i18n import t, t_prayer, format_date, set_lang, LANGS, get_lang
+from backend.translations import city_name, country_name
 
 
 class TestTranslationFunction:
@@ -15,7 +15,7 @@ class TestTranslationFunction:
     def test_t_returns_english_when_switched(self):
         set_lang("en")
         result = t("app_name")
-        assert "Athan" in result or "Prayer" in result or "أذان" in result
+        assert result == "Prayer Times"
 
     def test_t_french_returns_french(self):
         set_lang("fr")
@@ -57,19 +57,56 @@ class TestTranslationFunction:
 
     def test_credits_html_returns_string(self):
         from backend.i18n import credits_html
+
         html = credits_html()
         assert isinstance(html, str)
         assert len(html) > 0
 
     def test_credits_title_returns_string(self):
         from backend.i18n import credits_title
+
         title = credits_title()
         assert isinstance(title, str)
         assert len(title) > 0
 
+    def test_city_name_arabic_returns_arabic(self):
+        set_lang("ar")
+        assert city_name("Tunis") == "تونس"
+
+    def test_city_name_english_returns_english(self):
+        set_lang("en")
+        assert city_name("Tunis") == "Tunis"
+
+    def test_city_name_unknown_returns_itself(self):
+        set_lang("ar")
+        assert city_name("__nonexistent_city__") == "__nonexistent_city__"
+
+    def test_city_name_french_returns_english(self):
+        set_lang("fr")
+        assert city_name("Tunis") == "Tunis"
+
+    def test_country_name_arabic_returns_arabic(self):
+        set_lang("ar")
+        assert country_name("TN") == "تونس"
+        assert country_name("US") == "الولايات المتحدة"
+
+    def test_country_name_english_returns_english(self):
+        set_lang("en")
+        name = country_name("TN")
+        assert name == "Tunisia"
+
+    def test_country_name_invalid_code_returns_code(self):
+        set_lang("ar")
+        assert country_name("__XX__") == "__XX__"
+
+    def test_country_name_french_returns_french(self):
+        set_lang("fr")
+        assert country_name("TN") == "Tunisie"
+
     def test_t_prayer_jumuah(self):
         friday = date(2025, 6, 13)  # Friday
         from backend._constants import _display_key
+
         key = _display_key("dhuhr", friday)
         name = t_prayer(key)
         assert isinstance(name, str)
@@ -103,7 +140,9 @@ class TestFormatDate:
         assert greg_en != greg_ar
 
     def test_format_date_known_date(self):
+        set_lang("ar")
         d = date(2025, 1, 1)
         greg, hijri = format_date(d)
-        assert isinstance(greg, str)
-        assert isinstance(hijri, str)
+        assert "الأربعاء" in greg
+        assert "يناير" in greg
+        assert "هـ" in hijri

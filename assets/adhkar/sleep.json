@@ -1,0 +1,66 @@
+{
+  "id": "sleep",
+  "name_ar": "أذكار النوم",
+  "name_en": "Sleeping Adhkar",
+  "icon": "sleep",
+  "total": 8,
+  "tags": ["sleep", "night"],
+  "items": [
+    {
+      "id": "s01",
+      "arabic": "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا",
+      "count": 1,
+      "reference_id": "bukhari",
+      "reference_detail": "7/156"
+    },
+    {
+      "id": "s02",
+      "arabic": "اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ",
+      "count": 1,
+      "reference_id": "abudawud",
+      "reference_detail": "4/316"
+    },
+    {
+      "id": "s03",
+      "arabic": "سُبْحَانَ اللَّهِ (33) وَالْحَمْدُ لِلَّهِ (33) وَاللَّهُ أَكْبَرُ (34)",
+      "count": 1,
+      "reference_id": "bukhari",
+      "reference_detail": "7/154"
+    },
+    {
+      "id": "s04",
+      "arabic": "اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ",
+      "count": 1,
+      "reference_id": "quran",
+      "reference_detail": "البقرة:255"
+    },
+    {
+      "id": "s05",
+      "arabic": "آمَنَ الرَّسُولُ بِمَا أُنْزِلَ إِلَيْهِ مِنْ رَبِّهِ وَالْمُؤْمِنُونَ",
+      "count": 1,
+      "reference_id": "quran",
+      "reference_detail": "البقرة:285-286"
+    },
+    {
+      "id": "s06",
+      "arabic": "قُلْ هُوَ اللَّهُ أَحَدٌ",
+      "count": 3,
+      "reference_id": "bukhari",
+      "reference_detail": "6/214, 6/215"
+    },
+    {
+      "id": "s07",
+      "arabic": "اللَّهُمَّ أَسْلَمْتُ نَفْسِي إِلَيْكَ، وَفَوَّضْتُ أَمْرِي إِلَيْكَ، وَوَجَّهْتُ وَجْهِي إِلَيْكَ",
+      "count": 1,
+      "reference_id": "bukhari",
+      "reference_detail": "7/159"
+    },
+    {
+      "id": "s08",
+      "arabic": "بِاسْمِكَ رَبِّ وَضَعْتُ جَنْبِي، وَبِكَ أَرْفَعُهُ، فَإِنْ أَمْسَكْتَ نَفْسِي فَارْحَمْهَا",
+      "count": 1,
+      "reference_id": "bukhari",
+      "reference_detail": "7/159"
+    }
+  ]
+}

@@ -7,38 +7,19 @@ Dialog {
     id: root
     title: tr("عن البرنامج")
 
-    width: 460
-    height: 560
+    width: Math.min(460, parent ? parent.width * 0.95 : 460)
+    height: Math.min(560, parent ? parent.height * 0.9 : 560)
     modal: true
 
     x: (parent.width - width) / 2
     y: (parent.height - height) / 2
 
-    property var __pal: Theme.resolvePalette(
-        typeof themeController !== 'undefined' && themeController
-            ? themeController.resolvedTheme : "light")
-
-    property color bgColor: __pal.background
-    property color cardColor: __pal.surface
-    property color textColor: __pal.text
-    property color accentColor: __pal.primary
-    property color secondaryTextColor: __pal.textMuted
-    property color borderColor: __pal.border
-
-    Connections {
-        target: themeController
-        function onResolvedThemeChanged(resolvedTheme) {
-            __pal = Theme.resolvePalette(resolvedTheme)
-            bgColor = __pal.background
-            cardColor = __pal.surface
-            textColor = __pal.text
-            accentColor = __pal.primary
-            secondaryTextColor = __pal.textMuted
-            borderColor = __pal.border
-        }
-    }
+    ThemeColors { id: theme }
 
     function tr(key) {
+        if (typeof l10n === "undefined" || l10n === null
+                || typeof backendController === "undefined" || backendController === null)
+            return key
         var _ = l10n.currentLanguage
         return backendController.translate(key)
     }
@@ -57,9 +38,9 @@ Dialog {
     }
 
     background: Rectangle {
-        color: bgColor
+        color: theme.bgColor
         radius: 16
-        border.color: borderColor
+        border.color: theme.borderColor
         border.width: 1
     }
 
@@ -77,7 +58,7 @@ Dialog {
                 width: 72
                 height: 72
                 radius: 36
-                color: accentColor
+                color: theme.accentColor
 
                 Image {
                     anchors.centerIn: parent
@@ -94,7 +75,7 @@ Dialog {
                 text: tr("أذان الصلاة")
                 font.pixelSize: 22
                 font.bold: true
-                color: textColor
+                color: theme.textColor
             }
 
             Label {
@@ -102,7 +83,7 @@ Dialog {
                 Layout.alignment: Qt.AlignHCenter
                 text: tr("تطبيق مفتوح المصدر لأوقات الصلاة والأذان")
                 font.pixelSize: 13
-                color: secondaryTextColor
+                color: theme.textMutedColor
             }
         }
     }
@@ -117,7 +98,7 @@ Dialog {
             Layout.leftMargin: 20
             Layout.rightMargin: 20
             height: 1
-            color: borderColor
+            color: theme.borderColor
         }
 
         ScrollView {
@@ -139,7 +120,7 @@ Dialog {
                     text: tr("المكتبات المستخدمة")
                     font.pixelSize: 14
                     font.bold: true
-                    color: accentColor
+                    color: theme.accentColor
                 }
 
                 Text {
@@ -148,7 +129,7 @@ Dialog {
                     textFormat: Text.RichText
                     wrapMode: Text.WordWrap
                     font.pixelSize: 13
-                    color: textColor
+                    color: theme.textColor
                     onLinkActivated: function(link) {
                         Qt.openUrlExternally(link)
                     }
@@ -161,7 +142,7 @@ Dialog {
             Layout.leftMargin: 20
             Layout.rightMargin: 20
             height: 1
-            color: borderColor
+            color: theme.borderColor
         }
 
         ColumnLayout {
@@ -176,14 +157,14 @@ Dialog {
                 text: tr("الإصدار") + " " + (typeof appVersion !== 'undefined' ? appVersion : "1.0.0")
                 font.pixelSize: 13
                 font.bold: true
-                color: accentColor
+                color: theme.accentColor
             }
 
             Label {
                 Layout.alignment: Qt.AlignHCenter
-                text: tr("من صنع") + " H.Z.Tun"
+                text: tr("تطوير") + ": H.Z.Tun"
                 font.pixelSize: 12
-                color: secondaryTextColor
+                color: theme.textMutedColor
             }
         }
     }

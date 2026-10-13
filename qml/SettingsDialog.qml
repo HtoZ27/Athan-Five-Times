@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import QtQuick.Dialogs
+import QtQuick.Dialogs as NativeDialogs
 import Theme 1.0
 
 Dialog {
@@ -15,32 +15,7 @@ Dialog {
     modal: true
     closePolicy: Dialog.CloseOnEscape
 
-    // Reactive palette - updates when themeController.resolvedTheme changes
-    property var _pal: Theme.resolvePalette(
-        typeof themeController !== 'undefined' && themeController
-            ? themeController.resolvedTheme : "light")
-
-    // Color properties - updated when theme changes
-    property color backgroundColor: _pal.background
-    property color cardColor: _pal.surface
-    property color textColor: _pal.text
-    property color secondaryTextColor: _pal.textMuted
-    property color accentColor: _pal.primary
-    property color borderColor: _pal.border
-
-    // Force _pal and colors update when themeController.resolvedTheme changes
-    Connections {
-        target: themeController
-        function onResolvedThemeChanged(resolvedTheme) {
-            _pal = Theme.resolvePalette(resolvedTheme)
-            backgroundColor = _pal.background
-            cardColor = _pal.surface
-            textColor = _pal.text
-            secondaryTextColor = _pal.textMuted
-            accentColor = _pal.primary
-            borderColor = _pal.border
-        }
-    }
+    ThemeColors { id: theme }
 
     Connections {
         target: backendController
@@ -52,7 +27,54 @@ Dialog {
     property bool useCustomCoords: false
     property string searchText: ""
     property int currentTabIndex: 0
+    property string _currentCountryCode: ""
     property bool _populating: true
+    property bool _saving: false
+    property var _tabLoaded: [false, false, false, false, false, false, false]
+
+    onClosed: {
+        if (!_saving) backendController.restoreSettingsSnapshot()
+    }
+
+    onCurrentTabIndexChanged: {
+        if (_populating) return
+        _ensureTabLoaded(currentTabIndex)
+    }
+
+    function _ensureTabLoaded(idx) {
+        if (idx < 0 || idx > 6) return
+        if (_tabLoaded[idx]) return
+        _tabLoaded[idx] = true
+        var tabs = [locationTab, offsetsTab, muezzinsTab, audioTab, notificationsTab, athkarTab, generalTab]
+        tabs[idx].populate()
+    }
+    property var _pendingOffsets: ({})
+    property Timer _offsetDebounce: Timer {
+        interval: 300
+        onTriggered: {
+            var po = _pendingOffsets
+            _pendingOffsets = ({})
+            for (var k in po) backendController.setOffset(k, po[k])
+        }
+    }
+    property Timer _filterTimer: Timer {
+        interval: 150
+        onTriggered: {
+            var text = searchText
+            var all = backendController.getCountryList()
+            if (!text || text === "") {
+                countryCombo.model = all
+                return
+            }
+            var filtered = []
+            for (var i = 0; i < all.length; i++) {
+                var item = all[i]
+                if (item.name && item.name.toLowerCase().indexOf(text.toLowerCase()) >= 0)
+                    filtered.push(item)
+            }
+            countryCombo.model = filtered
+        }
+    }
 
     property var _tabNames: [
         tr("الموقع"),
@@ -65,11 +87,17 @@ Dialog {
     ]
 
     function tr(key) {
+        if (typeof l10n === "undefined" || l10n === null
+                || typeof backendController === "undefined" || backendController === null)
+            return key
         var _ = l10n.currentLanguage
         return backendController.translate(key)
     }
 
     function trPrayer(key) {
+        if (typeof l10n === "undefined" || l10n === null
+                || typeof backendController === "undefined" || backendController === null)
+            return key
         var _ = l10n.currentLanguage
         return backendController.translatePrayer(key)
     }
@@ -92,12 +120,10 @@ Dialog {
         importDialog.title = tr("اختر ملف إعدادات")
         importDialog.nameFilters = [tr("ملفات JSON (*.json)")]
         _populating = true
+        _tabLoaded = [false, false, false, false, false, false, false]
+        _tabLoaded[0] = true
         locationTab.populate()
-        offsetsTab.populate()
-        muezzinsTab.populate()
-        audioTab.populate()
-        notificationsTab.populate()
-        athkarTab.populate()
+        _tabLoaded[6] = true
         generalTab.populate()
         _populating = false
     }
@@ -127,7 +153,7 @@ Dialog {
     }
 
     background: Rectangle {
-        color: backgroundColor
+        color: theme.bgColor
         radius: 12
     }
 
@@ -136,17 +162,20 @@ Dialog {
         color: "transparent"
         radius: 12
 
-        property point dragStart: Qt.point(0, 0)
+        property point pressGlobal: Qt.point(0, 0)
+        property point dlgPos: Qt.point(0, 0)
 
         MouseArea {
             anchors.fill: parent
             onPressed: {
-                dragStart = Qt.point(mouse.x, mouse.y)
+                pressGlobal = mapToGlobal(mouse.x, mouse.y)
+                dlgPos = Qt.point(root.x, root.y)
             }
             onPositionChanged: {
                 if (pressed) {
-                    root.x += mouse.x - dragStart.x
-                    root.y += mouse.y - dragStart.y
+                    var g = mapToGlobal(mouse.x, mouse.y)
+                    root.x = dlgPos.x + g.x - pressGlobal.x
+                    root.y = dlgPos.y + g.y - pressGlobal.y
                 }
             }
         }
@@ -154,7 +183,7 @@ Dialog {
         Label {
             anchors.centerIn: parent
             text: root.title
-            color: textColor
+            color: theme.textColor
             font.pixelSize: 16
             font.bold: true
         }
@@ -164,7 +193,7 @@ Dialog {
             anchors.left: parent.left
             anchors.right: parent.right
             height: 1
-            color: borderColor
+            color: theme.borderColor
         }
     }
 
@@ -194,14 +223,14 @@ Dialog {
                         required property int index
                         implicitWidth: tabLabel.implicitWidth + 20
                         implicitHeight: 36
-                        color: currentTabIndex === index ? accentColor : Qt.rgba(cardColor.r, cardColor.g, cardColor.b, 0.55)
+                        color: currentTabIndex === index ? theme.accentColor : Qt.rgba(theme.cardColor.r, theme.cardColor.g, theme.cardColor.b, 0.55)
                         radius: 6
 
                         Label {
                             id: tabLabel
                             anchors.centerIn: parent
                             text: modelData
-                            color: currentTabIndex === index ? "#fff" : textColor
+                            color: currentTabIndex === index ? "#fff" : theme.textColor
                             font.pixelSize: 12
                             font.bold: currentTabIndex === index
                         }
@@ -274,37 +303,22 @@ Dialog {
 
                     function _setCityCombo(countryCode, cityCode) {
                         if (countryCode && countryCode !== "none") {
-                            cityCombo.model = backendController.getCitiesForCountry(countryCode)
-                            if (cityCode) {
-                                for (var i = 0; i < cityCombo.model.length; i++) {
-                                    if (cityCombo.model[i].engName === cityCode) {
-                                        cityCombo.currentIndex = i
-                                        return
-                                    }
-                                }
-                            }
+                            _currentCountryCode = countryCode
+                            cityPicker.setCity(cityCode)
                         }
                     }
 
                     function filterCountry(text) {
                         searchText = text
-                        var all = backendController.getCountryList()
-                        if (!text || text === "") {
-                            countryCombo.model = all
-                            return
-                        }
-                        var filtered = []
-                        for (var i = 0; i < all.length; i++) {
-                            var item = all[i]
-                            if (item.name && item.name.toLowerCase().indexOf(text.toLowerCase()) >= 0)
-                                filtered.push(item)
-                        }
-                        countryCombo.model = filtered
+                        _filterTimer.restart()
                     }
 
                     function onCountryChanged() {
                         var code = backendController.getSetting("country")
-                        if (code) _setCountryCombo(code)
+                        if (code) {
+                            _currentCountryCode = code
+                            _setCountryCombo(code)
+                        }
                     }
 
                     ScrollView {
@@ -318,8 +332,8 @@ Dialog {
 
                                 GroupBox {
                                     Layout.fillWidth: true
-                                    label: Label { text: tr("تحديد الموقع تلقائياً"); color: textColor; font.bold: true; ToolTip.text: tr("تحديد موقعك الحالي عبر الإنترنت") }
-                                    background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
+                                    label: Label { text: tr("تحديد الموقع تلقائياً"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تحديد موقعك الحالي عبر الإنترنت") }
+                                    background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                     ColumnLayout { width: parent.width; spacing: 6
                                         Button {
                                             Layout.fillWidth: true
@@ -338,12 +352,12 @@ Dialog {
 
                                 GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("الموقع"); color: textColor; font.bold: true }
+                                label: Label { text: tr("الموقع"); color: theme.textColor; font.bold: true }
 
                                 background: Rectangle {
-                                    color: cardColor
+                                    color: theme.cardColor
                                     radius: 8
-                                    border.color: borderColor
+                                    border.color: theme.borderColor
                                     border.width: 1
                                 }
 
@@ -360,46 +374,49 @@ Dialog {
                                         onCurrentIndexChanged: {
                                             if (_populating || currentIndex < 0 || currentIndex >= model.length) return
                                             var item = model[currentIndex]
+                                            _currentCountryCode = item.code
                                             backendController.updateSetting("country", item.code)
-                                            cityCombo.model = backendController.getCitiesForCountry(item.code)
-                                            cityCombo.currentIndex = -1
                                             var defaultMethod = backendController.getDefaultMethod(item.code)
                                             if (defaultMethod) {
                                                 methodCombo.currentIndex = _findMethodIndex(defaultMethod)
                                             }
                                         }
                                         onAccepted: {
-                                            if (editText && currentIndex < 0)
-                                                backendController.updateSetting("country", editText)
+                                            if (editText && currentIndex < 0) {
+                                                var q = editText.toLowerCase()
+                                                var hit = -1
+                                                for (var i = 0; i < model.length; i++) {
+                                                    var it = model[i]
+                                                    if (it.code === editText
+                                                            || (it.name && it.name.toLowerCase() === q)) {
+                                                        hit = i
+                                                        break
+                                                    }
+                                                }
+                                                if (hit >= 0) {
+                                                    currentIndex = hit
+                                                } else {
+                                                    _setCountryCombo(backendController.getSetting("country"))
+                                                }
+                                            }
                                         }
                                     }
 
-                    ComboBox {
-                        id: cityCombo
-                        Layout.fillWidth: true
-                        editable: true
-                        textRole: "name"
-                        onCurrentIndexChanged: {
-                            if (_populating || currentIndex < 0 || currentIndex >= model.length) return
-                            var item = model[currentIndex]
-                            backendController.updateSetting("city", item.engName)
-                            if (item.lat) backendController.updateSetting("latitude", item.lat)
-                            if (item.lon) backendController.updateSetting("longitude", item.lon)
-                        }
-                        onAccepted: {
-                            if (editText && currentIndex < 0) {
-                                var match = cityCombo.model.find(function(it) { return it.name === editText || it.engName === editText })
-                                if (match >= 0) {
-                                    var matchedItem = cityCombo.model[match]
-                                    backendController.updateSetting("city", matchedItem.engName)
-                                    if (matchedItem.lat) backendController.updateSetting("latitude", matchedItem.lat)
-                                    if (matchedItem.lon) backendController.updateSetting("longitude", matchedItem.lon)
-                                } else {
-                                    backendController.updateSetting("city", editText)
-                                }
-                            }
-                        }
-                    }
+                                    VirtualCityPicker {
+                                        id: cityPicker
+                                        countryCode: _currentCountryCode
+                                        onCitySelected: function(engName, displayName) {
+                                            if (_populating) return
+                                            backendController.updateSetting("city", engName)
+                                            var coords = backendController.getCityCoords(_currentCountryCode, engName)
+                                            if (coords && coords.lat) backendController.updateSetting("latitude", coords.lat)
+                                            if (coords && coords.lon) backendController.updateSetting("longitude", coords.lon)
+                                        }
+                                        onAccepted: function(text) {
+                                            if (_populating) return
+                                            backendController.updateSetting("city", text)
+                                        }
+                                    }
 
                                     CheckBox {
                                         id: customCoordsCheck
@@ -412,8 +429,9 @@ Dialog {
                                             if (!checked) {
                                                 backendController.resetToAutoCoordinates()
                                                 var s = backendController.getSettings()
+                                                _currentCountryCode = s.country
                                                 _setCountryCombo(s.country)
-                                                _setCityCombo(s.country, s.city)
+                                                cityPicker.setCity(s.city)
                                                 if (s.latitude) latField.text = String(s.latitude)
                                                 if (s.longitude) lonField.text = String(s.longitude)
                                             }
@@ -428,12 +446,12 @@ Dialog {
                                             id: latField
                                             Layout.fillWidth: true
                                             placeholderText: tr("العرض (Latitude)")
-                                            color: textColor
-                                            placeholderTextColor: secondaryTextColor
+                                            color: theme.textColor
+                                            placeholderTextColor: theme.textMutedColor
                                             validator: DoubleValidator { bottom: -90; top: 90; decimals: 6 }
                                             background: Rectangle {
-                                                color: backgroundColor; radius: 6
-                                                border.color: borderColor; border.width: 1
+                                                color: theme.bgColor; radius: 6
+                                                border.color: theme.borderColor; border.width: 1
                                             }
                                             onEditingFinished: {
                                                 var v = parseFloat(text)
@@ -447,12 +465,12 @@ Dialog {
                                             id: lonField
                                             Layout.fillWidth: true
                                             placeholderText: tr("الطول (Longitude)")
-                                            color: textColor
-                                            placeholderTextColor: secondaryTextColor
+                                            color: theme.textColor
+                                            placeholderTextColor: theme.textMutedColor
                                             validator: DoubleValidator { bottom: -180; top: 180; decimals: 6 }
                                             background: Rectangle {
-                                                color: backgroundColor; radius: 6
-                                                border.color: borderColor; border.width: 1
+                                                color: theme.bgColor; radius: 6
+                                                border.color: theme.borderColor; border.width: 1
                                             }
                                             onEditingFinished: {
                                                 var v = parseFloat(text)
@@ -468,10 +486,10 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("طريقة الحساب"); color: textColor; font.bold: true }
+                                label: Label { text: tr("طريقة الحساب"); color: theme.textColor; font.bold: true }
                                 background: Rectangle {
-                                    color: cardColor; radius: 8
-                                    border.color: borderColor; border.width: 1
+                                    color: theme.cardColor; radius: 8
+                                    border.color: theme.borderColor; border.width: 1
                                 }
                                 ColumnLayout {
                                     width: parent.width
@@ -489,10 +507,10 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("المذهب"); color: textColor; font.bold: true }
+                                label: Label { text: tr("المذهب"); color: theme.textColor; font.bold: true }
                                 background: Rectangle {
-                                    color: cardColor; radius: 8
-                                    border.color: borderColor; border.width: 1
+                                    color: theme.cardColor; radius: 8
+                                    border.color: theme.borderColor; border.width: 1
                                 }
                                 ColumnLayout {
                                     width: parent.width
@@ -532,9 +550,9 @@ Dialog {
 
                     function resetOffsets() {
                         var keys = ["fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha"]
-                        for (var i = 0; i < keys.length; i++) {
-                            backendController.setOffset(keys[i], 0)
-                        }
+                        for (var i = 0; i < keys.length; i++)
+                            _pendingOffsets[keys[i]] = 0
+                        _offsetDebounce.restart()
                         fajrSp.value = sunriseSp.value = dhuhrSp.value = 0
                         asrSp.value = maghribSp.value = ishaSp.value = 0
                     }
@@ -546,38 +564,38 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("إزاحة أوقات الصلاة (دقائق)"); color: textColor }
-                                background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
+                                label: Label { text: tr("إزاحة أوقات الصلاة (دقائق)"); color: theme.textColor }
+                                background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 4
                                     RowLayout { Layout.fillWidth: true
-                                        Label { text: tr("الفجر"); color: textColor; Layout.fillWidth: true }
+                                        Label { text: tr("الفجر"); color: theme.textColor; Layout.fillWidth: true }
                                         SpinBox { id: fajrSp; from: -60; to: 60
-                                            onValueChanged: { if (_populating) return; backendController.setOffset("fajr", value) } }
+                                            onValueChanged: { if (_populating) return; _pendingOffsets["fajr"] = value; _offsetDebounce.restart() } }
                                     }
                                     RowLayout { Layout.fillWidth: true
-                                        Label { text: tr("الشروق"); color: textColor; Layout.fillWidth: true }
+                                        Label { text: tr("الشروق"); color: theme.textColor; Layout.fillWidth: true }
                                         SpinBox { id: sunriseSp; from: -60; to: 60
-                                            onValueChanged: { if (_populating) return; backendController.setOffset("sunrise", value) } }
+                                            onValueChanged: { if (_populating) return; _pendingOffsets["sunrise"] = value; _offsetDebounce.restart() } }
                                     }
                                     RowLayout { Layout.fillWidth: true
-                                        Label { text: tr("الظهر"); color: textColor; Layout.fillWidth: true }
+                                        Label { text: tr("الظهر"); color: theme.textColor; Layout.fillWidth: true }
                                         SpinBox { id: dhuhrSp; from: -60; to: 60
-                                            onValueChanged: { if (_populating) return; backendController.setOffset("dhuhr", value) } }
+                                            onValueChanged: { if (_populating) return; _pendingOffsets["dhuhr"] = value; _offsetDebounce.restart() } }
                                     }
                                     RowLayout { Layout.fillWidth: true
-                                        Label { text: tr("العصر"); color: textColor; Layout.fillWidth: true }
+                                        Label { text: tr("العصر"); color: theme.textColor; Layout.fillWidth: true }
                                         SpinBox { id: asrSp; from: -60; to: 60
-                                            onValueChanged: { if (_populating) return; backendController.setOffset("asr", value) } }
+                                            onValueChanged: { if (_populating) return; _pendingOffsets["asr"] = value; _offsetDebounce.restart() } }
                                     }
                                     RowLayout { Layout.fillWidth: true
-                                        Label { text: tr("المغرب"); color: textColor; Layout.fillWidth: true }
+                                        Label { text: tr("المغرب"); color: theme.textColor; Layout.fillWidth: true }
                                         SpinBox { id: maghribSp; from: -60; to: 60
-                                            onValueChanged: { if (_populating) return; backendController.setOffset("maghrib", value) } }
+                                            onValueChanged: { if (_populating) return; _pendingOffsets["maghrib"] = value; _offsetDebounce.restart() } }
                                     }
                                     RowLayout { Layout.fillWidth: true
-                                        Label { text: tr("العشاء"); color: textColor; Layout.fillWidth: true }
+                                        Label { text: tr("العشاء"); color: theme.textColor; Layout.fillWidth: true }
                                         SpinBox { id: ishaSp; from: -60; to: 60
-                                            onValueChanged: { if (_populating) return; backendController.setOffset("isha", value) } }
+                                            onValueChanged: { if (_populating) return; _pendingOffsets["isha"] = value; _offsetDebounce.restart() } }
                                     }
                                     Button {
                                         Layout.fillWidth: true; Layout.preferredHeight: 36; Layout.topMargin: 4
@@ -589,8 +607,8 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("إزاحة التاريخ الهجري"); color: textColor }
-                                background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
+                                label: Label { text: tr("إزاحة التاريخ الهجري"); color: theme.textColor }
+                                background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
                                     SpinBox {
                                         id: hijriSp; Layout.fillWidth: true; from: -5; to: 5
@@ -644,7 +662,7 @@ Dialog {
                         if (!m) return
                         var newName = m.name + tr(" (نسخة)")
                         var counter = 2
-                        while (true) {
+                        while (counter < 1000) {
                             var exists = false
                             for (var i = 0; i < muezzinsModel.count; i++) {
                                 if (muezzinsModel.get(i).name === newName) { exists = true; break }
@@ -668,15 +686,15 @@ Dialog {
                                             required property var modelData
                                             required property int index
                                             Layout.fillWidth: true; Layout.preferredHeight: 56
-                                            color: cardColor; radius: 8
-                                            border.color: borderColor; border.width: 1
+                                            color: theme.cardColor; radius: 8
+                                            border.color: theme.borderColor; border.width: 1
 
                                              RowLayout {
                                                  anchors.fill: parent; anchors.margins: 8; spacing: 6
                                                  ColumnLayout {
                                                      Layout.fillWidth: true; Layout.fillHeight: true; spacing: 2
-                                                     Label { text: modelData.name; color: textColor; font.bold: true }
-                                                     Label { text: modelData.path; color: secondaryTextColor; font.pixelSize: 11
+                                                     Label { text: modelData.name; color: theme.textColor; font.bold: true }
+                                                     Label { text: modelData.path; color: theme.textMutedColor; font.pixelSize: 11
                                                          elide: Text.ElideMiddle; Layout.fillWidth: true }
                                                  }
                                                   Button {
@@ -756,8 +774,8 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("ملفات الصوت لكل صلاة"); color: textColor; font.bold: true }
-                                background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
+                                label: Label { text: tr("ملفات الصوت لكل صلاة"); color: theme.textColor; font.bold: true }
+                                background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 4
                                     Repeater {
                                         model: audioFilesModel
@@ -767,13 +785,13 @@ Dialog {
                                             Layout.fillWidth: true
                                             Label { 
                                                 text: modelData && modelData.prayer ? trPrayer(modelData.prayer) : ""
-                                                color: textColor
+                                                color: theme.textColor
                                                 Layout.preferredWidth: 60
                                                 font.bold: true
                                             }
                                             Label {
                                                 text: modelData && modelData.path ? modelData.path : tr("(غير محدد)")
-                                                color: modelData && modelData.path ? textColor : secondaryTextColor
+                                                color: modelData && modelData.path ? theme.textColor : theme.textMutedColor
                                                 elide: Text.ElideMiddle; Layout.fillWidth: true
                                                 font.pixelSize: 12
                                             }
@@ -808,18 +826,18 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("الصوت العام"); color: textColor; font.bold: true; ToolTip.text: tr("إعدادات الصوت العامة للأذان") }
-                                background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
+                                label: Label { text: tr("الصوت العام"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات الصوت العامة للأذان") }
+                                background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 6
 
                                     RowLayout {
                                         Layout.fillWidth: true
-                                        Label { text: tr("مستوى الصوت:"); color: textColor; ToolTip.text: tr("ضبط مستوى صوت الأذان (0-100%)") }
+                                        Label { text: tr("مستوى الصوت:"); color: theme.textColor; ToolTip.text: tr("ضبط مستوى صوت الأذان (0-100%)") }
                                         Slider {
                                             id: volumeSp; Layout.fillWidth: true; from: 0; to: 1; stepSize: 0.05
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("volume", value) }
                                         }
-                                        Label { text: Math.round(volumeSp.value * 100) + "%"; color: textColor; Layout.preferredWidth: 50 }
+                                        Label { text: Math.round(volumeSp.value * 100) + "%"; color: theme.textColor; Layout.preferredWidth: 50 }
                                     }
 
                                     CheckBox {
@@ -830,7 +848,7 @@ Dialog {
 
                                     RowLayout {
                                         Layout.fillWidth: true; visible: fadeInCb.checked
-                                        Label { text: tr("مدة التلاشي (ثوانٍ):"); color: textColor; Layout.fillWidth: true; ToolTip.text: tr("مدة الزيادة التدريجية للصوت عند بداية الأذان") }
+                                        Label { text: tr("مدة التلاشي (ثوانٍ):"); color: theme.textColor; Layout.fillWidth: true; ToolTip.text: tr("مدة الزيادة التدريجية للصوت عند بداية الأذان") }
                                         SpinBox { id: fadeDurSp; from: 1; to: 10
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("fade_in_duration", value) } }
                                     }
@@ -843,7 +861,7 @@ Dialog {
 
                                     Label {
                                         text: tr("ملاحظة: تفعيل \"تكبير فقط\" يشغل التكبير بدلاً من الأذان الكامل")
-                                        color: secondaryTextColor; font.pixelSize: 11; wrapMode: Text.WordWrap
+                                        color: theme.textMutedColor; font.pixelSize: 11; wrapMode: Text.WordWrap
                                         Layout.fillWidth: true
                                     }
                                 }
@@ -851,15 +869,15 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("تفعيل الأذان لكل صلاة"); color: textColor; font.bold: true; ToolTip.text: tr("تفعيل/إيقاف الأذان لكل صلاة على حدة") }
-                                background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
+                                label: Label { text: tr("تفعيل الأذان لكل صلاة"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تفعيل/إيقاف الأذان لكل صلاة على حدة") }
+                                background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 4
 
                                     Repeater {
                                         model: ["fajr", "dhuhr", "asr", "maghrib", "isha"]
                                         delegate: CheckBox {
                                             text: trPrayer(modelData)
-                                            checked: backendController.getNestedSetting("azan_enabled." + modelData) !== false
+                                            checked: backendController ? backendController.getNestedSetting("azan_enabled." + modelData) !== false : true
                                             ToolTip.text: tr("تفعيل الأذان لصلاة ") + trPrayer(modelData)
                                             onCheckedChanged: backendController.updateSetting("azan_enabled." + modelData, checked)
                                         }
@@ -883,6 +901,7 @@ Dialog {
                             dndToSp.value = s.dnd_to !== undefined ? s.dnd_to : 6
                             dndDurSp.value = s.dnd_duration !== undefined ? s.dnd_duration : 20
                             silentCb.checked = s.silent_mode || false
+                            showTrayCb.checked = s.show_tray !== undefined ? s.show_tray : true
                         } finally {
                             _populating = false
                         }
@@ -895,15 +914,15 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("الأذان المبكر"); color: textColor; font.bold: true; ToolTip.text: tr("إعدادات التنبيه المبكر قبل الأذان") }
-                                background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
+                                label: Label { text: tr("الأذان المبكر"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات التنبيه المبكر قبل الأذان") }
+                                background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 4
                                     CheckBox { id: preAzanCb; text: tr("تفعيل التنبيه المبكر")
                                         ToolTip.text: tr("تفعيل التنبيه المبكر قبل الأذان بالدقائق المحددة")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("pre_azan_enabled", checked) } }
                                     RowLayout {
                                         Layout.leftMargin: 20; visible: preAzanCb.checked
-                                        Label { text: tr("دقائق قبل الأذان:"); color: textColor; ToolTip.text: tr("عدد الدقائق قبل الأذان للتنبيه المبكر") }
+                                        Label { text: tr("دقائق قبل الأذان:"); color: theme.textColor; ToolTip.text: tr("عدد الدقائق قبل الأذان للتنبيه المبكر") }
                                         SpinBox { id: preAzanSp; from: 1; to: 60
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("pre_azan_minutes", value) } }
                                     }
@@ -912,24 +931,24 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("عدم الإزعاج (DND)"); color: textColor; font.bold: true; ToolTip.text: tr("إيقاف الإشعارات النظامية في أوقات محددة") }
-                                background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
+                                label: Label { text: tr("عدم الإزعاج (DND)"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إيقاف الإشعارات النظامية في أوقات محددة") }
+                                background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 4
                                     CheckBox { id: dndCb; text: tr("تفعيل DND")
                                         ToolTip.text: tr("إيقاف إشعارات النظام خلال فترة DND")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("dnd_enabled", checked) } }
                                     RowLayout {
                                         Layout.leftMargin: 20; visible: dndCb.checked
-                                        Label { text: tr("من الساعة:"); color: textColor; ToolTip.text: tr("ساعة بداية فترة DND") }
+                                        Label { text: tr("من الساعة:"); color: theme.textColor; ToolTip.text: tr("ساعة بداية فترة DND") }
                                         SpinBox { id: dndFromSp; from: 0; to: 23
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("dnd_from", value) } }
-                                        Label { text: tr("إلى الساعة:"); color: textColor; ToolTip.text: tr("ساعة نهاية فترة DND") }
+                                        Label { text: tr("إلى الساعة:"); color: theme.textColor; ToolTip.text: tr("ساعة نهاية فترة DND") }
                                         SpinBox { id: dndToSp; from: 0; to: 23
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("dnd_to", value) } }
                                     }
                                     RowLayout {
                                         Layout.leftMargin: 20; visible: dndCb.checked
-                                        Label { text: tr("مدة بعد الصلاة (دقيقة):"); color: textColor; ToolTip.text: tr("مدة تفعيل DND بعد كل صلاة") }
+                                        Label { text: tr("مدة بعد الصلاة (دقيقة):"); color: theme.textColor; ToolTip.text: tr("مدة تفعيل DND بعد كل صلاة") }
                                         SpinBox { id: dndDurSp; from: 5; to: 120
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("dnd_duration", value) } }
                                     }
@@ -938,12 +957,23 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("الوضع الصامت"); color: textColor; font.bold: true; ToolTip.text: tr("كتم جميع الأصوات والتنبيهات") }
-                                background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
+                                label: Label { text: tr("الوضع الصامت"); color: theme.textColor; font.bold: true; ToolTip.text: tr("كتم جميع الأصوات والتنبيهات") }
+                                background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
                                     CheckBox { id: silentCb; text: tr("الوضع الصامت")
                                         ToolTip.text: tr("كتم جميع أصوات الأذان والإشعارات")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("silent_mode", checked) } }
+                                }
+                            }
+
+                            GroupBox {
+                                Layout.fillWidth: true
+                                label: Label { text: tr("شريط النظام"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات أيقونة شريط النظام") }
+                                background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
+                                ColumnLayout { width: parent.width
+                                    CheckBox { id: showTrayCb; text: tr("إظهار أيقونة شريط النظام")
+                                        ToolTip.text: tr("إظهار أو إخفاء أيقونة التطبيق في شريط النظام")
+                                        onCheckedChanged: { if (_populating) return; backendController.updateSetting("show_tray", checked) } }
                                 }
                             }
 
@@ -964,7 +994,7 @@ Dialog {
                             athkarMethodCb.currentIndex = idx >= 0 ? idx : 0
                             popupEnabledCb.checked = s.athkar_popup_enabled !== false
                             popupDurSp.value = s.athkar_popup_duration !== undefined ? s.athkar_popup_duration : 300
-                            popupDelaySp.value = s.athkar_popup_delay !== undefined ? s.athkar_popup_delay : 600
+                            popupDelaySp.value = s.athkar_popup_delay !== undefined ? s.athkar_popup_delay : 60
                         } finally {
                             _populating = false
                         }
@@ -977,18 +1007,18 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("الأذكار"); color: textColor; font.bold: true; ToolTip.text: tr("إعدادات الأذكار بعد الصلاة") }
-                                background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
+                                label: Label { text: tr("الأذكار"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات الأذكار بعد الصلاة") }
+                                background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 6
                                     RowLayout {
                                         Layout.fillWidth: true
-                                        Label { text: tr("عدد مرات التكرار:"); color: textColor; ToolTip.text: tr("عدد مرات تكرار كل ذكر") }
+                                        Label { text: tr("عدد مرات التكرار:"); color: theme.textColor; ToolTip.text: tr("عدد مرات تكرار كل ذكر") }
                                         SpinBox { id: athkarCountSp; from: 1; to: 99
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("athkarCount", value) } }
                                     }
                                     RowLayout {
                                         Layout.fillWidth: true
-                                        Label { text: tr("طريقة العرض:"); color: textColor; ToolTip.text: tr("متى تظهر الأذكار: بعد كل صلاة، في وقت محدد، أو كلاهما") }
+                                        Label { text: tr("طريقة العرض:"); color: theme.textColor; ToolTip.text: tr("متى تظهر الأذكار: بعد كل صلاة، في وقت محدد، أو كلاهما") }
                                         ComboBox {
                                             id: athkarMethodCb; Layout.fillWidth: true
                                             model: [tr("بعد الصلاة"), tr("وقت محدد"), tr("كلاهما")]
@@ -1004,21 +1034,21 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("النافذة المنبثقة للأذكار"); color: textColor; font.bold: true; ToolTip.text: tr("إعدادات النافذة المنبثقة التي تظهر الأذكار") }
-                                background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
+                                label: Label { text: tr("النافذة المنبثقة للأذكار"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات النافذة المنبثقة التي تظهر الأذكار") }
+                                background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 6
                                     CheckBox { id: popupEnabledCb; text: tr("تفعيل النافذة المنبثقة")
                                         ToolTip.text: tr("عرض نافذة منبثقة بالأذكار بعد كل صلاة")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("athkar_popup_enabled", checked) } }
                                     RowLayout {
                                         Layout.fillWidth: true; visible: popupEnabledCb.checked
-                                        Label { text: tr("مدة العرض (ثوانٍ):"); color: textColor; ToolTip.text: tr("مدة بقاء النافذة المنبثقة ظاهرة قبل الإغلاق التلقائي") }
+                                        Label { text: tr("مدة العرض (ثوانٍ):"); color: theme.textColor; ToolTip.text: tr("مدة بقاء النافذة المنبثقة ظاهرة قبل الإغلاق التلقائي") }
                                         SpinBox { id: popupDurSp; from: 5; to: 600
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("athkar_popup_duration", value) } }
                                     }
                                     RowLayout {
                                         Layout.fillWidth: true; visible: popupEnabledCb.checked
-                                        Label { text: tr("تأخير الظهور (ثوانٍ):"); color: textColor; ToolTip.text: tr("تأخير ظهور النافذة بعد انتهاء الصلاة") }
+                                        Label { text: tr("تأخير الظهور (ثوانٍ):"); color: theme.textColor; ToolTip.text: tr("تأخير ظهور النافذة بعد انتهاء الصلاة") }
                                         SpinBox { id: popupDelaySp; from: 0; to: 300
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("athkar_popup_delay", value) } }
                                     }
@@ -1073,6 +1103,12 @@ Dialog {
                                         }
                                     }
                                     timezoneCombo.currentIndex = tzIdx >= 0 ? tzIdx : 0
+                                    var rbCodes = ["auto", "opengl", "software"]
+                                    var rbIdx = rbCodes.indexOf(s.render_backend)
+                                    renderBackendCb.currentIndex = rbIdx >= 0 ? rbIdx : 0
+                                    var rlCodes = ["auto", "threaded", "basic"]
+                                    var rlIdx = rlCodes.indexOf(s.render_loop)
+                                    renderLoopCb.currentIndex = rlIdx >= 0 ? rlIdx : 0
                                     autostartCb.checked = s.autostart || false
                                     sleepModeCbGeneral.checked = s.sleep_mode !== false
                                     backgroundEnabledCb.checked = s.background_enabled !== false
@@ -1106,8 +1142,8 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("اللغة"); color: textColor; font.bold: true; ToolTip.text: tr("اختيار لغة واجهة التطبيق") }
-                                background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
+                                label: Label { text: tr("اللغة"); color: theme.textColor; font.bold: true; ToolTip.text: tr("اختيار لغة واجهة التطبيق") }
+                                background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
                     ComboBox { id: langCombo; Layout.fillWidth: true
                         model: l10n ? l10n.languages : []
@@ -1126,11 +1162,11 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("المظهر"); color: textColor; font.bold: true; ToolTip.text: tr("اختيار سمة ألوان التطبيق") }
-                                background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
+                                label: Label { text: tr("المظهر"); color: theme.textColor; font.bold: true; ToolTip.text: tr("اختيار سمة ألوان التطبيق") }
+                                background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
                                     ComboBox { id: themeCombo; Layout.fillWidth: true
-                                        model: backendController.getThemes()
+                                        model: backendController ? backendController.getThemes() : []
                                         textRole: "name"
                                         onActivated: {
                                             if (index >= 0 && index < model.length) {
@@ -1144,8 +1180,35 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("بدء التشغيل التلقائي"); color: textColor; font.bold: true; ToolTip.text: tr("تشغيل التطبيق تلقائياً عند بدء تشغيل النظام") }
-                                background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
+                                label: Label { text: tr("العرض"); color: theme.textColor; font.bold: true; ToolTip.text: tr("اختيار محرك العرض") }
+                                background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
+                                ColumnLayout { width: parent.width; spacing: 4
+                                    Label { text: tr("محرك العرض:"); color: theme.textColor }
+                                    ComboBox { id: renderBackendCb; Layout.fillWidth: true
+                                        model: [tr("تلقائي"), "OpenGL", tr("برمجي")]
+                                        onActivated: {
+                                            var codes = ["auto", "opengl", "software"]
+                                            if (index >= 0 && index < 3)
+                                                backendController.updateSetting("render_backend", codes[index])
+                                        }
+                                    }
+                                    Label { text: tr("حلقة العرض:"); color: theme.textColor }
+                                    ComboBox { id: renderLoopCb; Layout.fillWidth: true
+                                        model: [tr("تلقائي"), "threaded", "basic"]
+                                        onActivated: {
+                                            var codes = ["auto", "threaded", "basic"]
+                                            if (index >= 0 && index < 3)
+                                                backendController.updateSetting("render_loop", codes[index])
+                                        }
+                                    }
+                                    Label { text: tr("تغيير العرض يتطلب إعادة تشغيل التطبيق"); color: theme.textMutedColor; font.pixelSize: 11; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                                }
+                            }
+
+                            GroupBox {
+                                Layout.fillWidth: true
+                                label: Label { text: tr("بدء التشغيل التلقائي"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تشغيل التطبيق تلقائياً عند بدء تشغيل النظام") }
+                                background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
                                     CheckBox { id: autostartCb; text: tr("تشغيل التطبيق تلقائياً عند بدء النظام")
                                         ToolTip.text: tr("إضافة التطبيق لبرامج بدء التشغيل")
@@ -1155,8 +1218,8 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("وضع النوم"); color: textColor; font.bold: true; ToolTip.text: tr("إعدادات وضع النوم عند الإغلاق") }
-                                background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
+                                label: Label { text: tr("وضع النوم"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات وضع النوم عند الإغلاق") }
+                                background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
                                     CheckBox { id: sleepModeCbGeneral; text: tr("العمل في الخلفية عند الإغلاق (Sleep Mode)")
                                         ToolTip.text: tr("إبقاء التطبيق يعمل في علبة النظام عند إغلاق النافذة")
@@ -1166,8 +1229,8 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("صورة الخلفية"); color: textColor; font.bold: true; ToolTip.text: tr("تفعيل أو تعطيل صورة الخلفية في الواجهة الرئيسية") }
-                                background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
+                                label: Label { text: tr("صورة الخلفية"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تفعيل أو تعطيل صورة الخلفية في الواجهة الرئيسية") }
+                                background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
                                     CheckBox { id: backgroundEnabledCb; text: tr("إظهار صورة الخلفية")
                                         ToolTip.text: tr("تفعيل/تعطيل صورة المسجد النبوي في الخلفية")
@@ -1177,11 +1240,11 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("المنطقة الزمنية"); color: textColor; font.bold: true; ToolTip.text: tr("اختيار المنطقة الزمنية لحساب مواقيت الصلاة") }
-                                background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
+                                label: Label { text: tr("المنطقة الزمنية"); color: theme.textColor; font.bold: true; ToolTip.text: tr("اختيار المنطقة الزمنية لحساب مواقيت الصلاة") }
+                                background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
                                     ComboBox { id: timezoneCombo; Layout.fillWidth: true
-                                        model: backendController.getTimezones()
+                                        model: backendController ? backendController.getTimezones() : []
                                         textRole: "name"
                                         valueRole: "code"
                                         ToolTip.text: tr("اختيار المنطقة الزمنية لحساب مواقيت الصلاة بدقة")
@@ -1196,8 +1259,8 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("إدارة الإعدادات"); color: textColor; font.bold: true; ToolTip.text: tr("استيراد/تصدير/إعادة تعيين الإعدادات") }
-                                background: Rectangle { color: cardColor; radius: 8; border.color: borderColor; border.width: 1 }
+                                label: Label { text: tr("إدارة الإعدادات"); color: theme.textColor; font.bold: true; ToolTip.text: tr("استيراد/تصدير/إعادة تعيين الإعدادات") }
+                                background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 6
                                     Button {
                                         Layout.fillWidth: true; Layout.preferredHeight: 36
@@ -1226,7 +1289,7 @@ Dialog {
 
     footer: Rectangle {
         height: 52
-        color: cardColor
+        color: theme.cardColor
         radius: 12
 
         RowLayout {
@@ -1241,6 +1304,7 @@ Dialog {
                 text: tr("💾 حفظ")
                 Layout.preferredHeight: 36
                 onClicked: {
+                    _saving = true
                     backendController.commitSettings()
                     root.close()
                 }
@@ -1260,14 +1324,20 @@ Dialog {
         title: tr("🔄 إعادة تعيين")
         standardButtons: Dialog.Yes | Dialog.No
         modal: true
-        anchors.centerIn: parent
+        width: 420
+        implicitWidth: 420
+        implicitHeight: 160
+        x: Math.round((parent ? parent.width : 800) / 2 - width / 2)
+        y: Math.round((parent ? parent.height : 720) / 2 - height / 2)
         Label {
             id: resetConfirmDlgLabel
             text: tr("هل أنت متأكد من إعادة تعيين جميع الإعدادات؟")
-            color: _pal.text
+            color: theme.textColor
         }
         onAccepted: {
             backendController.resetAllSettings()
+            backendController.storeSettingsSnapshot()
+            _tabLoaded = [true, true, true, true, true, true, true]
             locationTab.populate()
             offsetsTab.populate()
             muezzinsTab.populate()
@@ -1278,11 +1348,11 @@ Dialog {
         }
     }
 
-    FileDialog {
+    NativeDialogs.FileDialog {
         id: importDialog
         title: tr("اختر ملف إعدادات")
         nameFilters: [tr("ملفات JSON (*.json)")]
-        fileMode: FileDialog.OpenFile
+        fileMode: NativeDialogs.FileDialog.OpenFile
         property var _callback: null
         onAccepted: {
             if (_callback) { _callback(Qt.urlToLocalFile(selectedFile)); _callback = null }
@@ -1292,15 +1362,12 @@ Dialog {
 
     onVisibleChanged: {
         if (visible) {
+            _saving = false
             _populating = true
+            _tabLoaded = [false, false, false, false, false, false, false]
             backendController.storeSettingsSnapshot()
+            _tabLoaded[0] = true
             locationTab.populate()
-            offsetsTab.populate()
-            muezzinsTab.populate()
-            audioTab.populate()
-            notificationsTab.populate()
-            athkarTab.populate()
-            generalTab.populate()
             _populating = false
         }
     }

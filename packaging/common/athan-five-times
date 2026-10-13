@@ -1,0 +1,4 @@
+#!/bin/sh
+# System launcher for Athan Five Times (used by .deb/.rpm/Arch packages).
+export PYTHONPATH="/usr/share/athan-five-times${PYTHONPATH:+:$PYTHONPATH}"
+exec python3 -m backend.main "$@"

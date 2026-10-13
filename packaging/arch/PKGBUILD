@@ -1,0 +1,31 @@
+# Maintainer: H.Z.Tun <htoz27@users.noreply.github.com>
+pkgname=athan-five-times
+pkgver=0.3.0b1
+pkgrel=1
+pkgdesc="Islamic prayer times with azan audio and adhkar (PySide6/Qt6)"
+arch=('any')
+url="https://github.com/HtoZ27/Athan-Five-Times"
+license=('GPL-3.0-or-later')
+depends=('python' 'pyside6' 'libnotify')
+optdepends=('python-adhan: prayer calculation (or: pip install adhan)'
+            'python-miniaudio: azan audio decoding (or: pip install miniaudio)')
+source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('SKIP')
+
+package() {
+  cd "Athan-Five-Times-$pkgver"
+
+  install -d "$pkgdir/usr/share/athan-five-times"
+  cp -a backend qml assets "$pkgdir/usr/share/athan-five-times/"
+  find "$pkgdir/usr/share/athan-five-times" -type d -name __pycache__ \
+    -prune -exec rm -rf {} + 2>/dev/null || true
+
+  install -Dm755 packaging/common/athan-five-times \
+    "$pkgdir/usr/bin/athan-five-times"
+  install -Dm644 packaging/common/com.azanprayer.app.desktop \
+    "$pkgdir/usr/share/applications/com.azanprayer.app.desktop"
+  install -Dm644 assets/kaaba.svg \
+    "$pkgdir/usr/share/icons/hicolor/scalable/apps/com.azanprayer.app.svg"
+  install -Dm644 LICENSE \
+    "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

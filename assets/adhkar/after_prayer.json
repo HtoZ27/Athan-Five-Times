@@ -1,0 +1,73 @@
+{
+  "id": "after_prayer",
+  "name_ar": "أذكار بعد الصلاة",
+  "name_en": "After Prayer Adhkar",
+  "icon": "after_prayer",
+  "total": 9,
+  "tags": ["prayer", "daily"],
+  "items": [
+    {
+      "id": "ap01",
+      "arabic": "أَسْتَغْفِرُ اللَّهَ",
+      "count": 3,
+      "reference_id": "muslim",
+      "reference_detail": "1/414"
+    },
+    {
+      "id": "ap02",
+      "arabic": "اللَّهُمَّ أَنْتَ السَّلَامُ وَمِنْكَ السَّلَامُ، تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ",
+      "count": 1,
+      "reference_id": "muslim",
+      "reference_detail": "1/414"
+    },
+    {
+      "id": "ap03",
+      "arabic": "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+      "count": 1,
+      "reference_id": "bukhari",
+      "reference_detail": "1/255"
+    },
+    {
+      "id": "ap04",
+      "arabic": "سُبْحَانَ اللَّهِ",
+      "count": 33,
+      "reference_id": "muslim",
+      "reference_detail": "1/418"
+    },
+    {
+      "id": "ap05",
+      "arabic": "الْحَمْدُ لِلَّهِ",
+      "count": 33,
+      "reference_id": "muslim",
+      "reference_detail": "1/418"
+    },
+    {
+      "id": "ap06",
+      "arabic": "اللَّهُ أَكْبَرُ",
+      "count": 33,
+      "reference_id": "muslim",
+      "reference_detail": "1/418"
+    },
+    {
+      "id": "ap07",
+      "arabic": "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+      "count": 1,
+      "reference_id": "muslim",
+      "reference_detail": "1/418"
+    },
+    {
+      "id": "ap08",
+      "arabic": "اللَّهُمَّ أَعِنِّي عَلَى ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ",
+      "count": 1,
+      "reference_id": "abudawud",
+      "reference_detail": "2/86"
+    },
+    {
+      "id": "ap09",
+      "arabic": "اللَّهُمَّ لَا مَانِعَ لِمَا أَعْطَيْتَ وَلَا مُعْطِيَ لِمَا مَنَعْتَ وَلَا يَنْفَعُ ذَا الْجَدِّ مِنْكَ الْجَدُّ",
+      "count": 1,
+      "reference_id": "bukhari",
+      "reference_detail": "1/255"
+    }
+  ]
+}

@@ -5,7 +5,6 @@ __pycache__/
 dist/
 build/
 *.tar.gz
-*.png
 .DS_Store
 *.bak
 *.backup
@@ -15,3 +14,18 @@ build/
 .coverage
 htmlcov/
 .python-version
+# Build staging is derived (regenerate with scripts/sync-appdir.sh)
+/AppDir/usr/
+/*.AppImage
+*.deb
+*.rpm
+*.pkg.tar.*
+*.src.rpm
+*.log
+.env
+.env.*
+.venv/
+venv/
+.ruff_cache/
+.mypy_cache/
+node_modules/

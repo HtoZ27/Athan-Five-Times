@@ -36,21 +36,19 @@ class ThemeController(QObject):
             if theme in THEME_IDS:
                 return theme
         except Exception as e:
-            logger.warning(f"Failed to load theme: {e}")
+            logger.warning("Failed to load theme: %s", e)
         return "auto"
 
     def _detect_system_theme(self) -> str:
         """Detect system theme (light/dark) - Qt5/Qt6 compatible."""
         try:
             hints = QGuiApplication.styleHints()
-            # Qt6: colorScheme() returns Qt.ColorScheme enum
-            if hasattr(Qt, 'ColorScheme'):
+            if hasattr(Qt, "ColorScheme"):
                 scheme = hints.colorScheme()
                 if scheme == Qt.ColorScheme.Dark:
                     return "dark"
                 return "light"
-            # Qt5 fallback: isDarkTheme()
-            if hasattr(hints, 'isDarkTheme'):
+            if hasattr(hints, "isDarkTheme"):
                 return "dark" if hints.isDarkTheme() else "light"
         except (AttributeError, RuntimeError):
             pass
@@ -78,7 +76,6 @@ class ThemeController(QObject):
         new_resolved = self._compute_resolved()
         if new_resolved != self._resolved_cache:
             self._resolved_cache = new_resolved
-        # Anti-Spam Gate: فقط إذا تغيرت القيمة النهائية
         if new_resolved != self._last_resolved_emit:
             self._last_resolved_emit = new_resolved
             self.resolvedThemeChanged.emit(new_resolved)
@@ -97,14 +94,14 @@ class ThemeController(QObject):
     def setTheme(self, theme_id: str):
         """Set user's theme choice."""
         if theme_id not in THEME_IDS:
-            logger.warning(f"Invalid theme: {theme_id}")
+            logger.warning("Invalid theme: %s", theme_id)
             return
         if theme_id == self._user_theme:
             return
         self._user_theme = theme_id
         self._update_resolved_cache()
         self.themeChanged.emit(self._user_theme)
-        logger.info(f"Theme changed to: {theme_id} (resolved: {self._resolved_cache})")
+        logger.info("Theme changed to: %s (resolved: %s)", theme_id, self._resolved_cache)
 
     @Slot()
     def toggleTheme(self):
