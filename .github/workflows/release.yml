@@ -25,8 +25,8 @@ jobs:
           pip install -e .[test]
       - name: Run test suite
         run: python -m pytest tests/ -q --tb=short
-      - name: AppDir sync check
-        run: bash scripts/sync-appdir.sh --check-only
+      - name: AppDir sync (regenerate derived staging)
+        run: bash scripts/sync-appdir.sh
       - name: Build .deb
         run: bash packaging/debian/build-deb.sh
       - name: Build AppImage
