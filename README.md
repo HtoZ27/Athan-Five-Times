@@ -1,10 +1,26 @@
 # أذان الأوقات الخمس (Athan Five Times)
 
+[![CI](https://github.com/HtoZ27/Athan-Five-Times/actions/workflows/ci.yml/badge.svg)](https://github.com/HtoZ27/Athan-Five-Times/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/HtoZ27/Athan-Five-Times?include_prereleases)](https://github.com/HtoZ27/Athan-Five-Times/releases)
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
+
 > **Beta (0.3.0b1)** — This is a beta release: not yet bug-free, not yet
 > tested on all Linux environments, and translations are still unreviewed.
 > Bug reports are welcome via GitHub Issues.
 
 A Linux desktop prayer-times application with azan audio, structured adhkar, do-not-disturb, and multi-language support. Built with Python + PySide6 (Qt6/QML).
+
+![Main window](docs/screenshots/01-main.png)
+
+## Screenshots
+
+| Prayer times | Adhkar library |
+|---|---|
+| ![Prayer times](docs/screenshots/01-main.png) | ![Adhkar categories](docs/screenshots/02-adhkar-grid.png) |
+
+| Morning adhkar | Settings |
+|---|---|
+| ![Morning adhkar](docs/screenshots/03-adhkar-dialog.png) | ![Settings](docs/screenshots/04-settings.png) |
 
 ## Features
 
