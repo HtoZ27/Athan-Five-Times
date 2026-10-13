@@ -16,7 +16,7 @@ TOPDIR="$(mktemp -d)/rpmbuild"
 trap 'rm -rf "$(dirname "$TOPDIR")"' EXIT
 mkdir -p "$TOPDIR"/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
 
-TARBALL="$TOPDIR/SOURCES/Athan-Five-Times-$VERSION.tar.gz"
+TARBALL="$TOPDIR/SOURCES/v$VERSION.tar.gz"
 git -C "$ROOT" archive --format=tar.gz --prefix="Athan-Five-Times-$VERSION/" \
   HEAD > "$TARBALL"
 cp "$ROOT/packaging/rpm/athan-five-times.spec" "$TOPDIR/SPECS/"
