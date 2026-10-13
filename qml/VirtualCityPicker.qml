@@ -15,7 +15,10 @@ Item {
     property int _searchOffset: 0
 
     function tr(key) {
-        var _ = typeof l10n !== 'undefined' ? l10n.currentLanguage : ""
+        if (typeof l10n === "undefined" || l10n === null
+                || typeof backendController === "undefined" || backendController === null)
+            return key
+        var _ = l10n.currentLanguage
         return backendController.translate(key)
     }
     property int _searchTotal: 0

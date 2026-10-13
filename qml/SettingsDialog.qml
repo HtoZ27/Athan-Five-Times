@@ -1218,11 +1218,11 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("وضع النوم"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات وضع النوم عند الإغلاق") }
+                                label: Label { text: tr("وضع النوم"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تقليل نشاط التطبيق في الخلفية") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
-                                    CheckBox { id: sleepModeCbGeneral; text: tr("العمل في الخلفية عند الإغلاق (Sleep Mode)")
-                                        ToolTip.text: tr("إبقاء التطبيق يعمل في علبة النظام عند إغلاق النافذة")
+                                    CheckBox { id: sleepModeCbGeneral; text: tr("وضع السكون (فحص أقل في الخلفية)")
+                                        ToolTip.text: tr("تقليل تكرار فحص الأوقات لتوفير البطارية والمعالج")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("sleep_mode", checked) } }
                                 }
                             }

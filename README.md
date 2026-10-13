@@ -55,13 +55,13 @@ Or install a native package (also on the releases page):
 
 ```bash
 # Debian / Ubuntu
-sudo dpkg -i athan-five-times_0.3.0_all.deb
+sudo dpkg -i athan-five-times_0.3.0b1_all.deb
 sudo apt-get install -f   # pulls python3-pyside6* if missing
 pip install adhan miniaudio
 athan-five-times
 
 # Fedora / openSUSE (from spec)
-sudo dnf install athan-five-times-0.3.0-1.noarch.rpm
+sudo dnf install athan-five-times-0.3.0b1-1.noarch.rpm
 
 # Arch Linux (from PKGBUILD)
 makepkg -si   # inside packaging/arch, or use the AUR

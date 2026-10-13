@@ -64,3 +64,54 @@ class TestAudioPlayer:
     def test_lock_is_rlock(self):
         p = AudioPlayer()
         assert isinstance(p._lock, type(threading.RLock()))
+
+
+class TestFramecountProtocol:
+    """The device sends exact frame counts; every yield must match."""
+
+    def _gen(self):
+        import os
+        import pytest as _pytest
+
+        _pytest.importorskip("miniaudio")
+        path = os.path.join(os.path.dirname(__file__), "..", "assets", "muezzins", "قطامي.mp3")
+        if not os.path.isfile(path):
+            _pytest.skip("bundled azan missing")
+        p = AudioPlayer()
+        gen, sr, ch = p._create_stream(path, AudioConfig(fade_in=True, volume=0.8))
+        assert (sr, ch) == (48000, 2)
+        return gen, ch
+
+    def test_exact_sizes(self):
+        gen, ch = self._gen()
+        frame_size = ch * 2
+        assert next(gen) == b""
+        total = 0
+        for want in (2048, 4096, 1024, 8192, 2048, 5000):
+            try:
+                out = gen.send(want)
+            except StopIteration:
+                break
+            assert len(out) == want * frame_size, (want, len(out))
+            total += want
+        gen.close()
+        assert total > 0
+
+    def test_takbeer_cap_exact(self):
+        import os
+        import pytest as _pytest
+
+        _pytest.importorskip("miniaudio")
+        path = os.path.join(os.path.dirname(__file__), "..", "assets", "muezzins", "قطامي.mp3")
+        if not os.path.isfile(path):
+            _pytest.skip("bundled azan missing")
+        p = AudioPlayer()
+        gen, sr, ch = p._create_stream(path, AudioConfig(takbeer_only=True))
+        next(gen)
+        total = 0
+        try:
+            while True:
+                total += len(gen.send(4096)) // (ch * 2)
+        except StopIteration:
+            pass
+        assert total == 3 * 48000

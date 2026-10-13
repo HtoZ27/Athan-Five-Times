@@ -71,11 +71,17 @@ Rectangle {
                 Text {
                     id: chipText
                     anchors.centerIn: parent
-                    text: "× " + numeral(itemData ? itemData.count : 1) + " مرات"
+                    text: "× " + numeral(itemData ? itemData.count : 1) + " " + tr("مرات")
                     font.pixelSize: 11
                     font.bold: true
                     color: theme.accentColor
                 }
+
+    function tr(key) {
+        if (typeof backendController === "undefined" || backendController === null)
+            return key
+        return backendController.translate(key)
+    }
             }
         }
 

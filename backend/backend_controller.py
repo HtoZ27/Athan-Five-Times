@@ -163,25 +163,24 @@ class PrayerEngine(QObject):
         self._midnight_timer.start(secs * 1000 + 1500)
 
     def _update_clock(self):
-        now = datetime.now()
+        now = self._now()
         text = now.strftime("%H:%M:%S")
         if text != self._clock_text:
             self._clock_text = text
             self.clockChanged.emit(text)
         if not self._result:
             return
-        dt_now = self._now()
         try:
-            if self._result.calc_date != dt_now.date():
+            if self._result.calc_date != now.date():
                 self.recalculate()
                 return
         except (AttributeError, TypeError):
             pass
-        if self._cached_next is None or dt_now >= self._cached_next[1]:
-            self._cached_next = self._next_prayer(dt_now)
+        if self._cached_next is None or now >= self._cached_next[1]:
+            self._cached_next = self._next_prayer(now)
             self.nextPrayerChanged.emit()
-        self._update_countdown(dt_now)
-        self._check_pre_azan(dt_now)
+        self._update_countdown(now)
+        self._check_pre_azan(now)
         self._update_tray_info()
 
     def _update_tray_info(self):
@@ -800,6 +799,7 @@ class PrayerEngine(QObject):
                 self._settings = self._update_settings_batch({"latitude": lat, "longitude": lon})
                 return
             if cities:
+                logger.warning("City %r not in database, using first city of %s", city, country)
                 self._settings = self._update_settings_batch(
                     {"latitude": cities[0][1], "longitude": cities[0][2]}
                 )
@@ -1011,6 +1011,12 @@ class PrayerEngine(QObject):
             self.languageChanged.emit()
             self.recalculate()
             self.locationChanged.emit()
+            # Persist the reverted state so immediately-written settings
+            # (offsets, theme) do not keep cancelled values on disk.
+            try:
+                save_settings(self._settings)
+            except (OSError, TypeError, ValueError) as exc:
+                logger.error("Failed to save after restore: %s", exc)
 
     @Slot(str, "QVariant")
     def updateSetting(self, key: str, value):
@@ -1263,14 +1269,14 @@ class PrayerEngine(QObject):
     @Slot(str)
     def previewAudio(self, path: str):
         resolved = resolve_azan_path(path)
-        if os.path.isfile(resolved):
-            self._stop_event.set()
-            stop_azan()
-            self._stop_event.clear()
-            self._set_azan_playing(True)
-            play_azan(
-                resolved, fade_in=False, stop_flag=self._stop_event, on_done=self._on_azan_done
-            )
+        if not resolved or not os.path.isfile(resolved):
+            logger.warning("Preview requested for missing audio file: %r", path)
+            return
+        self._stop_event.set()
+        stop_azan()
+        self._stop_event.clear()
+        self._set_azan_playing(True)
+        play_azan(resolved, fade_in=False, stop_flag=self._stop_event, on_done=self._on_azan_done)
 
     @Slot()
     def stopPreview(self):
