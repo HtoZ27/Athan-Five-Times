@@ -96,14 +96,17 @@ def _detect_sync(retries: int = 1) -> dict | None:
     result = _try_ip_api(retries)
     if result:
         return result
-    return _try_fallback()
+    result = _try_fallback()
+    if result:
+        return result
+    return _try_ipinfo()
 
 
 def _try_ip_api(retries: int) -> dict | None:
     for attempt in range(retries + 1):
         try:
             req = Request(
-                "https://ip-api.com/json/", headers={"User-Agent": "AthanFiveTimes/0.3.2b"}
+                "https://ip-api.com/json/", headers={"User-Agent": "AthanFiveTimes/0.3.3b"}
             )
             with urlopen(req, timeout=10) as resp:
                 data = json.loads(resp.read().decode())
@@ -137,7 +140,7 @@ def _try_ip_api(retries: int) -> dict | None:
 def _try_fallback() -> dict | None:
     """Fallback using ipapi.co (HTTPS)."""
     try:
-        req = Request("https://ipapi.co/json/", headers={"User-Agent": "AthanFiveTimes/0.3.2b"})
+        req = Request("https://ipapi.co/json/", headers={"User-Agent": "AthanFiveTimes/0.3.3b"})
         with urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode())
         if data.get("error"):
@@ -159,6 +162,36 @@ def _try_fallback() -> dict | None:
         }
     except (URLError, ValueError, AttributeError, KeyError, OSError) as exc:
         logger.warning("Fallback geolocation failed: %s", exc)
+    return None
+
+
+def _try_ipinfo() -> dict | None:
+    """Third provider (ipinfo.io, HTTPS, keyless basic tier)."""
+    try:
+        req = Request(
+            "https://ipinfo.io/json",
+            headers={"User-Agent": "AthanFiveTimes/0.3.3b"},
+        )
+        with urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read().decode())
+        code = (data.get("country") or "").upper()
+        try:
+            lat_s, _, lon_s = data.get("loc", "").partition(",")
+            lat, lon = float(lat_s), float(lon_s)
+        except (ValueError, TypeError, AttributeError):
+            return None
+        if (lat == 0.0 and lon == 0.0) or not (-90 <= lat <= 90) or not (-180 <= lon <= 180):
+            return None
+        return {
+            "city": data.get("city", ""),
+            "country": "",
+            "country_code": code,
+            "latitude": lat,
+            "longitude": lon,
+            "timezone": data.get("timezone", ""),
+        }
+    except (URLError, ValueError, AttributeError, KeyError, OSError) as exc:
+        logger.warning("ipinfo geolocation failed: %s", exc)
     return None
 
 

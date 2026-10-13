@@ -41,10 +41,7 @@ Rectangle {
         spacing: 6
         clip: true
         cacheBuffer: 30
-        ScrollBar.vertical: ScrollBar {
-            policy: ScrollBar.AlwaysOn
-            width: 8
-        }
+        ScrollIndicator.vertical: ScrollIndicator { }
 
         delegate: Rectangle {
             required property var modelData

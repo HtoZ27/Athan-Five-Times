@@ -1,6 +1,6 @@
 # Maintainer: H.Z.Tun <htoz27@users.noreply.github.com>
 pkgname=athan-five-times
-pkgver=0.3.2b
+pkgver=0.3.3b
 pkgrel=1
 pkgdesc="Islamic prayer times with azan audio and adhkar (PySide6/Qt6)"
 arch=('any')

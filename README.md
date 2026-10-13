@@ -4,7 +4,7 @@
 [![Release](https://img.shields.io/github/v/release/HtoZ27/Athan-Five-Times?include_prereleases)](https://github.com/HtoZ27/Athan-Five-Times/releases)
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 
-> **Beta (0.3.2b)** — This is a beta release: not yet bug-free, not yet
+> **Beta (0.3.3b)** — This is a beta release: not yet bug-free, not yet
 > tested on all Linux environments, and translations are still unreviewed.
 > Bug reports are welcome via GitHub Issues.
 
@@ -55,13 +55,13 @@ Or install a native package (also on the releases page):
 
 ```bash
 # Debian / Ubuntu
-sudo dpkg -i athan-five-times_0.3.2b_all.deb
+sudo dpkg -i athan-five-times_0.3.3b_all.deb
 sudo apt-get install -f   # pulls python3-pyside6* if missing
 pip install adhan miniaudio
 athan-five-times
 
 # Fedora / openSUSE (from spec)
-sudo dnf install athan-five-times-0.3.2b-1.noarch.rpm
+sudo dnf install athan-five-times-0.3.3b-1.noarch.rpm
 
 # Arch Linux (from PKGBUILD)
 makepkg -si   # inside packaging/arch, or use the AUR
@@ -93,12 +93,17 @@ bash packaging/rpm/build-rpm.sh           # needs rpmbuild → .rpm
 cd packaging/arch && makepkg -si          # Arch
 ```
 
-## Privacy
+## الخصوصية / Privacy
 
-On first run the app attempts one online IP-geolocation lookup
-(`ip-api.com`, fallback `ipapi.co`) to preset your city. No account, no
-tracking, no other network use. Delete or change the location anytime in
-Settings → Location, or stay offline to keep the Tunis defaults.
+عند التشغيل الأول فقط يحاول التطبيق تخمين مدينتك عبر بحث IP
+‏(`ip-api.com` ثم `ipapi.co` ثم `ipinfo.io`) لضبط الموقع مسبقاً. لا حسابات،
+لا تتبع، ولا أي استخدام آخر للشبكة. يمكنك تغيير المدينة أو حذفها في أي وقت
+من الإعدادات ← الموقع، أو البقاء دون إنترنت للإبقاء على الافتراضي (تونس).
+
+On first run only, the app attempts one IP-geolocation lookup (`ip-api.com`,
+then `ipapi.co`, then `ipinfo.io`) to preset your city. No accounts, no
+tracking, no other network use. Change or clear the location anytime in
+Settings → Location, or stay offline to keep the default (Tunis).
 
 ## License
 
