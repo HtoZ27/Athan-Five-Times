@@ -52,7 +52,7 @@ fi
 
 # 5. تنظيف ملفات الـ Build
 echo -e "\n${YELLOW}[4] تنظيف ملفات البناء...${NC}"
-for d in "$SCRIPT_DIR"/dist "$SCRIPT_DIR"/build "$SCRIPT_DIR"/AppDir; do
+for d in "$SCRIPT_DIR"/dist "$SCRIPT_DIR"/build "$SCRIPT_DIR"/AppDir/usr; do
     if [ -d "$d" ]; then
         rm -rf "$d" 2>/dev/null && echo -e "  ${GREEN}$d -> تم الحذف${NC}" || echo -e "  ${RED}$d -> فشل الحذف${NC}"
     fi

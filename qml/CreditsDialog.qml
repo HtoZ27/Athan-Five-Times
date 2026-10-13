@@ -55,8 +55,8 @@ Dialog {
 
             Rectangle {
                 Layout.alignment: Qt.AlignHCenter
-                width: 72
-                height: 72
+                Layout.preferredWidth: 72
+                Layout.preferredHeight: 72
                 radius: 36
                 color: theme.accentColor
 
@@ -97,7 +97,7 @@ Dialog {
             Layout.fillWidth: true
             Layout.leftMargin: 20
             Layout.rightMargin: 20
-            height: 1
+            Layout.preferredHeight: 1
             color: theme.borderColor
         }
 
@@ -141,7 +141,7 @@ Dialog {
             Layout.fillWidth: true
             Layout.leftMargin: 20
             Layout.rightMargin: 20
-            height: 1
+            Layout.preferredHeight: 1
             color: theme.borderColor
         }
 

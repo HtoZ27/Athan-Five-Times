@@ -10,7 +10,6 @@ import gc
 os.environ["GTK_MODULES"] = ""
 os.environ.setdefault("QT_AUTO_SCREEN_SCALE_FACTOR", "0")
 os.environ.setdefault("QT_QPA_PLATFORMTHEME", "gtk3")
-os.environ["QT_ACCESSIBILITY"] = "0"
 os.environ["QT_QUICK_CONTROLS_STYLE"] = "Fusion"
 
 

@@ -6,7 +6,7 @@
   "ui": {
     "app_name": "أذان الصلاة",
     "athkar_title": " الأذكار",
-    "athkar_after_prayer": " أذكار ما بعد الصلاة",
+    "athkar_after_prayer": "أذكار بعد الصلاة",
     "tray_show": "إظهار النافذة",
     "tray_quit": "خروج",
     "tray_loading": "جاري التحميل...",

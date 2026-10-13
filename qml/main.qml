@@ -274,7 +274,7 @@ ApplicationWindow {
 
                     Rectangle {
                         Layout.fillWidth: true
-                        height: 1
+                        Layout.preferredHeight: 1
                         color: Qt.rgba(theme.accentColor.r, theme.accentColor.g, theme.accentColor.b, 0.3)
                         Layout.margins: 8
                     }

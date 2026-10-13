@@ -17,11 +17,18 @@ Rectangle {
     border.color: theme.borderColor
     border.width: 1
 
-    height: Math.max(110, col.implicitHeight + 24)
+    height: Math.max(110, 12 + headerRow.height + 8 + bodyText.height
+                        + (refRow.visible ? 8 + refRow.height : 0) + 12)
 
     function numeral(n) {
         if (athkarProvider) return athkarProvider.toArabicNumeral(n)
         return String(n)
+    }
+
+    function tr(key) {
+        if (typeof backendController === "undefined" || backendController === null)
+            return key
+        return backendController.translate(key)
     }
 
     function refName(id) {
@@ -41,6 +48,7 @@ Rectangle {
         spacing: 8
 
         RowLayout {
+            id: headerRow
             Layout.fillWidth: true
             spacing: 8
 
@@ -76,16 +84,11 @@ Rectangle {
                     font.bold: true
                     color: theme.accentColor
                 }
-
-    function tr(key) {
-        if (typeof backendController === "undefined" || backendController === null)
-            return key
-        return backendController.translate(key)
-    }
             }
         }
 
         Text {
+            id: bodyText
             Layout.fillWidth: true
             text: itemData ? itemData.arabic : ""
             wrapMode: Text.WordWrap
@@ -97,6 +100,7 @@ Rectangle {
         }
 
         RowLayout {
+            id: refRow
             visible: itemData && (itemData.reference_detail || itemData.reference_id)
             Layout.fillWidth: true
             spacing: 4

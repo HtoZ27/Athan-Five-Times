@@ -12,7 +12,14 @@ import sys
 import tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-VERSION = "0.3.0b1"
+def _version():
+    import re
+
+    text = open(os.path.join(ROOT, "pyproject.toml"), encoding="utf-8").read()
+    return re.search(r'version\s*=\s*"([^"]+)"', text).group(1)
+
+
+VERSION = _version()
 PKGREL = "1"
 PKGNAME = "athan-five-times"
 
