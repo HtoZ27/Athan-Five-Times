@@ -13,7 +13,7 @@ ApplicationWindow {
     maximumWidth: 1590
     maximumHeight: 1080
     width: 500
-    height: 800
+    height: 840
 
     title: tr("أذان الأوقات الخمس")
     flags: Qt.FramelessWindowHint | Qt.Window
@@ -250,7 +250,7 @@ ApplicationWindow {
             Rectangle {
                 id: headerBg
                 Layout.fillWidth: true
-                Layout.preferredHeight: 200
+                Layout.preferredHeight: 180
                 radius: rLrg
                 border.color: theme.borderColor
                 border.width: 1

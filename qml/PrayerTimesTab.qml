@@ -15,8 +15,16 @@ Rectangle {
     property var prayerModel: []
 
     function refresh() {
-        prayerModel = prayerEngine ? prayerEngine.getPrayerTimes() : []
+        var list = prayerEngine ? prayerEngine.getPrayerTimes() : []
+        prayerModel = list
         listView.model = prayerModel
+        // Keep the highlighted (next) prayer visible even in short windows.
+        for (var i = 0; i < list.length; i++) {
+            if (list[i].isNext) {
+                listView.positionViewAtIndex(i, ListView.Contain)
+                break
+            }
+        }
     }
 
     Component.onCompleted: refresh()
@@ -30,16 +38,19 @@ Rectangle {
         id: listView
         anchors.fill: parent
         anchors.margins: 12
-        spacing: 8
+        spacing: 6
         clip: true
         cacheBuffer: 30
-        ScrollIndicator.vertical: ScrollIndicator { }
+        ScrollBar.vertical: ScrollBar {
+            policy: ScrollBar.AlwaysOn
+            width: 8
+        }
 
         delegate: Rectangle {
             required property var modelData
 
             width: listView.width - listView.leftMargin - listView.rightMargin
-            height: 52
+            height: 50
             radius: 12
             color: modelData && modelData.isNext ? theme.accentColor : Qt.rgba(theme.cardColor.r, theme.cardColor.g, theme.cardColor.b, 0.55)
             border.color: modelData && modelData.isNext ? "transparent" : theme.borderColor

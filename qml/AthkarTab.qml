@@ -89,6 +89,10 @@ Rectangle {
                 cellWidth: Math.floor(width / 3)
                 cellHeight: 118
                 model: categories
+                ScrollBar.vertical: ScrollBar {
+                    policy: ScrollBar.AlwaysOn
+                    width: 8
+                }
 
                 delegate: Rectangle {
                     required property var modelData
