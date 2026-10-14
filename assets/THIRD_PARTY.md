@@ -9,17 +9,20 @@ Full license texts: https://openfontlicense.org (OFL-1.1).
 
 ## Azan recordings (`assets/muezzins/`)
 
-Bundled MP3s are recordings of well-known muezzins, downloaded from an
-open GitHub source. Per the project owner they are free and require no
-license for this use:
+An important distinction:
 
-- قطامي (Qatami), Nasser Alqatami, Malek Chebae, Ibrahim Al-Arkani,
-  Majed Al-Hamathani, Mansoor Az-Zahrani, Hamad Deghreri,
-  Abed Albase, Athan Hamdan Almalki, Athan Suhaib Khatba,
-  Mohammad Almenshawy, Ahmad Nuyne, Farouk Abdallah
+- The **azan text itself** is part of common religious teachings and acts of
+  worship, available to everyone — no ownership, no license needed.
+- The **voice recordings** (MP3 files) belong to their reciters/owners.
 
-The app plays whatever MP3s are present in `assets/muezzins/` (or user-added
-muezzins); deleting files only removes those voices.
+⚠️ Please do not modify or tamper with the bundled voice files.
+Altering a reciter's voice and redistributing it misrepresents the owner.
+You may ADD your own muezzin files freely (Settings → Muezzins).
+
+Bundled voices: قطامي (Qatami), Nasser Alqatami, Malek Chebae,
+Ibrahim Al-Arkani, Majed Al-Hamathani, Mansoor Az-Zahrani, Hamad Deghreri,
+Abed Albase, Athan Hamdan Almalki, Athan Suhaib Khatba,
+Mohammad Almenshawy, Ahmad Nuyne, Farouk Abdallah.
 
 ## Icons
 
