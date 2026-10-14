@@ -385,7 +385,6 @@ class TestAnalystRoundTwo:
 
 class TestRestorePersistsDisk:
     def test_disk_matches_after_restore(self, engine, monkeypatch, tmp_path):
-        import json
         import backend.backend_controller as BC
         from backend.i18n import get_lang
 
@@ -400,8 +399,11 @@ class TestRestorePersistsDisk:
 class TestRecalcTriggers:
     def test_hijri_offset_schedules_recalc(self, engine, monkeypatch):
         calls = []
-        monkeypatch.setattr(engine, "_schedule_recalc",
-                            lambda location_changed=False: calls.append(location_changed))
+        monkeypatch.setattr(
+            engine,
+            "_schedule_recalc",
+            lambda location_changed=False: calls.append(location_changed),
+        )
         engine.updateSetting("hijri_day_offset", 1)
         assert calls, "hijri_day_offset must schedule a recalculation"
 
@@ -424,14 +426,17 @@ class TestIpinfoProvider:
             m.__enter__.return_value = m
             return m
 
-        with patch("backend.location.urlopen",
-                   return_value=resp({"country": "tn", "city": "Tunis",
-                                      "loc": "36.8,10.2",
-                                      "timezone": "Africa/Tunis"})):
+        with patch(
+            "backend.location.urlopen",
+            return_value=resp(
+                {"country": "tn", "city": "Tunis", "loc": "36.8,10.2", "timezone": "Africa/Tunis"}
+            ),
+        ):
             r = _try_ipinfo()
         assert r is not None and r["country_code"] == "TN"
 
-        with patch("backend.location.urlopen",
-                   return_value=resp({"country": "TN", "city": "X",
-                                      "loc": "0.0,0.0"})):
+        with patch(
+            "backend.location.urlopen",
+            return_value=resp({"country": "TN", "city": "X", "loc": "0.0,0.0"}),
+        ):
             assert _try_ipinfo() is None
