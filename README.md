@@ -2,9 +2,9 @@
 
 [![CI](https://github.com/HtoZ27/Athan-Five-Times/actions/workflows/ci.yml/badge.svg)](https://github.com/HtoZ27/Athan-Five-Times/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/HtoZ27/Athan-Five-Times?include_prereleases)](https://github.com/HtoZ27/Athan-Five-Times/releases)
-[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> **Beta (0.3.8b)** — This is a beta release: not yet bug-free, not yet
+> **Beta (0.3.9b)** — This is a beta release: not yet bug-free, not yet
 > tested on all Linux environments, and translations are still unreviewed.
 > Bug reports are welcome via GitHub Issues.
 
@@ -55,13 +55,13 @@ Or install a native package (also on the releases page):
 
 ```bash
 # Debian / Ubuntu
-sudo dpkg -i athan-five-times_0.3.8b_all.deb
+sudo dpkg -i athan-five-times_0.3.9b_all.deb
 sudo apt-get install -f   # pulls python3-pyside6* if missing
 pip install adhan miniaudio
 athan-five-times
 
 # Fedora / openSUSE (from spec)
-sudo dnf install athan-five-times-0.3.8b-1.noarch.rpm
+sudo dnf install athan-five-times-0.3.9b-1.noarch.rpm
 
 # Arch Linux (from PKGBUILD)
 makepkg -si   # inside packaging/arch, or use the AUR

@@ -10,7 +10,7 @@
     "tray_show": "Muuji Daaqada",
     "tray_quit": "Jooji",
     "tray_loading": "Soodejinaya...",
-    "tray_tooltip": "🕋 Waqtiyada Salaadda\nDucada xigta: {name}\nHaray: {harsan}",
+    "tray_tooltip": "Waqtiyada Salaadda\nDucada xigta: {name}\nHaray: {harsan}",
     "tray_next": "Ducada xigta: {name} ({harsan})",
     "notif_prayer_title": "Waqtiga Salaadda",
     "notif_prayer_body": "Waa waqtigii salaada",

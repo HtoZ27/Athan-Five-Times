@@ -10,7 +10,7 @@
     "tray_show": "ونڈو دکھائیں۔",
     "tray_quit": "چھوڑو",
     "tray_loading": "لوڈ ہو رہا ہے...",
-    "tray_tooltip": "🕋 اوقات نماز\nاگلی دعا: {name}\nباقی: {remaining}",
+    "tray_tooltip": "اوقات نماز\nاگلی دعا: {name}\nباقی: {remaining}",
     "tray_next": "اگلی دعا: {name} ({remaining})",
     "notif_prayer_title": "نماز کا وقت",
     "notif_prayer_body": "یہ نماز کا وقت ہے",

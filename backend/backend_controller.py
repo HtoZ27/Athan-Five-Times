@@ -941,20 +941,7 @@ class PrayerEngine(QObject):
         new_lang = self._settings.get("language", "ar")
         if new_lang != old_lang:
             set_lang(new_lang)
-            self._clear_trans_caches()
-            global \
-                _COUNTRY_LIST_CACHE, \
-                _CALC_METHODS_CACHE, \
-                _MADHABS_CACHE, \
-                _THEMES_CACHE, \
-                _TIMEZONES_CACHE
-            _COUNTRY_LIST_CACHE = None
-            _CALC_METHODS_CACHE = None
-            _MADHABS_CACHE = None
-            _THEMES_CACHE = None
-            _TIMEZONES_CACHE = None
-            self._prayer_times_cache = None
-            self._prayer_times_cache_key = None
+            self._clear_display_caches()
             self.languageChanged.emit()
         new_theme = self._settings.get("theme", "dark")
         if new_theme != old_theme:
@@ -1009,6 +996,12 @@ class PrayerEngine(QObject):
                 logger.warning("Failed to revert language: %s", exc)
             self.themeChanged.emit(old_theme)
             self.languageChanged.emit()
+            self._clear_display_caches()
+            try:
+                set_volume(self._settings.get("volume", 1.0))
+            except (AttributeError, RuntimeError, TypeError, ValueError) as exc:
+                logger.warning("Failed to revert volume: %s", exc)
+            self.settingChanged.emit("show_tray")
             self.recalculate()
             self.locationChanged.emit()
             # Persist the reverted state so immediately-written settings
@@ -1575,6 +1568,28 @@ class PrayerEngine(QObject):
     def _clear_trans_caches(cls):
         cls._TRANS_CACHE.clear()
         cls._TRANS_PRAYER_CACHE.clear()
+
+    def _clear_display_caches(self):
+        """Clear every language-dependent display cache.
+
+        Covers translation caches, localized list caches and this
+        instance's prayer-times cache. Used on language switch (commit),
+        settings restore (cancel) and manual cache clearing.
+        """
+        self._clear_trans_caches()
+        global \
+            _COUNTRY_LIST_CACHE, \
+            _CALC_METHODS_CACHE, \
+            _MADHABS_CACHE, \
+            _THEMES_CACHE, \
+            _TIMEZONES_CACHE
+        _COUNTRY_LIST_CACHE = None
+        _CALC_METHODS_CACHE = None
+        _MADHABS_CACHE = None
+        _THEMES_CACHE = None
+        _TIMEZONES_CACHE = None
+        self._prayer_times_cache = None
+        self._prayer_times_cache_key = None
 
     @Slot(str, result=str)
     def translate(self, key: str) -> str:

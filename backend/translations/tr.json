@@ -10,7 +10,7 @@
     "tray_show": "Pencereyi Göster",
     "tray_quit": "Çıkış",
     "tray_loading": "Yükleniyor...",
-    "tray_tooltip": "🕋 Namaz Vakitleri\nSonraki Namaz: {name}\nKalan: {remaining}",
+    "tray_tooltip": "Namaz Vakitleri\nSonraki Namaz: {name}\nKalan: {remaining}",
     "tray_next": "Sonraki Namaz: {name}  ({remaining})",
     "notif_prayer_title": "Namaz Vakti",
     "notif_prayer_body": "{prayer} vakti geldi",

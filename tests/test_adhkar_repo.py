@@ -130,3 +130,9 @@ class TestNoDuplication:
             if "athkar" in d:
                 dupes.append(os.path.basename(f))
         assert dupes == [], f"flat athkar duplicates library in: {dupes}"
+
+    def test_total_item_count(self):
+        total = 0
+        for c in AdhkarRepository().get_index():
+            total += len(AdhkarRepository().load_category(c["id"])["items"])
+        assert total == 382, total

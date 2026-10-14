@@ -10,7 +10,7 @@
     "tray_show": "Mostra finestra",
     "tray_quit": "Esci",
     "tray_loading": "Caricamento...",
-    "tray_tooltip": "🕋 Orari di Preghiera\nProssima preghiera: {name}\nTempo rimanente: {remaining}",
+    "tray_tooltip": "Orari di Preghiera\nProssima preghiera: {name}\nTempo rimanente: {remaining}",
     "tray_next": "Prossima preghiera: {name}  ({remaining})",
     "notif_prayer_title": "Ora della preghiera",
     "notif_prayer_body": "È ora di {prayer}",

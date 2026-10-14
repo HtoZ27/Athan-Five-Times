@@ -113,9 +113,9 @@ Dialog {
             tr("الأذكار"),
             tr("عام")
         ]
-        saveBtn.text = tr("💾 حفظ")
-        cancelBtn.text = tr("❌ إلغاء")
-        resetConfirmDlg.title = tr("🔄 إعادة تعيين")
+        saveBtn.text = tr("حفظ")
+        cancelBtn.text = tr("إلغاء")
+        resetConfirmDlg.title = tr("إعادة تعيين")
         if (resetConfirmDlgLabel) resetConfirmDlgLabel.text = tr("هل أنت متأكد من إعادة تعيين جميع الإعدادات؟")
         importDialog.title = tr("اختر ملف إعدادات")
         importDialog.nameFilters = [tr("ملفات JSON (*.json)")]
@@ -338,7 +338,7 @@ Dialog {
                                         Button {
                                             Layout.fillWidth: true
                                             Layout.preferredHeight: 40
-                                            text: tr("🌍 تحديد موقعي تلقائياً عبر الإنترنت")
+                                            text: tr("تحديد موقعي تلقائياً عبر الإنترنت")
                                             enabled: !useCustomCoords
                                             onClicked: {
                                                 if (useCustomCoords) {
@@ -420,7 +420,7 @@ Dialog {
 
                                     CheckBox {
                                         id: customCoordsCheck
-                                        text: tr("🌐 استخدام إحداثيات مخصصة")
+                                        text: tr("استخدام إحداثيات مخصصة")
                                         checked: useCustomCoords
                                         onCheckedChanged: {
                                             if (_populating) return
@@ -599,7 +599,7 @@ Dialog {
                                     }
                                     Button {
                                         Layout.fillWidth: true; Layout.preferredHeight: 36; Layout.topMargin: 4
-                                        text: tr("🔄 إعادة تعيين جميع الإزاحات")
+                                        text: tr("إعادة تعيين جميع الإزاحات")
                                         onClicked: resetOffsets()
                                     }
                                 }
@@ -737,7 +737,7 @@ Dialog {
 
                             Button {
                                 Layout.fillWidth: true; Layout.preferredHeight: 40
-                                text: tr("➕ إضافة مؤذن")
+                                text: tr("إضافة مؤذن")
                                 onClicked: browseMuezzinAudio(-1)
                             }
                         }
@@ -814,7 +814,7 @@ Dialog {
 
                                     Button {
                                         Layout.fillWidth: true; Layout.preferredHeight: 36; Layout.topMargin: 4
-                                        text: tr("🔊 اختبار الأذان الافتراضي")
+                                        text: tr("اختبار الأذان الافتراضي")
                                         onClicked: {
                                             var s = backendController.getSettings()
                                             var path = s.audio?.default || s.muezzins?.["افتراضي"] || ""
@@ -1054,7 +1054,7 @@ Dialog {
                                     }
                                     Button {
                                         Layout.fillWidth: true; Layout.preferredHeight: 36; Layout.topMargin: 4; visible: popupEnabledCb.checked
-                                        text: tr("🧪 اختبار النافذة المنبثقة")
+                                        text: tr("اختبار النافذة المنبثقة")
                                         onClicked: {
                                             var provider = prayerEngine ? prayerEngine.getAthkarProvider() : null
                                             if (provider) {
@@ -1264,17 +1264,17 @@ Dialog {
                                 ColumnLayout { width: parent.width; spacing: 6
                                     Button {
                                         Layout.fillWidth: true; Layout.preferredHeight: 36
-                                        text: tr("📤 تصدير الإعدادات")
+                                        text: tr("تصدير الإعدادات")
                                         onClicked: exportSettings()
                                     }
                                     Button {
                                         Layout.fillWidth: true; Layout.preferredHeight: 36
-                                        text: tr("📥 استيراد الإعدادات")
+                                        text: tr("استيراد الإعدادات")
                                         onClicked: importSettings()
                                     }
                                     Button {
                                         Layout.fillWidth: true; Layout.preferredHeight: 36
-                                        text: tr("🔄 إعادة تعيين للإعدادات الافتراضية")
+                                        text: tr("إعادة تعيين للإعدادات الافتراضية")
                                         onClicked: resetAllSettings()
                                     }
                                 }
@@ -1301,7 +1301,7 @@ Dialog {
 
             Button {
                 id: saveBtn
-                text: tr("💾 حفظ")
+                text: tr("حفظ")
                 Layout.preferredHeight: 36
                 onClicked: {
                     _saving = true
@@ -1312,7 +1312,7 @@ Dialog {
 
             Button {
                 id: cancelBtn
-                text: tr("❌ إلغاء")
+                text: tr("إلغاء")
                 Layout.preferredHeight: 36
                 onClicked: root.close()
             }
@@ -1321,7 +1321,7 @@ Dialog {
 
     Dialog {
         id: resetConfirmDlg
-        title: tr("🔄 إعادة تعيين")
+        title: tr("إعادة تعيين")
         standardButtons: Dialog.Yes | Dialog.No
         modal: true
         width: 420

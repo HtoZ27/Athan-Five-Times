@@ -1,9 +1,14 @@
 """
-Structured adhkar library (ported from the Dart sibling's assets/data/adhkar/).
+Structured adhkar library (140 JSON categories, 382 items).
 
-Single source of truth for all remembrance texts: 10 JSON categories with
-per-item repetition counts and source references. Loaded lazily per
-category with structural validation and a small LRU cache.
+Source mix and conflict policy (documented, do not change silently):
+- Base: Dart sibling assets (curated, counts/references verified).
+- Extended with azkar-db (345 rows, open data): new texts appended;
+  same texts skipped as duplicates.
+- On count conflicts between sources, OURS is kept (multiple legitimate
+  narrations exist, e.g. x3 vs x100 variants); DB texts without explicit
+  count default to 1 (chip hidden).
+- Empty reference_id allowed (UI hides the row); arabic text required.
 """
 
 import json
@@ -29,19 +34,28 @@ def _read_json(path: str) -> Any:
         return json.load(f)
 
 
-def validate_index(data: Any) -> None:
+def validate_index(data: Any, base_dir: str = BASE_DIR) -> None:
     errors: List[str] = []
     cats = data.get("categories") if isinstance(data, dict) else None
     if not cats:
         errors.append("missing or empty categories list")
+    seen_ids: set = set()
     for c in cats or []:
         if not isinstance(c, dict):
             errors.append("category entry is not a map")
             continue
         if not c.get("id"):
             errors.append("index: category missing id")
+        elif c.get("id") in seen_ids:
+            errors.append("index: duplicate id %s" % c.get("id"))
+        else:
+            seen_ids.add(c.get("id"))
         if not c.get("asset"):
             errors.append("index: %s missing asset" % c.get("id"))
+        else:
+            asset_file = os.path.join(base_dir, os.path.basename(c["asset"]))
+            if not os.path.isfile(asset_file):
+                errors.append("index: %s asset missing on disk" % c.get("id"))
     if errors:
         raise AdhkarValidationError("; ".join(errors))
 
@@ -83,7 +97,7 @@ class AdhkarRepository:
     def get_index(self) -> List[Dict[str, Any]]:
         if self._index is None:
             data = _read_json(self._index_file)
-            validate_index(data)
+            validate_index(data, self._base_dir)
             entries = sorted(data["categories"], key=lambda c: c.get("order", 0))
             self._index = [
                 {

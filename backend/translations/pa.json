@@ -10,7 +10,7 @@
     "tray_show": "ਵਿੰਡੋ ਦਿਖਾਓ",
     "tray_quit": "ਛੱਡੋ",
     "tray_loading": "ਲੋਡ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...",
-    "tray_tooltip": "🕋 ਪ੍ਰਾਰਥਨਾ ਦੇ ਸਮੇਂ\nਅਗਲੀ ਪ੍ਰਾਰਥਨਾ: {name}\nਬਾਕੀ: {remaining}",
+    "tray_tooltip": "ਪ੍ਰਾਰਥਨਾ ਦੇ ਸਮੇਂ\nਅਗਲੀ ਪ੍ਰਾਰਥਨਾ: {name}\nਬਾਕੀ: {remaining}",
     "tray_next": "ਅਗਲੀ ਪ੍ਰਾਰਥਨਾ: {name} ({remaining})",
     "notif_prayer_title": "ਪ੍ਰਾਰਥਨਾ ਦਾ ਸਮਾਂ",
     "notif_prayer_body": "ਇਹ {ਪ੍ਰਾਰਥਨਾ} ਦਾ ਸਮਾਂ ਹੈ",

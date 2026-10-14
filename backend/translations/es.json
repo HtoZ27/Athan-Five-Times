@@ -10,7 +10,7 @@
     "tray_show": "Mostrar ventana",
     "tray_quit": "Salir",
     "tray_loading": "Cargando...",
-    "tray_tooltip": "🕋 Horarios de Oración\nPróxima oración: {name}\nTiempo restante: {remaining}",
+    "tray_tooltip": "Horarios de Oración\nPróxima oración: {name}\nTiempo restante: {remaining}",
     "tray_next": "Próxima oración: {name}  ({remaining})",
     "notif_prayer_title": "Hora de la oración",
     "notif_prayer_body": "Es hora de {prayer}",

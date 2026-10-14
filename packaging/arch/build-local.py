@@ -57,7 +57,7 @@ def build_tree(dest):
             "pkgdesc = Islamic prayer times with azan audio and adhkar (PySide6/Qt6)\n"
             "url = https://github.com/HtoZ27/Athan-Five-Times\n"
             "builddate = 0\npackager = H.Z.Tun\nsize = 0\narch = any\n"
-            "license = GPL-3.0-or-later\n"
+            "license = MIT\n"
             "depend = python\ndepend = pyside6\ndepend = libnotify\n"
             "depend = hicolor-icon-theme\n"
         )

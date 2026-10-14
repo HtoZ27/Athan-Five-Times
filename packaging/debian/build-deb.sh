@@ -28,8 +28,8 @@ find "$PKGDIR/usr" -type d -exec chmod 755 {} +
 find "$APP" "$PKGDIR/usr/share/doc" -type f -exec chmod 644 {} +
 chmod 755 "$PKGDIR/usr/bin/athan-five-times"
 mkdir -p "$PKGDIR/usr/share/man/man1"
-cat > "$PKGDIR/usr/share/man/man1/athan-five-times.1" <<'MAN'
-.TH ATHAN-FIVE-TIMES 1 "2026" "0.3.0" "User Commands"
+cat > "$PKGDIR/usr/share/man/man1/athan-five-times.1" <<MAN
+.TH ATHAN-FIVE-TIMES 1 "2026" "$VERSION" "User Commands"
 .SH NAME
 athan-five-times \- Islamic prayer times with azan audio and adhkar
 .SH SYNOPSIS

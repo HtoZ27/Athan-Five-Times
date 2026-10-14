@@ -10,7 +10,7 @@
     "tray_show": "کړکۍ ښکاره کړئ",
     "tray_quit": "پرېږده",
     "tray_loading": "بار کول...",
-    "tray_tooltip": "🕋 د لمانځه وختونه\nبل دعا: {name}\nپاتې: {باقي}",
+    "tray_tooltip": "د لمانځه وختونه\nبل دعا: {name}\nپاتې: {باقي}",
     "tray_next": "بل دعا: {نوم} ({پاتې})",
     "notif_prayer_title": "د لمانځه وخت",
     "notif_prayer_body": "د لمانځه وخت دی",

@@ -26,8 +26,19 @@ muezzins); deleting files only removes those voices.
 Prayer, adhkar-category and tray icons are rendered from the project's own
 Dart sibling (` PrayerIcon ` painters) — no third-party icon sets.
 
+## Adhkar content
+
+Remembrance texts (adhkar) belong to no one: they are divine religious
+teachings for everyone and require no license or attribution.
+
+For the record, the library (`assets/adhkar/`, 140 categories / 382 items)
+was assembled from commonly circulated collections (project's own assets
+plus open adhkar data, 345 rows); identical texts were deduplicated.
+Where sources disagree on repetition counts, our kept variant is documented
+in code comments; texts without an explicit count default to 1.
+
 ## Code libraries
 
-See the in-app **About** dialog and `LICENSE` (GPL-3.0-or-later): Python (PSF),
+See the in-app **About** dialog and `LICENSE` (MIT): Python (PSF),
 Qt 6 + PySide6 (LGPL-3.0), miniaudio (MIT), Adhan (MIT), cffi (MIT),
 pycparser (BSD).

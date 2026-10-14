@@ -10,7 +10,7 @@
     "tray_show": "Показать окно",
     "tray_quit": "Выход",
     "tray_loading": "Загрузка...",
-    "tray_tooltip": "🕋 Время намаза\nСледующий намаз: {name}\nОсталось: {remaining}",
+    "tray_tooltip": "Время намаза\nСледующий намаз: {name}\nОсталось: {remaining}",
     "tray_next": "Следующий намаз: {name}  ({remaining})",
     "notif_prayer_title": "Время намаза",
     "notif_prayer_body": "Настало время {prayer}",

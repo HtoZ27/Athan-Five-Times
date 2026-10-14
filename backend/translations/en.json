@@ -10,7 +10,7 @@
     "tray_show": "Show Window",
     "tray_quit": "Quit",
     "tray_loading": "Loading...",
-    "tray_tooltip": "🕋 Prayer Times\nNext Prayer: {name}\nRemaining: {remaining}",
+    "tray_tooltip": "Prayer Times\nNext Prayer: {name}\nRemaining: {remaining}",
     "tray_next": "Next Prayer: {name}  ({remaining})",
     "notif_prayer_title": "Prayer Time",
     "notif_prayer_body": "It's time for {prayer}",

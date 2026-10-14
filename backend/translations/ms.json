@@ -10,7 +10,7 @@
     "tray_show": "Tunjuk Tetingkap",
     "tray_quit": "Berhenti",
     "tray_loading": "Memuatkan...",
-    "tray_tooltip": "🕋 Waktu Solat\nDoa Seterusnya: {name}\nBaki: {baki}",
+    "tray_tooltip": "Waktu Solat\nDoa Seterusnya: {name}\nBaki: {baki}",
     "tray_next": "Doa Seterusnya: {nama} ({baki})",
     "notif_prayer_title": "Waktu Solat",
     "notif_prayer_body": "Sudah tiba masanya untuk {solat}",

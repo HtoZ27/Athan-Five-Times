@@ -38,7 +38,7 @@ class TestTrayStrings:
         bad = []
         for f in sorted(glob.glob(os.path.join(TRANS, "*.json"))):
             ui = json.load(open(f, encoding="utf-8")).get("ui", {})
-            for k in self.KEYS:
+            for k in self.KEYS + ["tray_tooltip", "tray_next", "tray_loading"]:
                 v = ui.get(k, "")
                 if "🕋" in v or "❌" in v:
                     bad.append((os.path.basename(f), k))

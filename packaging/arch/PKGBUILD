@@ -1,11 +1,11 @@
 # Maintainer: H.Z.Tun <htoz27@users.noreply.github.com>
 pkgname=athan-five-times
-pkgver=0.3.8b
+pkgver=0.3.9b
 pkgrel=1
 pkgdesc="Islamic prayer times with azan audio and adhkar (PySide6/Qt6)"
 arch=('any')
 url="https://github.com/HtoZ27/Athan-Five-Times"
-license=('GPL-3.0-or-later')
+license=('MIT')
 depends=('python' 'pyside6' 'libnotify')
 optdepends=('python-adhan: prayer calculation (or: pip install adhan)'
             'python-miniaudio: azan audio decoding (or: pip install miniaudio)')

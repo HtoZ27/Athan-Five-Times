@@ -10,7 +10,7 @@
     "tray_show": "Fenster anzeigen",
     "tray_quit": "Beenden",
     "tray_loading": "Laden...",
-    "tray_tooltip": "🕋 Gebetszeiten\nNächstes Gebet: {name}\nVerbleibende Zeit: {remaining}",
+    "tray_tooltip": "Gebetszeiten\nNächstes Gebet: {name}\nVerbleibende Zeit: {remaining}",
     "tray_next": "Nächstes Gebet: {name}  ({remaining})",
     "notif_prayer_title": "Gebetszeit",
     "notif_prayer_body": "Es ist Zeit für {prayer}",

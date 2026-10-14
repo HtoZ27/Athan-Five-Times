@@ -242,11 +242,16 @@ class TestNoRawCodesInUI:
         try:
             assert engine.getMadhabs()[0]["display"] == "Shafi'i"
             assert engine.getCountryList()[0]["name"] != ""
+            engine.getTimezones()
             engine._settings = dict(engine._settings, language="ar")
             engine._stored_old_lang = "en"
             engine.commitSettings()
             assert engine.getMadhabs()[0]["display"] == "شافعي"
             assert BC._MADHABS_CACHE is not None
+            assert BC._TIMEZONES_CACHE is None
+            assert BC._THEMES_CACHE is None
+            assert BC._CALC_METHODS_CACHE is None
+            assert engine._TRANS_CACHE == {}
         finally:
             set_lang("ar")
             engine._settings = dict(engine._settings, language="ar")
@@ -376,3 +381,57 @@ class TestAnalystRoundTwo:
         from backend.settings import DEFAULT_SETTINGS
 
         assert DEFAULT_SETTINGS.get("athkar_popup_delay") == 60
+
+
+class TestRestorePersistsDisk:
+    def test_disk_matches_after_restore(self, engine, monkeypatch, tmp_path):
+        import json
+        import backend.backend_controller as BC
+        from backend.i18n import get_lang
+
+        monkeypatch.setattr(BC, "_set_autostart", lambda enabled: None)
+        engine.updateSetting("autostart", False)
+        engine.storeSettingsSnapshot()
+        engine.updateSetting("language", "en")
+        engine.restoreSettingsSnapshot()
+        assert get_lang() == engine.getSetting("language")
+
+
+class TestRecalcTriggers:
+    def test_hijri_offset_schedules_recalc(self, engine, monkeypatch):
+        calls = []
+        monkeypatch.setattr(engine, "_schedule_recalc",
+                            lambda location_changed=False: calls.append(location_changed))
+        engine.updateSetting("hijri_day_offset", 1)
+        assert calls, "hijri_day_offset must schedule a recalculation"
+
+    def test_time_format_emits(self, engine):
+        seen = []
+        engine.prayerTimesChanged.connect(lambda: seen.append(1))
+        engine.updateSetting("time_format", "24h")
+        assert seen, "time_format must emit prayerTimesChanged"
+
+
+class TestIpinfoProvider:
+    def test_uppercase_and_validation(self):
+        import json
+        from unittest.mock import MagicMock, patch
+        from backend.location import _try_ipinfo
+
+        def resp(payload):
+            m = MagicMock()
+            m.read.return_value = json.dumps(payload).encode()
+            m.__enter__.return_value = m
+            return m
+
+        with patch("backend.location.urlopen",
+                   return_value=resp({"country": "tn", "city": "Tunis",
+                                      "loc": "36.8,10.2",
+                                      "timezone": "Africa/Tunis"})):
+            r = _try_ipinfo()
+        assert r is not None and r["country_code"] == "TN"
+
+        with patch("backend.location.urlopen",
+                   return_value=resp({"country": "TN", "city": "X",
+                                      "loc": "0.0,0.0"})):
+            assert _try_ipinfo() is None

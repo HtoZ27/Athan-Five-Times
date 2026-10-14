@@ -10,7 +10,7 @@
     "tray_show": "Tampilkan Jendela",
     "tray_quit": "Berhenti",
     "tray_loading": "Memuat...",
-    "tray_tooltip": "🕋 Waktu Sholat\nDoa Berikutnya: {name}\nTersisa: {tersisa}",
+    "tray_tooltip": "Waktu Sholat\nDoa Berikutnya: {name}\nTersisa: {tersisa}",
     "tray_next": "Doa Berikutnya: {name} ({remaining})",
     "notif_prayer_title": "Waktu Sholat",
     "notif_prayer_body": "Saatnya untuk {doa}",
