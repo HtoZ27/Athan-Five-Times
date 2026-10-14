@@ -63,10 +63,12 @@ def _get_calc_methods() -> Dict[str, dict]:
                 "maghrib_interval": 2,
             },
             "المغرب": {
+                # Per ITL reference (arabeyes): 19/17 with +5 min
+                # Zuhr and Maghrib offsets.
                 "fajr_angle": 19.0,
                 "isha_angle": 17.0,
-                "dhuhr_interval": 0,
-                "maghrib_interval": 2,
+                "dhuhr_interval": 5,
+                "maghrib_interval": 5,
             },
             "ليبيا": {
                 "fajr_angle": 18.5,
@@ -93,14 +95,18 @@ def _get_calc_methods() -> Dict[str, dict]:
                 "maghrib_interval": 2,
             },
             "العراق": {
-                "fajr_angle": 17.5,
+                # Follows the Egyptian convention (19.5/17.5) as published
+                # for Iraqi cities (muwaqqit labels + explicit angles).
+                "fajr_angle": 19.5,
                 "isha_angle": 17.5,
                 "dhuhr_interval": 0,
                 "maghrib_interval": 2,
             },
             "فلسطين (وزارة الأوقاف)": {
-                "fajr_angle": 17.5,
-                "isha_angle": 17.5,
+                # No published national convention; follows Jordan Awqaf
+                # practice (18.2/18) per Assabile documentation.
+                "fajr_angle": 18.2,
+                "isha_angle": 18.0,
                 "dhuhr_interval": 0,
                 "maghrib_interval": 2,
             },
@@ -123,17 +129,22 @@ def _get_calc_methods() -> Dict[str, dict]:
                 "maghrib_interval": 2,
             },
             "الهيئة العامة للشؤون الإسلامية (الإمارات)": {
-                "fajr_angle": 18.5,
-                "isha_angle": 18.5,
-                "dhuhr_interval": 0,
-                "maghrib_interval": 2,
-                "isha_interval": 90,
-            },
-            "وزارة الأوقاف القطرية": {
+                # Verified 2026-10-09 Abu Dhabi official (Awqaf):
+                # Fajr 05:01 + Isha 19:18 == 18.0/18.0 angles exactly.
+                # (The old 90-min interval gave Isha +16 min late.)
                 "fajr_angle": 18.0,
                 "isha_angle": 18.0,
                 "dhuhr_interval": 0,
                 "maghrib_interval": 2,
+            },
+            "وزارة الأوقاف القطرية": {
+                # Verified 2026-10-11 Al Rayyan official (Qatar Awqaf):
+                # Maghrib 17:13 + 90 min == Isha 18:43 exactly (raw sunset,
+                # so no maghrib adjustment here).
+                "fajr_angle": 18.0,
+                "isha_interval": 90,
+                "dhuhr_interval": 0,
+                "maghrib_interval": 0,
             },
             "وزارة الأوقاف الكويتية": {
                 "fajr_angle": 18.0,
@@ -144,12 +155,6 @@ def _get_calc_methods() -> Dict[str, dict]:
             "اليمن": {
                 "fajr_angle": 18.2,
                 "isha_angle": 18.2,
-                "dhuhr_interval": 0,
-                "maghrib_interval": 2,
-            },
-            "طريقة فاروقي (باكستان/شمال الهند)": {
-                "fajr_angle": 18.0,
-                "isha_angle": 18.0,
                 "dhuhr_interval": 0,
                 "maghrib_interval": 2,
             },

@@ -1,5 +1,5 @@
 Name:           athan-five-times
-Version:        0.3.12b
+Version:        0.3.13b
 Release:        1%{?dist}
 Summary:        Islamic prayer times with azan audio and adhkar
 License:        MIT
@@ -44,5 +44,5 @@ install -Dm644 LICENSE %{buildroot}%{_docdir}/%{name}/LICENSE
 %{_docdir}/%{name}/LICENSE
 
 %changelog
-* Tue Oct 13 2026 H.Z.Tun <htoz27@users.noreply.github.com> - 0.3.12b-1
+* Tue Oct 13 2026 H.Z.Tun <htoz27@users.noreply.github.com> - 0.3.13b-1
 - Initial RPM packaging.

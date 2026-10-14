@@ -79,19 +79,21 @@ class TestVolumeWiring:
 
 
 class TestIshaInterval:
-    def test_uae_gap_exactly_90_minutes(self):
+    def test_uae_official_oct9(self):
+        # Awqaf Abu Dhabi official 2026-10-09: Fajr 05:01, Isha 19:18
+        # (angle-derived 18.0/18.0 — verified, NOT a fixed interval).
         from backend.prayer_calc import calculate
 
         r = calculate(
-            25.2048,
-            55.2708,
-            target_date=date(2025, 6, 15),
+            24.4539,
+            54.3773,
+            target_date=date(2026, 10, 9),
             method_name="الهيئة العامة للشؤون الإسلامية (الإمارات)",
             tz_name="Asia/Dubai",
         )
         d = r.as_dict()
-        gap = (d["isha"] - d["maghrib"]).total_seconds() / 60
-        assert abs(gap - 90.0) < 0.6
+        assert d["fajr"].strftime("%H:%M") == "05:01", d
+        assert d["isha"].strftime("%H:%M") == "19:18", d
 
 
 class TestHighlightRefresh:

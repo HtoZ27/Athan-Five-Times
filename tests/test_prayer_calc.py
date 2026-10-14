@@ -105,3 +105,21 @@ class TestCalculate:
             36.8, 10.18, "2025-06-15", "وزارة الشؤون الدينية التونسية", "shafi", None, ()
         )
         assert r1 is r2
+
+
+class TestUnverifiedMethodRemoved:
+    def test_farooqi_gone_unknown_falls_back(self):
+        from datetime import date
+
+        r = calculate(
+            36.8,
+            10.18,
+            target_date=date(2025, 6, 15),
+            method_name="طريقة فاروقي (باكستان/شمال الهند)",
+            tz_name="Africa/Tunis",
+        )
+        assert r is not None
+        from backend.prayer_calc import CALCULATION_METHODS
+
+        assert "طريقة فاروقي (باكستان/شمال الهند)" not in CALCULATION_METHODS
+        assert len(CALCULATION_METHODS) == 26
