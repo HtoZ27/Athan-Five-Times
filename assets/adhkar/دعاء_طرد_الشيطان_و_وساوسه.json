@@ -1,0 +1,40 @@
+{
+  "id": "دعاء_طرد_الشيطان_و_وساوسه",
+  "name_ar": "دعاء طرد الشيطان و وساوسه",
+  "name_en": "دعاء طرد الشيطان و وساوسه",
+  "icon": "dua",
+  "total": 3,
+  "tags": [],
+  "items": [
+    {
+      "id": "دعاء_طرد_الشيطان_و_وساوسه_01",
+      "arabic": "((الْاسْتِعَاذَةُ بِاللَّهِ مِنْهُ)).",
+      "count": 1,
+      "reference_id": "",
+      "reference_detail": "",
+      "virtue": null,
+      "translation": null,
+      "tags": []
+    },
+    {
+      "id": "دعاء_طرد_الشيطان_و_وساوسه_02",
+      "arabic": "((الْأَذَانُ)).",
+      "count": 1,
+      "reference_id": "",
+      "reference_detail": "",
+      "virtue": null,
+      "translation": null,
+      "tags": []
+    },
+    {
+      "id": "دعاء_طرد_الشيطان_و_وساوسه_03",
+      "arabic": "((الْأَذْكَارُ وَقِرَاءَةُ الْقُرْآنِ)).",
+      "count": 1,
+      "reference_id": "",
+      "reference_detail": "",
+      "virtue": null,
+      "translation": null,
+      "tags": []
+    }
+  ]
+}

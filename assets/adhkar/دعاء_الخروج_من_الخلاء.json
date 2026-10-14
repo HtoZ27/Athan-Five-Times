@@ -1,0 +1,20 @@
+{
+  "id": "دعاء_الخروج_من_الخلاء",
+  "name_ar": "دعاء الخروج من الخلاء",
+  "name_en": "دعاء الخروج من الخلاء",
+  "icon": "dua",
+  "total": 1,
+  "tags": [],
+  "items": [
+    {
+      "id": "دعاء_الخروج_من_الخلاء_01",
+      "arabic": "(غُفْرَانَكَ).",
+      "count": 1,
+      "reference_id": "",
+      "reference_detail": "",
+      "virtue": null,
+      "translation": null,
+      "tags": []
+    }
+  ]
+}

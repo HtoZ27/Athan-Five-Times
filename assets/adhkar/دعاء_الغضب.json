@@ -1,0 +1,20 @@
+{
+  "id": "دعاء_الغضب",
+  "name_ar": "دعاء الغضب",
+  "name_en": "دعاء الغضب",
+  "icon": "dua",
+  "total": 1,
+  "tags": [],
+  "items": [
+    {
+      "id": "دعاء_الغضب_01",
+      "arabic": "((أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ)).",
+      "count": 1,
+      "reference_id": "",
+      "reference_detail": "",
+      "virtue": null,
+      "translation": null,
+      "tags": []
+    }
+  ]
+}

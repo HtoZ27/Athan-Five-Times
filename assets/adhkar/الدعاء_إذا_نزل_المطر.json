@@ -1,0 +1,20 @@
+{
+  "id": "الدعاء_إذا_نزل_المطر",
+  "name_ar": "الدعاء إذا نزل المطر",
+  "name_en": "الدعاء إذا نزل المطر",
+  "icon": "dua",
+  "total": 1,
+  "tags": [],
+  "items": [
+    {
+      "id": "الدعاء_إذا_نزل_المطر_01",
+      "arabic": "((اللَّهُمَّ صَيِّباً نَافِعاً)).",
+      "count": 1,
+      "reference_id": "",
+      "reference_detail": "",
+      "virtue": null,
+      "translation": null,
+      "tags": []
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "id": "الدعاء_للمريض_في_عيادته",
+  "name_ar": "الدعاء للمريض في عيادته",
+  "name_en": "الدعاء للمريض في عيادته",
+  "icon": "dua",
+  "total": 2,
+  "tags": [],
+  "items": [
+    {
+      "id": "الدعاء_للمريض_في_عيادته_01",
+      "arabic": "((لاَ بأْسَ طَهُورٌ إِنْ شَاءَ اللَّهُ)).",
+      "count": 1,
+      "reference_id": "",
+      "reference_detail": "",
+      "virtue": null,
+      "translation": null,
+      "tags": []
+    },
+    {
+      "id": "الدعاء_للمريض_في_عيادته_02",
+      "arabic": "أَسْأَلُ اللَّهَ الْعَظيمَ رَبَّ الْعَرْشِ الْعَظِيمِ أَنْ يَشْفيَكَ",
+      "count": 7,
+      "reference_id": "",
+      "reference_detail": "",
+      "virtue": null,
+      "translation": null,
+      "tags": []
+    }
+  ]
+}

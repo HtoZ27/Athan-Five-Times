@@ -1,0 +1,30 @@
+{
+  "id": "دعاء_التعجب_والأمر_السار",
+  "name_ar": "دعاء التعجب والأمر السار",
+  "name_en": "دعاء التعجب والأمر السار",
+  "icon": "dua",
+  "total": 2,
+  "tags": [],
+  "items": [
+    {
+      "id": "دعاء_التعجب_والأمر_السار_01",
+      "arabic": "((سُبْحَانَ اللَّهِ!)).",
+      "count": 1,
+      "reference_id": "",
+      "reference_detail": "",
+      "virtue": null,
+      "translation": null,
+      "tags": []
+    },
+    {
+      "id": "دعاء_التعجب_والأمر_السار_02",
+      "arabic": "((اللَّهُ أَكْبَرُ!)).",
+      "count": 1,
+      "reference_id": "",
+      "reference_detail": "",
+      "virtue": null,
+      "translation": null,
+      "tags": []
+    }
+  ]
+}

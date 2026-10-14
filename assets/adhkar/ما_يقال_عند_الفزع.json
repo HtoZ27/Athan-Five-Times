@@ -1,0 +1,20 @@
+{
+  "id": "ما_يقال_عند_الفزع",
+  "name_ar": "ما يقال عند الفزع",
+  "name_en": "ما يقال عند الفزع",
+  "icon": "dua",
+  "total": 1,
+  "tags": [],
+  "items": [
+    {
+      "id": "ما_يقال_عند_الفزع_01",
+      "arabic": "((لاَ إِلَهَ إِلاَّ اللَّهُ!)).",
+      "count": 1,
+      "reference_id": "",
+      "reference_detail": "",
+      "virtue": null,
+      "translation": null,
+      "tags": []
+    }
+  ]
+}

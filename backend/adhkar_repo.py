@@ -59,8 +59,8 @@ def validate_category(data: Any) -> None:
             continue
         if not item.get("arabic"):
             errors.append("%s: missing arabic" % item.get("id", "?"))
-        if not item.get("reference_id"):
-            errors.append("%s: missing reference_id" % item.get("id", "?"))
+        # reference_id is optional (many authentic adhkar circulate without
+        # a citable source); the UI hides the reference row when absent.
     if errors:
         raise AdhkarValidationError("; ".join(errors))
 

@@ -4,7 +4,7 @@
 [![Release](https://img.shields.io/github/v/release/HtoZ27/Athan-Five-Times?include_prereleases)](https://github.com/HtoZ27/Athan-Five-Times/releases)
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 
-> **Beta (0.3.7b)** — This is a beta release: not yet bug-free, not yet
+> **Beta (0.3.8b)** — This is a beta release: not yet bug-free, not yet
 > tested on all Linux environments, and translations are still unreviewed.
 > Bug reports are welcome via GitHub Issues.
 
@@ -26,7 +26,7 @@ A Linux desktop prayer-times application with azan audio, structured adhkar, do-
 
 - **Prayer Times** — Accurate calculation (MWL, Umm Al-Qura, Egyptian, Tunisian + 20 more), per-prayer icons, live countdown, Hijri date
 - **Audio Azan** — Streaming MP3 playback with fade-in, volume control, multiple muezzins + per-prayer audio, takbeer mode
-- **Adhkar Library** — 10 structured categories (74 remembrances) with repetition counts and source references, Arabic-Indic numerals
+- **Adhkar Library** — 140 structured categories (382 remembrances) with repetition counts and source references, Arabic-Indic numerals
 - **System Tray** — Mosque icon, next-prayer tooltip, show/quit menu, optional visibility, no-ghost quit
 - **DND Integration** — Auto system-wide do-not-disturb around prayer times (GNOME)
 - **Themes** — Dark/Light/Ottoman Gold/Catppuccin + auto, per-component palettes
@@ -55,13 +55,13 @@ Or install a native package (also on the releases page):
 
 ```bash
 # Debian / Ubuntu
-sudo dpkg -i athan-five-times_0.3.7b_all.deb
+sudo dpkg -i athan-five-times_0.3.8b_all.deb
 sudo apt-get install -f   # pulls python3-pyside6* if missing
 pip install adhan miniaudio
 athan-five-times
 
 # Fedora / openSUSE (from spec)
-sudo dnf install athan-five-times-0.3.7b-1.noarch.rpm
+sudo dnf install athan-five-times-0.3.8b-1.noarch.rpm
 
 # Arch Linux (from PKGBUILD)
 makepkg -si   # inside packaging/arch, or use the AUR

@@ -1,14 +1,1124 @@
 {
   "categories": [
-    {"id": "morning", "name_ar": "أذكار الصباح", "name_en": "Morning Adhkar", "asset": "assets/data/adhkar/morning.json", "icon": "morning", "order": 1},
-    {"id": "evening", "name_ar": "أذكار المساء", "name_en": "Evening Adhkar", "asset": "assets/data/adhkar/evening.json", "icon": "evening", "order": 2},
-    {"id": "after_prayer", "name_ar": "أذكار بعد الصلاة", "name_en": "After Prayer Adhkar", "asset": "assets/data/adhkar/after_prayer.json", "icon": "after_prayer", "order": 3},
-    {"id": "sleep", "name_ar": "أذكار النوم", "name_en": "Sleeping Adhkar", "asset": "assets/data/adhkar/sleep.json", "icon": "sleep", "order": 4},
-    {"id": "waking", "name_ar": "أذكار الاستيقاظ", "name_en": "Waking Up Adhkar", "asset": "assets/data/adhkar/waking.json", "icon": "waking", "order": 5},
-    {"id": "home", "name_ar": "أذكار المنزل", "name_en": "Home Adhkar", "asset": "assets/data/adhkar/home.json", "icon": "home", "order": 6},
-    {"id": "eating", "name_ar": "أذكار الأكل والشرب", "name_en": "Eating & Drinking Adhkar", "asset": "assets/data/adhkar/eating.json", "icon": "eating", "order": 7},
-    {"id": "mosque", "name_ar": "أذكار المسجد", "name_en": "Mosque Adhkar", "asset": "assets/data/adhkar/mosque.json", "icon": "mosque", "order": 8},
-    {"id": "travel", "name_ar": "أذكار السفر", "name_en": "Travel Adhkar", "asset": "assets/data/adhkar/travel.json", "icon": "travel", "order": 9},
-    {"id": "misc", "name_ar": "أدعية متنوعة", "name_en": "Various Duas", "asset": "assets/data/adhkar/misc.json", "icon": "dua", "order": 10}
+    {
+      "id": "morning",
+      "name_ar": "أذكار الصباح",
+      "name_en": "Morning Adhkar",
+      "asset": "assets/data/adhkar/morning.json",
+      "icon": "morning",
+      "order": 1
+    },
+    {
+      "id": "evening",
+      "name_ar": "أذكار المساء",
+      "name_en": "Evening Adhkar",
+      "asset": "assets/data/adhkar/evening.json",
+      "icon": "evening",
+      "order": 2
+    },
+    {
+      "id": "after_prayer",
+      "name_ar": "أذكار بعد الصلاة",
+      "name_en": "After Prayer Adhkar",
+      "asset": "assets/data/adhkar/after_prayer.json",
+      "icon": "after_prayer",
+      "order": 3
+    },
+    {
+      "id": "sleep",
+      "name_ar": "أذكار النوم",
+      "name_en": "Sleeping Adhkar",
+      "asset": "assets/data/adhkar/sleep.json",
+      "icon": "sleep",
+      "order": 4
+    },
+    {
+      "id": "waking",
+      "name_ar": "أذكار الاستيقاظ",
+      "name_en": "Waking Up Adhkar",
+      "asset": "assets/data/adhkar/waking.json",
+      "icon": "waking",
+      "order": 5
+    },
+    {
+      "id": "home",
+      "name_ar": "أذكار المنزل",
+      "name_en": "Home Adhkar",
+      "asset": "assets/data/adhkar/home.json",
+      "icon": "home",
+      "order": 6
+    },
+    {
+      "id": "eating",
+      "name_ar": "أذكار الأكل والشرب",
+      "name_en": "Eating & Drinking Adhkar",
+      "asset": "assets/data/adhkar/eating.json",
+      "icon": "eating",
+      "order": 7
+    },
+    {
+      "id": "mosque",
+      "name_ar": "أذكار المسجد",
+      "name_en": "Mosque Adhkar",
+      "asset": "assets/data/adhkar/mosque.json",
+      "icon": "mosque",
+      "order": 8
+    },
+    {
+      "id": "travel",
+      "name_ar": "أذكار السفر",
+      "name_en": "Travel Adhkar",
+      "asset": "assets/data/adhkar/travel.json",
+      "icon": "travel",
+      "order": 9
+    },
+    {
+      "id": "misc",
+      "name_ar": "أدعية متنوعة",
+      "name_en": "Various Duas",
+      "asset": "assets/data/adhkar/misc.json",
+      "icon": "dua",
+      "order": 10
+    },
+    {
+      "id": "أذكار_الآذان",
+      "name_ar": "أذكار الآذان",
+      "name_en": "أذكار الآذان",
+      "icon": "dua",
+      "order": 11,
+      "asset": "assets/data/adhkar/أذكار_الآذان.json"
+    },
+    {
+      "id": "أماكن_وأوقات_إجابة_الدعاء",
+      "name_ar": "أماكن وأوقات إجابة الدعاء",
+      "name_en": "أماكن وأوقات إجابة الدعاء",
+      "icon": "dua",
+      "order": 12,
+      "asset": "assets/data/adhkar/أماكن_وأوقات_إجابة_الدعاء.json"
+    },
+    {
+      "id": "إفشاء_السلام",
+      "name_ar": "إفشاء السلام",
+      "name_en": "إفشاء السلام",
+      "icon": "dua",
+      "order": 13,
+      "asset": "assets/data/adhkar/إفشاء_السلام.json"
+    },
+    {
+      "id": "الاستغفار_و_التوبة",
+      "name_ar": "الاستغفار و التوبة",
+      "name_en": "الاستغفار و التوبة",
+      "icon": "dua",
+      "order": 14,
+      "asset": "assets/data/adhkar/الاستغفار_و_التوبة.json"
+    },
+    {
+      "id": "التسبيح،_التحميد،_التهليل،_التكبير",
+      "name_ar": "التسبيح، التحميد، التهليل، التكبير",
+      "name_en": "التسبيح، التحميد، التهليل، التكبير",
+      "icon": "dua",
+      "order": 15,
+      "asset": "assets/data/adhkar/التسبيح،_التحميد،_التهليل،_التكبير.json"
+    },
+    {
+      "id": "التشهد",
+      "name_ar": "التشهد",
+      "name_en": "التشهد",
+      "icon": "dua",
+      "order": 16,
+      "asset": "assets/data/adhkar/التشهد.json"
+    },
+    {
+      "id": "التعريض_بالدعاء_لطلب_الطعام_أو_الشراب",
+      "name_ar": "التعريض بالدعاء لطلب الطعام أو الشراب",
+      "name_en": "التعريض بالدعاء لطلب الطعام أو الشراب",
+      "icon": "dua",
+      "order": 17,
+      "asset": "assets/data/adhkar/التعريض_بالدعاء_لطلب_الطعام_أو_الشراب.json"
+    },
+    {
+      "id": "التكبير_إذا_أتى_الركن_الأسود",
+      "name_ar": "التكبير إذا أتى الركن الأسود",
+      "name_en": "التكبير إذا أتى الركن الأسود",
+      "icon": "dua",
+      "order": 18,
+      "asset": "assets/data/adhkar/التكبير_إذا_أتى_الركن_الأسود.json"
+    },
+    {
+      "id": "التكبير_عند_رمي_الجمار_مع_كل_حصاة",
+      "name_ar": "التكبير عند رمي الجمار مع كل حصاة",
+      "name_en": "التكبير عند رمي الجمار مع كل حصاة",
+      "icon": "dua",
+      "order": 19,
+      "asset": "assets/data/adhkar/التكبير_عند_رمي_الجمار_مع_كل_حصاة.json"
+    },
+    {
+      "id": "التكبير_و_التسبيح_في_سير_السفر",
+      "name_ar": "التكبير و التسبيح في سير السفر",
+      "name_en": "التكبير و التسبيح في سير السفر",
+      "icon": "dua",
+      "order": 20,
+      "asset": "assets/data/adhkar/التكبير_و_التسبيح_في_سير_السفر.json"
+    },
+    {
+      "id": "الدعاء_إذا_أفطر_عند_أهل_بيت",
+      "name_ar": "الدعاء إذا أفطر عند أهل بيت",
+      "name_en": "الدعاء إذا أفطر عند أهل بيت",
+      "icon": "dua",
+      "order": 21,
+      "asset": "assets/data/adhkar/الدعاء_إذا_أفطر_عند_أهل_بيت.json"
+    },
+    {
+      "id": "الدعاء_إذا_تعس_المركوب",
+      "name_ar": "الدعاء إذا تعس المركوب",
+      "name_en": "الدعاء إذا تعس المركوب",
+      "icon": "dua",
+      "order": 22,
+      "asset": "assets/data/adhkar/الدعاء_إذا_تعس_المركوب.json"
+    },
+    {
+      "id": "الدعاء_إذا_تقلب_في_الليل",
+      "name_ar": "الدعاء إذا تقلب في الليل",
+      "name_en": "الدعاء إذا تقلب في الليل",
+      "icon": "dua",
+      "order": 23,
+      "asset": "assets/data/adhkar/الدعاء_إذا_تقلب_في_الليل.json"
+    },
+    {
+      "id": "الدعاء_إذا_نزل_المطر",
+      "name_ar": "الدعاء إذا نزل المطر",
+      "name_en": "الدعاء إذا نزل المطر",
+      "icon": "dua",
+      "order": 24,
+      "asset": "assets/data/adhkar/الدعاء_إذا_نزل_المطر.json"
+    },
+    {
+      "id": "الدعاء_إذا_نزل_مترلا_في_سفر_أو_غيره",
+      "name_ar": "الدعاء إذا نزل مترلا في سفر أو غيره",
+      "name_en": "الدعاء إذا نزل مترلا في سفر أو غيره",
+      "icon": "dua",
+      "order": 25,
+      "asset": "assets/data/adhkar/الدعاء_إذا_نزل_مترلا_في_سفر_أو_غيره.json"
+    },
+    {
+      "id": "الدعاء_بعد_التشهد_الأخير_قبل_السلام",
+      "name_ar": "الدعاء بعد التشهد الأخير قبل السلام",
+      "name_en": "الدعاء بعد التشهد الأخير قبل السلام",
+      "icon": "dua",
+      "order": 26,
+      "asset": "assets/data/adhkar/الدعاء_بعد_التشهد_الأخير_قبل_السلام.json"
+    },
+    {
+      "id": "الدعاء_بعد_دفن_الميت",
+      "name_ar": "الدعاء بعد دفن الميت",
+      "name_en": "الدعاء بعد دفن الميت",
+      "icon": "dua",
+      "order": 27,
+      "asset": "assets/data/adhkar/الدعاء_بعد_دفن_الميت.json"
+    },
+    {
+      "id": "الدعاء_بين_الركن_اليماني_والحجر_الأسود",
+      "name_ar": "الدعاء بين الركن اليماني والحجر الأسود",
+      "name_en": "الدعاء بين الركن اليماني والحجر الأسود",
+      "icon": "dua",
+      "order": 28,
+      "asset": "assets/data/adhkar/الدعاء_بين_الركن_اليماني_والحجر_الأسود.json"
+    },
+    {
+      "id": "الدعاء_حينما_يقع_ما_لا_يرضاه_أو_غلب_على_",
+      "name_ar": "الدعاء حينما يقع ما لا يرضاه أو غلب على أمره",
+      "name_en": "الدعاء حينما يقع ما لا يرضاه أو غلب على أمره",
+      "icon": "dua",
+      "order": 29,
+      "asset": "assets/data/adhkar/الدعاء_حينما_يقع_ما_لا_يرضاه_أو_غلب_على_.json"
+    },
+    {
+      "id": "الدعاء_على_العدو",
+      "name_ar": "الدعاء على العدو",
+      "name_en": "الدعاء على العدو",
+      "icon": "dua",
+      "order": 30,
+      "asset": "assets/data/adhkar/الدعاء_على_العدو.json"
+    },
+    {
+      "id": "الدعاء_عند_إدخال_الميت_القبر",
+      "name_ar": "الدعاء عند إدخال الميت القبر",
+      "name_en": "الدعاء عند إدخال الميت القبر",
+      "icon": "dua",
+      "order": 31,
+      "asset": "assets/data/adhkar/الدعاء_عند_إدخال_الميت_القبر.json"
+    },
+    {
+      "id": "الدعاء_عند_إغماض_الميت",
+      "name_ar": "الدعاء عند إغماض الميت",
+      "name_en": "الدعاء عند إغماض الميت",
+      "icon": "dua",
+      "order": 32,
+      "asset": "assets/data/adhkar/الدعاء_عند_إغماض_الميت.json"
+    },
+    {
+      "id": "الدعاء_عند_إفطار_الصائم",
+      "name_ar": "الدعاء عند إفطار الصائم",
+      "name_en": "الدعاء عند إفطار الصائم",
+      "icon": "dua",
+      "order": 33,
+      "asset": "assets/data/adhkar/الدعاء_عند_إفطار_الصائم.json"
+    },
+    {
+      "id": "الدعاء_عند_الفراغ_من_الطعام",
+      "name_ar": "الدعاء عند الفراغ من الطعام",
+      "name_en": "الدعاء عند الفراغ من الطعام",
+      "icon": "dua",
+      "order": 34,
+      "asset": "assets/data/adhkar/الدعاء_عند_الفراغ_من_الطعام.json"
+    },
+    {
+      "id": "الدعاء_عند_رؤية_باكورة_الثمر",
+      "name_ar": "الدعاء عند رؤية باكورة الثمر",
+      "name_en": "الدعاء عند رؤية باكورة الثمر",
+      "icon": "dua",
+      "order": 35,
+      "asset": "assets/data/adhkar/الدعاء_عند_رؤية_باكورة_الثمر.json"
+    },
+    {
+      "id": "الدعاء_عند_سماع_صياح_الديك_ونهيق_الحمار",
+      "name_ar": "الدعاء عند سماع صياح الديك ونهيق الحمار",
+      "name_en": "الدعاء عند سماع صياح الديك ونهيق الحمار",
+      "icon": "dua",
+      "order": 36,
+      "asset": "assets/data/adhkar/الدعاء_عند_سماع_صياح_الديك_ونهيق_الحمار.json"
+    },
+    {
+      "id": "الدعاء_قبل_إتيان_الزوجة",
+      "name_ar": "الدعاء قبل إتيان الزوجة",
+      "name_en": "الدعاء قبل إتيان الزوجة",
+      "icon": "dua",
+      "order": 37,
+      "asset": "assets/data/adhkar/الدعاء_قبل_إتيان_الزوجة.json"
+    },
+    {
+      "id": "الدعاء_قبل_الطعام",
+      "name_ar": "الدعاء قبل الطعام",
+      "name_en": "الدعاء قبل الطعام",
+      "icon": "dua",
+      "order": 38,
+      "asset": "assets/data/adhkar/الدعاء_قبل_الطعام.json"
+    },
+    {
+      "id": "الدعاء_للفرط_في_الصلاة_عليه",
+      "name_ar": "الدعاء للفرط في الصلاة عليه",
+      "name_en": "الدعاء للفرط في الصلاة عليه",
+      "icon": "dua",
+      "order": 39,
+      "asset": "assets/data/adhkar/الدعاء_للفرط_في_الصلاة_عليه.json"
+    },
+    {
+      "id": "الدعاء_للمتزوج",
+      "name_ar": "الدعاء للمتزوج",
+      "name_en": "الدعاء للمتزوج",
+      "icon": "dua",
+      "order": 40,
+      "asset": "assets/data/adhkar/الدعاء_للمتزوج.json"
+    },
+    {
+      "id": "الدعاء_للمريض_في_عيادته",
+      "name_ar": "الدعاء للمريض في عيادته",
+      "name_en": "الدعاء للمريض في عيادته",
+      "icon": "dua",
+      "order": 41,
+      "asset": "assets/data/adhkar/الدعاء_للمريض_في_عيادته.json"
+    },
+    {
+      "id": "الدعاء_للميت_في_الصلاة_عليه",
+      "name_ar": "الدعاء للميت في الصلاة عليه",
+      "name_en": "الدعاء للميت في الصلاة عليه",
+      "icon": "dua",
+      "order": 42,
+      "asset": "assets/data/adhkar/الدعاء_للميت_في_الصلاة_عليه.json"
+    },
+    {
+      "id": "الدعاء_لمن_أقرض_عند_القضاء",
+      "name_ar": "الدعاء لمن أقرض عند القضاء",
+      "name_en": "الدعاء لمن أقرض عند القضاء",
+      "icon": "dua",
+      "order": 43,
+      "asset": "assets/data/adhkar/الدعاء_لمن_أقرض_عند_القضاء.json"
+    },
+    {
+      "id": "الدعاء_لمن_سببته",
+      "name_ar": "الدعاء لمن سببته",
+      "name_en": "الدعاء لمن سببته",
+      "icon": "dua",
+      "order": 44,
+      "asset": "assets/data/adhkar/الدعاء_لمن_سببته.json"
+    },
+    {
+      "id": "الدعاء_لمن_صنع_إليك_معروفا",
+      "name_ar": "الدعاء لمن صنع إليك معروفا",
+      "name_en": "الدعاء لمن صنع إليك معروفا",
+      "icon": "dua",
+      "order": 45,
+      "asset": "assets/data/adhkar/الدعاء_لمن_صنع_إليك_معروفا.json"
+    },
+    {
+      "id": "الدعاء_لمن_عرض_عليك_ماله",
+      "name_ar": "الدعاء لمن عرض عليك ماله",
+      "name_en": "الدعاء لمن عرض عليك ماله",
+      "icon": "dua",
+      "order": 46,
+      "asset": "assets/data/adhkar/الدعاء_لمن_عرض_عليك_ماله.json"
+    },
+    {
+      "id": "الدعاء_لمن_قال_إني_أحبك_في_الله",
+      "name_ar": "الدعاء لمن قال إني أحبك في الله",
+      "name_en": "الدعاء لمن قال إني أحبك في الله",
+      "icon": "dua",
+      "order": 47,
+      "asset": "assets/data/adhkar/الدعاء_لمن_قال_إني_أحبك_في_الله.json"
+    },
+    {
+      "id": "الدعاء_لمن_قال_بارك_الله_فيك",
+      "name_ar": "الدعاء لمن قال بارك الله فيك",
+      "name_en": "الدعاء لمن قال بارك الله فيك",
+      "icon": "dua",
+      "order": 48,
+      "asset": "assets/data/adhkar/الدعاء_لمن_قال_بارك_الله_فيك.json"
+    },
+    {
+      "id": "الدعاء_لمن_قال_غفر_الله_لك",
+      "name_ar": "الدعاء لمن قال غفر الله لك",
+      "name_en": "الدعاء لمن قال غفر الله لك",
+      "icon": "dua",
+      "order": 49,
+      "asset": "assets/data/adhkar/الدعاء_لمن_قال_غفر_الله_لك.json"
+    },
+    {
+      "id": "الدعاء_يوم_عرفة",
+      "name_ar": "الدعاء يوم عرفة",
+      "name_en": "الدعاء يوم عرفة",
+      "icon": "dua",
+      "order": 50,
+      "asset": "assets/data/adhkar/الدعاء_يوم_عرفة.json"
+    },
+    {
+      "id": "الذكر_بعد_الفراغ_من_الوضوء",
+      "name_ar": "الذكر بعد الفراغ من الوضوء",
+      "name_en": "الذكر بعد الفراغ من الوضوء",
+      "icon": "dua",
+      "order": 51,
+      "asset": "assets/data/adhkar/الذكر_بعد_الفراغ_من_الوضوء.json"
+    },
+    {
+      "id": "الذكر_بعد_نزول_المطر",
+      "name_ar": "الذكر بعد نزول المطر",
+      "name_en": "الذكر بعد نزول المطر",
+      "icon": "dua",
+      "order": 52,
+      "asset": "assets/data/adhkar/الذكر_بعد_نزول_المطر.json"
+    },
+    {
+      "id": "الذكر_عقب_السلام_من_الوتر",
+      "name_ar": "الذكر عقب السلام من الوتر",
+      "name_en": "الذكر عقب السلام من الوتر",
+      "icon": "dua",
+      "order": 53,
+      "asset": "assets/data/adhkar/الذكر_عقب_السلام_من_الوتر.json"
+    },
+    {
+      "id": "الذكر_عند_الخروج_من_المنزل",
+      "name_ar": "الذكر عند الخروج من المنزل",
+      "name_en": "الذكر عند الخروج من المنزل",
+      "icon": "dua",
+      "order": 54,
+      "asset": "assets/data/adhkar/الذكر_عند_الخروج_من_المنزل.json"
+    },
+    {
+      "id": "الذكر_عند_المشعر_الحرام",
+      "name_ar": "الذكر عند المشعر الحرام",
+      "name_en": "الذكر عند المشعر الحرام",
+      "icon": "dua",
+      "order": 55,
+      "asset": "assets/data/adhkar/الذكر_عند_المشعر_الحرام.json"
+    },
+    {
+      "id": "الذكر_عند_دخول_المنزل",
+      "name_ar": "الذكر عند دخول المنزل",
+      "name_en": "الذكر عند دخول المنزل",
+      "icon": "dua",
+      "order": 56,
+      "asset": "assets/data/adhkar/الذكر_عند_دخول_المنزل.json"
+    },
+    {
+      "id": "الذكر_قبل_الوضوء",
+      "name_ar": "الذكر قبل الوضوء",
+      "name_en": "الذكر قبل الوضوء",
+      "icon": "dua",
+      "order": 57,
+      "asset": "assets/data/adhkar/الذكر_قبل_الوضوء.json"
+    },
+    {
+      "id": "الرقية_الشرعية_من_السنة_النبوية",
+      "name_ar": "الرقية الشرعية من السنة النبوية",
+      "name_en": "الرقية الشرعية من السنة النبوية",
+      "icon": "dua",
+      "order": 58,
+      "asset": "assets/data/adhkar/الرقية_الشرعية_من_السنة_النبوية.json"
+    },
+    {
+      "id": "الرقية_الشرعية_من_القرآن_الكريم",
+      "name_ar": "الرقية الشرعية من القرآن الكريم",
+      "name_en": "الرقية الشرعية من القرآن الكريم",
+      "icon": "dua",
+      "order": 59,
+      "asset": "assets/data/adhkar/الرقية_الشرعية_من_القرآن_الكريم.json"
+    },
+    {
+      "id": "الصلاة_على_النبي_بعد_التشهد",
+      "name_ar": "الصلاة على النبي بعد التشهد",
+      "name_en": "الصلاة على النبي بعد التشهد",
+      "icon": "dua",
+      "order": 60,
+      "asset": "assets/data/adhkar/الصلاة_على_النبي_بعد_التشهد.json"
+    },
+    {
+      "id": "تلقين_المحتضر",
+      "name_ar": "تلقين المحتضر",
+      "name_en": "تلقين المحتضر",
+      "icon": "dua",
+      "order": 61,
+      "asset": "assets/data/adhkar/تلقين_المحتضر.json"
+    },
+    {
+      "id": "دعاء_الاستفتاح",
+      "name_ar": "دعاء الاستفتاح",
+      "name_en": "دعاء الاستفتاح",
+      "icon": "dua",
+      "order": 62,
+      "asset": "assets/data/adhkar/دعاء_الاستفتاح.json"
+    },
+    {
+      "id": "دعاء_التعجب_والأمر_السار",
+      "name_ar": "دعاء التعجب والأمر السار",
+      "name_en": "دعاء التعجب والأمر السار",
+      "icon": "dua",
+      "order": 63,
+      "asset": "assets/data/adhkar/دعاء_التعجب_والأمر_السار.json"
+    },
+    {
+      "id": "دعاء_التعزية",
+      "name_ar": "دعاء التعزية",
+      "name_en": "دعاء التعزية",
+      "icon": "dua",
+      "order": 64,
+      "asset": "assets/data/adhkar/دعاء_التعزية.json"
+    },
+    {
+      "id": "دعاء_الجلسة_بين_السجدتين",
+      "name_ar": "دعاء الجلسة بين السجدتين",
+      "name_en": "دعاء الجلسة بين السجدتين",
+      "icon": "dua",
+      "order": 65,
+      "asset": "assets/data/adhkar/دعاء_الجلسة_بين_السجدتين.json"
+    },
+    {
+      "id": "دعاء_الخروج_من_الخلاء",
+      "name_ar": "دعاء الخروج من الخلاء",
+      "name_en": "دعاء الخروج من الخلاء",
+      "icon": "dua",
+      "order": 66,
+      "asset": "assets/data/adhkar/دعاء_الخروج_من_الخلاء.json"
+    },
+    {
+      "id": "دعاء_الخروج_من_المسجد",
+      "name_ar": "دعاء الخروج من المسجد",
+      "name_en": "دعاء الخروج من المسجد",
+      "icon": "dua",
+      "order": 67,
+      "asset": "assets/data/adhkar/دعاء_الخروج_من_المسجد.json"
+    },
+    {
+      "id": "دعاء_الخوف_من_الشرك",
+      "name_ar": "دعاء الخوف من الشرك",
+      "name_en": "دعاء الخوف من الشرك",
+      "icon": "dua",
+      "order": 68,
+      "asset": "assets/data/adhkar/دعاء_الخوف_من_الشرك.json"
+    },
+    {
+      "id": "دعاء_الذهاب_إلى_المسجد",
+      "name_ar": "دعاء الذهاب إلى المسجد",
+      "name_en": "دعاء الذهاب إلى المسجد",
+      "icon": "dua",
+      "order": 69,
+      "asset": "assets/data/adhkar/دعاء_الذهاب_إلى_المسجد.json"
+    },
+    {
+      "id": "دعاء_الرعد",
+      "name_ar": "دعاء الرعد",
+      "name_en": "دعاء الرعد",
+      "icon": "dua",
+      "order": 70,
+      "asset": "assets/data/adhkar/دعاء_الرعد.json"
+    },
+    {
+      "id": "دعاء_الرفع_من_الركوع",
+      "name_ar": "دعاء الرفع من الركوع",
+      "name_en": "دعاء الرفع من الركوع",
+      "icon": "dua",
+      "order": 71,
+      "asset": "assets/data/adhkar/دعاء_الرفع_من_الركوع.json"
+    },
+    {
+      "id": "دعاء_الركوب",
+      "name_ar": "دعاء الركوب",
+      "name_en": "دعاء الركوب",
+      "icon": "dua",
+      "order": 72,
+      "asset": "assets/data/adhkar/دعاء_الركوب.json"
+    },
+    {
+      "id": "دعاء_الركوع",
+      "name_ar": "دعاء الركوع",
+      "name_en": "دعاء الركوع",
+      "icon": "dua",
+      "order": 73,
+      "asset": "assets/data/adhkar/دعاء_الركوع.json"
+    },
+    {
+      "id": "دعاء_الريح",
+      "name_ar": "دعاء الريح",
+      "name_en": "دعاء الريح",
+      "icon": "dua",
+      "order": 74,
+      "asset": "assets/data/adhkar/دعاء_الريح.json"
+    },
+    {
+      "id": "دعاء_السجود",
+      "name_ar": "دعاء السجود",
+      "name_en": "دعاء السجود",
+      "icon": "dua",
+      "order": 75,
+      "asset": "assets/data/adhkar/دعاء_السجود.json"
+    },
+    {
+      "id": "دعاء_السفر",
+      "name_ar": "دعاء السفر",
+      "name_en": "دعاء السفر",
+      "icon": "dua",
+      "order": 76,
+      "asset": "assets/data/adhkar/دعاء_السفر.json"
+    },
+    {
+      "id": "دعاء_الصائم_إذا_حضر_الطعام_ولم_يفطر",
+      "name_ar": "دعاء الصائم إذا حضر الطعام ولم يفطر",
+      "name_en": "دعاء الصائم إذا حضر الطعام ولم يفطر",
+      "icon": "dua",
+      "order": 77,
+      "asset": "assets/data/adhkar/دعاء_الصائم_إذا_حضر_الطعام_ولم_يفطر.json"
+    },
+    {
+      "id": "دعاء_الضيف_لصاحب_الطعام",
+      "name_ar": "دعاء الضيف لصاحب الطعام",
+      "name_en": "دعاء الضيف لصاحب الطعام",
+      "icon": "dua",
+      "order": 78,
+      "asset": "assets/data/adhkar/دعاء_الضيف_لصاحب_الطعام.json"
+    },
+    {
+      "id": "دعاء_العطاس",
+      "name_ar": "دعاء العطاس",
+      "name_en": "دعاء العطاس",
+      "icon": "dua",
+      "order": 79,
+      "asset": "assets/data/adhkar/دعاء_العطاس.json"
+    },
+    {
+      "id": "دعاء_الغضب",
+      "name_ar": "دعاء الغضب",
+      "name_en": "دعاء الغضب",
+      "icon": "dua",
+      "order": 80,
+      "asset": "assets/data/adhkar/دعاء_الغضب.json"
+    },
+    {
+      "id": "دعاء_الفزع_في_النوم_و_من_بلي_بالوحشة",
+      "name_ar": "دعاء الفزع في النوم و من بلي بالوحشة",
+      "name_en": "دعاء الفزع في النوم و من بلي بالوحشة",
+      "icon": "dua",
+      "order": 81,
+      "asset": "assets/data/adhkar/دعاء_الفزع_في_النوم_و_من_بلي_بالوحشة.json"
+    },
+    {
+      "id": "دعاء_الكرب",
+      "name_ar": "دعاء الكرب",
+      "name_en": "دعاء الكرب",
+      "icon": "dua",
+      "order": 82,
+      "asset": "assets/data/adhkar/دعاء_الكرب.json"
+    },
+    {
+      "id": "دعاء_المتزوج_و_شراء_الدابة",
+      "name_ar": "دعاء المتزوج و شراء الدابة",
+      "name_en": "دعاء المتزوج و شراء الدابة",
+      "icon": "dua",
+      "order": 83,
+      "asset": "assets/data/adhkar/دعاء_المتزوج_و_شراء_الدابة.json"
+    },
+    {
+      "id": "دعاء_المريض_الذي_يئس_من_حياته",
+      "name_ar": "دعاء المريض الذي يئس من حياته",
+      "name_en": "دعاء المريض الذي يئس من حياته",
+      "icon": "dua",
+      "order": 84,
+      "asset": "assets/data/adhkar/دعاء_المريض_الذي_يئس_من_حياته.json"
+    },
+    {
+      "id": "دعاء_المسافر_إذا_أسحر",
+      "name_ar": "دعاء المسافر إذا أسحر",
+      "name_en": "دعاء المسافر إذا أسحر",
+      "icon": "dua",
+      "order": 85,
+      "asset": "assets/data/adhkar/دعاء_المسافر_إذا_أسحر.json"
+    },
+    {
+      "id": "دعاء_المسافر_للمقيم",
+      "name_ar": "دعاء المسافر للمقيم",
+      "name_en": "دعاء المسافر للمقيم",
+      "icon": "dua",
+      "order": 86,
+      "asset": "assets/data/adhkar/دعاء_المسافر_للمقيم.json"
+    },
+    {
+      "id": "دعاء_المقيم_للمسافر",
+      "name_ar": "دعاء المقيم للمسافر",
+      "name_en": "دعاء المقيم للمسافر",
+      "icon": "dua",
+      "order": 87,
+      "asset": "assets/data/adhkar/دعاء_المقيم_للمسافر.json"
+    },
+    {
+      "id": "دعاء_الهم_والحزن",
+      "name_ar": "دعاء الهم والحزن",
+      "name_en": "دعاء الهم والحزن",
+      "icon": "dua",
+      "order": 88,
+      "asset": "assets/data/adhkar/دعاء_الهم_والحزن.json"
+    },
+    {
+      "id": "دعاء_الوسوسة_في_الصلاة_و_القراءة",
+      "name_ar": "دعاء الوسوسة في الصلاة و القراءة",
+      "name_en": "دعاء الوسوسة في الصلاة و القراءة",
+      "icon": "dua",
+      "order": 89,
+      "asset": "assets/data/adhkar/دعاء_الوسوسة_في_الصلاة_و_القراءة.json"
+    },
+    {
+      "id": "دعاء_الوقوف_على_الصفا_والمروة",
+      "name_ar": "دعاء الوقوف على الصفا والمروة",
+      "name_en": "دعاء الوقوف على الصفا والمروة",
+      "icon": "dua",
+      "order": 90,
+      "asset": "assets/data/adhkar/دعاء_الوقوف_على_الصفا_والمروة.json"
+    },
+    {
+      "id": "دعاء_دخول_الخلاء",
+      "name_ar": "دعاء دخول الخلاء",
+      "name_en": "دعاء دخول الخلاء",
+      "icon": "dua",
+      "order": 91,
+      "asset": "assets/data/adhkar/دعاء_دخول_الخلاء.json"
+    },
+    {
+      "id": "دعاء_دخول_السوق",
+      "name_ar": "دعاء دخول السوق",
+      "name_en": "دعاء دخول السوق",
+      "icon": "dua",
+      "order": 92,
+      "asset": "assets/data/adhkar/دعاء_دخول_السوق.json"
+    },
+    {
+      "id": "دعاء_دخول_القرية_أو_البلدة",
+      "name_ar": "دعاء دخول القرية أو البلدة",
+      "name_en": "دعاء دخول القرية أو البلدة",
+      "icon": "dua",
+      "order": 93,
+      "asset": "assets/data/adhkar/دعاء_دخول_القرية_أو_البلدة.json"
+    },
+    {
+      "id": "دعاء_دخول_المسجد",
+      "name_ar": "دعاء دخول المسجد",
+      "name_en": "دعاء دخول المسجد",
+      "icon": "dua",
+      "order": 94,
+      "asset": "assets/data/adhkar/دعاء_دخول_المسجد.json"
+    },
+    {
+      "id": "دعاء_رؤية_الهلال",
+      "name_ar": "دعاء رؤية الهلال",
+      "name_en": "دعاء رؤية الهلال",
+      "icon": "dua",
+      "order": 95,
+      "asset": "assets/data/adhkar/دعاء_رؤية_الهلال.json"
+    },
+    {
+      "id": "دعاء_زيارة_القبور",
+      "name_ar": "دعاء زيارة القبور",
+      "name_en": "دعاء زيارة القبور",
+      "icon": "dua",
+      "order": 96,
+      "asset": "assets/data/adhkar/دعاء_زيارة_القبور.json"
+    },
+    {
+      "id": "دعاء_سجود_التلاوة",
+      "name_ar": "دعاء سجود التلاوة",
+      "name_en": "دعاء سجود التلاوة",
+      "icon": "dua",
+      "order": 97,
+      "asset": "assets/data/adhkar/دعاء_سجود_التلاوة.json"
+    },
+    {
+      "id": "دعاء_صلاة_الاستخارة",
+      "name_ar": "دعاء صلاة الاستخارة",
+      "name_en": "دعاء صلاة الاستخارة",
+      "icon": "dua",
+      "order": 98,
+      "asset": "assets/data/adhkar/دعاء_صلاة_الاستخارة.json"
+    },
+    {
+      "id": "دعاء_طرد_الشيطان_و_وساوسه",
+      "name_ar": "دعاء طرد الشيطان و وساوسه",
+      "name_en": "دعاء طرد الشيطان و وساوسه",
+      "icon": "dua",
+      "order": 99,
+      "asset": "assets/data/adhkar/دعاء_طرد_الشيطان_و_وساوسه.json"
+    },
+    {
+      "id": "دعاء_قضاء_الدين",
+      "name_ar": "دعاء قضاء الدين",
+      "name_en": "دعاء قضاء الدين",
+      "icon": "dua",
+      "order": 100,
+      "asset": "assets/data/adhkar/دعاء_قضاء_الدين.json"
+    },
+    {
+      "id": "دعاء_قنوت_الوتر",
+      "name_ar": "دعاء قنوت الوتر",
+      "name_en": "دعاء قنوت الوتر",
+      "icon": "dua",
+      "order": 101,
+      "asset": "assets/data/adhkar/دعاء_قنوت_الوتر.json"
+    },
+    {
+      "id": "دعاء_كراهية_الطيرة",
+      "name_ar": "دعاء كراهية الطيرة",
+      "name_en": "دعاء كراهية الطيرة",
+      "icon": "dua",
+      "order": 102,
+      "asset": "assets/data/adhkar/دعاء_كراهية_الطيرة.json"
+    },
+    {
+      "id": "دعاء_لبس_الثوب",
+      "name_ar": "دعاء لبس الثوب",
+      "name_en": "دعاء لبس الثوب",
+      "icon": "dua",
+      "order": 103,
+      "asset": "assets/data/adhkar/دعاء_لبس_الثوب.json"
+    },
+    {
+      "id": "دعاء_لبس_الثوب_الجديد",
+      "name_ar": "دعاء لبس الثوب الجديد",
+      "name_en": "دعاء لبس الثوب الجديد",
+      "icon": "dua",
+      "order": 104,
+      "asset": "assets/data/adhkar/دعاء_لبس_الثوب_الجديد.json"
+    },
+    {
+      "id": "دعاء_لقاء_العدو_و_ذي_السلطان",
+      "name_ar": "دعاء لقاء العدو و ذي السلطان",
+      "name_en": "دعاء لقاء العدو و ذي السلطان",
+      "icon": "dua",
+      "order": 105,
+      "asset": "assets/data/adhkar/دعاء_لقاء_العدو_و_ذي_السلطان.json"
+    },
+    {
+      "id": "دعاء_من_أصابه_وسوسة_في_الإيمان",
+      "name_ar": "دعاء من أصابه وسوسة في الإيمان",
+      "name_en": "دعاء من أصابه وسوسة في الإيمان",
+      "icon": "dua",
+      "order": 106,
+      "asset": "assets/data/adhkar/دعاء_من_أصابه_وسوسة_في_الإيمان.json"
+    },
+    {
+      "id": "دعاء_من_أصيب_بمصيبة",
+      "name_ar": "دعاء من أصيب بمصيبة",
+      "name_en": "دعاء من أصيب بمصيبة",
+      "icon": "dua",
+      "order": 107,
+      "asset": "assets/data/adhkar/دعاء_من_أصيب_بمصيبة.json"
+    },
+    {
+      "id": "دعاء_من_استصعب_عليه_أمر",
+      "name_ar": "دعاء من استصعب عليه أمر",
+      "name_en": "دعاء من استصعب عليه أمر",
+      "icon": "dua",
+      "order": 108,
+      "asset": "assets/data/adhkar/دعاء_من_استصعب_عليه_أمر.json"
+    },
+    {
+      "id": "دعاء_من_خشي_أن_يصيب_شيئا_بعينه",
+      "name_ar": "دعاء من خشي أن يصيب شيئا بعينه",
+      "name_en": "دعاء من خشي أن يصيب شيئا بعينه",
+      "icon": "dua",
+      "order": 109,
+      "asset": "assets/data/adhkar/دعاء_من_خشي_أن_يصيب_شيئا_بعينه.json"
+    },
+    {
+      "id": "دعاء_من_رأى_مبتلى",
+      "name_ar": "دعاء من رأى مبتلى",
+      "name_en": "دعاء من رأى مبتلى",
+      "icon": "dua",
+      "order": 110,
+      "asset": "assets/data/adhkar/دعاء_من_رأى_مبتلى.json"
+    },
+    {
+      "id": "دعاء_نباح_الكلب_بالليل",
+      "name_ar": "دعاء نباح الكلب بالليل",
+      "name_en": "دعاء نباح الكلب بالليل",
+      "icon": "dua",
+      "order": 111,
+      "asset": "assets/data/adhkar/دعاء_نباح_الكلب_بالليل.json"
+    },
+    {
+      "id": "ذكر_الرجوع_من_السفر",
+      "name_ar": "ذكر الرجوع من السفر",
+      "name_en": "ذكر الرجوع من السفر",
+      "icon": "dua",
+      "order": 112,
+      "asset": "assets/data/adhkar/ذكر_الرجوع_من_السفر.json"
+    },
+    {
+      "id": "فضل_الصلاة_على_النبي_صلى_الله_عليه_و_سلم",
+      "name_ar": "فضل الصلاة على النبي صلى الله عليه و سلم",
+      "name_en": "فضل الصلاة على النبي صلى الله عليه و سلم",
+      "icon": "dua",
+      "order": 113,
+      "asset": "assets/data/adhkar/فضل_الصلاة_على_النبي_صلى_الله_عليه_و_سلم.json"
+    },
+    {
+      "id": "فضل_عيادة_المريض",
+      "name_ar": "فضل عيادة المريض",
+      "name_en": "فضل عيادة المريض",
+      "icon": "dua",
+      "order": 114,
+      "asset": "assets/data/adhkar/فضل_عيادة_المريض.json"
+    },
+    {
+      "id": "كفارة_اﻟﻤﺠلس",
+      "name_ar": "كفارة اﻟﻤﺠلس",
+      "name_en": "كفارة اﻟﻤﺠلس",
+      "icon": "dua",
+      "order": 115,
+      "asset": "assets/data/adhkar/كفارة_اﻟﻤﺠلس.json"
+    },
+    {
+      "id": "كيف_كان_النبي_يسبح؟",
+      "name_ar": "كيف كان النبي يسبح؟",
+      "name_en": "كيف كان النبي يسبح؟",
+      "icon": "dua",
+      "order": 116,
+      "asset": "assets/data/adhkar/كيف_كان_النبي_يسبح؟.json"
+    },
+    {
+      "id": "كيف_يرد_السلام_على_الكافر_إذا_سلم",
+      "name_ar": "كيف يرد السلام على الكافر إذا سلم",
+      "name_en": "كيف يرد السلام على الكافر إذا سلم",
+      "icon": "dua",
+      "order": 117,
+      "asset": "assets/data/adhkar/كيف_يرد_السلام_على_الكافر_إذا_سلم.json"
+    },
+    {
+      "id": "كيف_يلبي_المحرم_في_الحج_أو_العمرة_؟",
+      "name_ar": "كيف يلبي المحرم في الحج أو العمرة ؟",
+      "name_en": "كيف يلبي المحرم في الحج أو العمرة ؟",
+      "icon": "dua",
+      "order": 118,
+      "asset": "assets/data/adhkar/كيف_يلبي_المحرم_في_الحج_أو_العمرة_؟.json"
+    },
+    {
+      "id": "ما_يعصم_الله_به_من_الدجال",
+      "name_ar": "ما يعصم الله به من الدجال",
+      "name_en": "ما يعصم الله به من الدجال",
+      "icon": "dua",
+      "order": 119,
+      "asset": "assets/data/adhkar/ما_يعصم_الله_به_من_الدجال.json"
+    },
+    {
+      "id": "ما_يعوذ_به_الأولاد",
+      "name_ar": "ما يعوذ به الأولاد",
+      "name_en": "ما يعوذ به الأولاد",
+      "icon": "dua",
+      "order": 120,
+      "asset": "assets/data/adhkar/ما_يعوذ_به_الأولاد.json"
+    },
+    {
+      "id": "ما_يفعل_من_أتاه_أمر_يسره",
+      "name_ar": "ما يفعل من أتاه أمر يسره",
+      "name_en": "ما يفعل من أتاه أمر يسره",
+      "icon": "dua",
+      "order": 121,
+      "asset": "assets/data/adhkar/ما_يفعل_من_أتاه_أمر_يسره.json"
+    },
+    {
+      "id": "ما_يفعل_من_رأى_الرؤيا_أو_الحلم_في_النوم",
+      "name_ar": "ما يفعل من رأى الرؤيا أو الحلم في النوم",
+      "name_en": "ما يفعل من رأى الرؤيا أو الحلم في النوم",
+      "icon": "dua",
+      "order": 122,
+      "asset": "assets/data/adhkar/ما_يفعل_من_رأى_الرؤيا_أو_الحلم_في_النوم.json"
+    },
+    {
+      "id": "ما_يقال_عند_الفزع",
+      "name_ar": "ما يقال عند الفزع",
+      "name_en": "ما يقال عند الفزع",
+      "icon": "dua",
+      "order": 123,
+      "asset": "assets/data/adhkar/ما_يقال_عند_الفزع.json"
+    },
+    {
+      "id": "ما_يقال_في_اﻟﻤﺠلس",
+      "name_ar": "ما يقال في اﻟﻤﺠلس",
+      "name_en": "ما يقال في اﻟﻤﺠلس",
+      "icon": "dua",
+      "order": 124,
+      "asset": "assets/data/adhkar/ما_يقال_في_اﻟﻤﺠلس.json"
+    },
+    {
+      "id": "ما_يقال_للكافر_إذا_عطس_فحمد_الله",
+      "name_ar": "ما يقال للكافر إذا عطس فحمد الله",
+      "name_en": "ما يقال للكافر إذا عطس فحمد الله",
+      "icon": "dua",
+      "order": 125,
+      "asset": "assets/data/adhkar/ما_يقال_للكافر_إذا_عطس_فحمد_الله.json"
+    },
+    {
+      "id": "ما_يقول_إذا_وضع_الثوب",
+      "name_ar": "ما يقول إذا وضع الثوب",
+      "name_en": "ما يقول إذا وضع الثوب",
+      "icon": "dua",
+      "order": 126,
+      "asset": "assets/data/adhkar/ما_يقول_إذا_وضع_الثوب.json"
+    },
+    {
+      "id": "ما_يقول_الصائم_إذا_سابه_أحد",
+      "name_ar": "ما يقول الصائم إذا سابه أحد",
+      "name_en": "ما يقول الصائم إذا سابه أحد",
+      "icon": "dua",
+      "order": 127,
+      "asset": "assets/data/adhkar/ما_يقول_الصائم_إذا_سابه_أحد.json"
+    },
+    {
+      "id": "ما_يقول_المسلم_إذا_زكي",
+      "name_ar": "ما يقول المسلم إذا زكي",
+      "name_en": "ما يقول المسلم إذا زكي",
+      "icon": "dua",
+      "order": 128,
+      "asset": "assets/data/adhkar/ما_يقول_المسلم_إذا_زكي.json"
+    },
+    {
+      "id": "ما_يقول_المسلم_إذا_مدح_المسلم",
+      "name_ar": "ما يقول المسلم إذا مدح المسلم",
+      "name_en": "ما يقول المسلم إذا مدح المسلم",
+      "icon": "dua",
+      "order": 129,
+      "asset": "assets/data/adhkar/ما_يقول_المسلم_إذا_مدح_المسلم.json"
+    },
+    {
+      "id": "ما_يقول_عند_الذبح_أو_النحر",
+      "name_ar": "ما يقول عند الذبح أو النحر",
+      "name_en": "ما يقول عند الذبح أو النحر",
+      "icon": "dua",
+      "order": 130,
+      "asset": "assets/data/adhkar/ما_يقول_عند_الذبح_أو_النحر.json"
+    },
+    {
+      "id": "ما_يقول_لرد_كيد_مردة_الشياطين",
+      "name_ar": "ما يقول لرد كيد مردة الشياطين",
+      "name_en": "ما يقول لرد كيد مردة الشياطين",
+      "icon": "dua",
+      "order": 131,
+      "asset": "assets/data/adhkar/ما_يقول_لرد_كيد_مردة_الشياطين.json"
+    },
+    {
+      "id": "ما_يقول_من_أتاه_أمر_يسره_أو_يكرهه",
+      "name_ar": "ما يقول من أتاه أمر يسره أو يكرهه",
+      "name_en": "ما يقول من أتاه أمر يسره أو يكرهه",
+      "icon": "dua",
+      "order": 132,
+      "asset": "assets/data/adhkar/ما_يقول_من_أتاه_أمر_يسره_أو_يكرهه.json"
+    },
+    {
+      "id": "ما_يقول_من_أحس_وجعا_في_جسده",
+      "name_ar": "ما يقول من أحس وجعا في جسده",
+      "name_en": "ما يقول من أحس وجعا في جسده",
+      "icon": "dua",
+      "order": 133,
+      "asset": "assets/data/adhkar/ما_يقول_من_أحس_وجعا_في_جسده.json"
+    },
+    {
+      "id": "ما_يقول_من_خاف_قوما",
+      "name_ar": "ما يقول من خاف قوما",
+      "name_en": "ما يقول من خاف قوما",
+      "icon": "dua",
+      "order": 134,
+      "asset": "assets/data/adhkar/ما_يقول_من_خاف_قوما.json"
+    },
+    {
+      "id": "ما_يقول_ويفعل_من_أذنب_ذنبا",
+      "name_ar": "ما يقول ويفعل من أذنب ذنبا",
+      "name_en": "ما يقول ويفعل من أذنب ذنبا",
+      "icon": "dua",
+      "order": 135,
+      "asset": "assets/data/adhkar/ما_يقول_ويفعل_من_أذنب_ذنبا.json"
+    },
+    {
+      "id": "من_أدعية_الاستسقاء",
+      "name_ar": "من أدعية الاستسقاء",
+      "name_en": "من أدعية الاستسقاء",
+      "icon": "dua",
+      "order": 136,
+      "asset": "assets/data/adhkar/من_أدعية_الاستسقاء.json"
+    },
+    {
+      "id": "من_أدعية_الاستصحاء",
+      "name_ar": "من أدعية الاستصحاء",
+      "name_en": "من أدعية الاستصحاء",
+      "icon": "dua",
+      "order": 137,
+      "asset": "assets/data/adhkar/من_أدعية_الاستصحاء.json"
+    },
+    {
+      "id": "من_أنواع_الخير_والآداب_الجامعة",
+      "name_ar": "من أنواع الخير والآداب الجامعة",
+      "name_en": "من أنواع الخير والآداب الجامعة",
+      "icon": "dua",
+      "order": 138,
+      "asset": "assets/data/adhkar/من_أنواع_الخير_والآداب_الجامعة.json"
+    },
+    {
+      "id": "من_تعار_من_الليل",
+      "name_ar": "من تعار من الليل",
+      "name_en": "من تعار من الليل",
+      "icon": "dua",
+      "order": 139,
+      "asset": "assets/data/adhkar/من_تعار_من_الليل.json"
+    },
+    {
+      "id": "ﺗﻬنئة_المولود_له_وجوابه",
+      "name_ar": "ﺗﻬنئة المولود له وجوابه",
+      "name_en": "ﺗﻬنئة المولود له وجوابه",
+      "icon": "dua",
+      "order": 140,
+      "asset": "assets/data/adhkar/ﺗﻬنئة_المولود_له_وجوابه.json"
+    }
   ]
 }

@@ -1,0 +1,20 @@
+{
+  "id": "الدعاء_لمن_قال_غفر_الله_لك",
+  "name_ar": "الدعاء لمن قال غفر الله لك",
+  "name_en": "الدعاء لمن قال غفر الله لك",
+  "icon": "dua",
+  "total": 1,
+  "tags": [],
+  "items": [
+    {
+      "id": "الدعاء_لمن_قال_غفر_الله_لك_01",
+      "arabic": "((وَلَكَ)).",
+      "count": 1,
+      "reference_id": "",
+      "reference_detail": "",
+      "virtue": null,
+      "translation": null,
+      "tags": []
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "id": "الدعاء_إذا_تعس_المركوب",
+  "name_ar": "الدعاء إذا تعس المركوب",
+  "name_en": "الدعاء إذا تعس المركوب",
+  "icon": "dua",
+  "total": 1,
+  "tags": [],
+  "items": [
+    {
+      "id": "الدعاء_إذا_تعس_المركوب_01",
+      "arabic": "((بِسْمِ اللَّهِ)).",
+      "count": 1,
+      "reference_id": "",
+      "reference_detail": "",
+      "virtue": null,
+      "translation": null,
+      "tags": []
+    }
+  ]
+}

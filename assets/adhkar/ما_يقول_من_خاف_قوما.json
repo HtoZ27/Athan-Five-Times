@@ -1,0 +1,20 @@
+{
+  "id": "ما_يقول_من_خاف_قوما",
+  "name_ar": "ما يقول من خاف قوما",
+  "name_en": "ما يقول من خاف قوما",
+  "icon": "dua",
+  "total": 1,
+  "tags": [],
+  "items": [
+    {
+      "id": "ما_يقول_من_خاف_قوما_01",
+      "arabic": "((اللَّهُمَّ اكْفِنِيهِمْ بِمَا شِئْتَ)).",
+      "count": 1,
+      "reference_id": "",
+      "reference_detail": "",
+      "virtue": null,
+      "translation": null,
+      "tags": []
+    }
+  ]
+}

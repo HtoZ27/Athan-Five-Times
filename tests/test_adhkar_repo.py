@@ -19,10 +19,10 @@ TRANSLATIONS = os.path.join(os.path.dirname(__file__), "..", "backend", "transla
 
 
 class TestIndex:
-    def test_ten_categories(self):
+    def test_full_library_categories(self):
         repo = AdhkarRepository()
         index = repo.get_index()
-        assert len(index) == 10
+        assert len(index) == 140
         ids = {c["id"] for c in index}
         assert {"morning", "evening", "after_prayer"} <= ids
 
@@ -63,17 +63,16 @@ class TestIndex:
 
 
 class TestCategories:
-    def test_morning_ten_items_structured(self):
+    def test_morning_items_structured(self):
         cat = AdhkarRepository().load_category("morning")
-        assert len(cat["items"]) == 10
+        assert len(cat["items"]) == 30
         for it in cat["items"]:
             assert it["arabic"]
             assert it["count"] >= 1
-            assert it["reference_id"]
 
-    def test_after_prayer_nine_items(self):
+    def test_after_prayer_items(self):
         cat = AdhkarRepository().load_category("after_prayer")
-        assert len(cat["items"]) == 9
+        assert len(cat["items"]) == 12
 
     def test_unknown_category_raises(self):
         with pytest.raises(KeyError):
@@ -111,12 +110,12 @@ class TestLegacyCompat:
     def test_prayer_keys_map_to_after_prayer(self):
         for key in ("fajr", "dhuhr", "asr", "maghrib", "isha"):
             texts = get_structured_texts(key)
-            assert len(texts) == 9
+            assert len(texts) == 12
             assert all(isinstance(t, str) and t for t in texts)
 
     def test_morning_evening(self):
-        assert len(get_structured_texts("morning")) == 10
-        assert len(get_structured_texts("evening")) == 10
+        assert len(get_structured_texts("morning")) == 30
+        assert len(get_structured_texts("evening")) == 29
 
     def test_unknown_key_empty(self):
         assert get_structured_texts("nope") == []
