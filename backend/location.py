@@ -106,7 +106,7 @@ def _try_ip_api(retries: int) -> dict | None:
     for attempt in range(retries + 1):
         try:
             req = Request(
-                "https://ip-api.com/json/", headers={"User-Agent": "0.3.6b}
+                "https://ip-api.com/json/", headers={"User-Agent": "AthanFiveTimes/0.3.7b"}
             )
             with urlopen(req, timeout=10) as resp:
                 data = json.loads(resp.read().decode())
@@ -140,7 +140,7 @@ def _try_ip_api(retries: int) -> dict | None:
 def _try_fallback() -> dict | None:
     """Fallback using ipapi.co (HTTPS)."""
     try:
-        req = Request("https://ipapi.co/json/", headers={"User-Agent": "0.3.6b})
+        req = Request("https://ipapi.co/json/", headers={"User-Agent": "AthanFiveTimes/0.3.7b"})
         with urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode())
         if data.get("error"):
@@ -170,7 +170,7 @@ def _try_ipinfo() -> dict | None:
     try:
         req = Request(
             "https://ipinfo.io/json",
-            headers={"User-Agent": "0.3.6b},
+            headers={"User-Agent": "AthanFiveTimes/0.3.7b"},
         )
         with urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode())
