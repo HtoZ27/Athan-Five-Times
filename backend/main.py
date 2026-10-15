@@ -51,13 +51,6 @@ from .audio import set_volume
 
 apply_render_env()
 
-try:
-    from .memory_profiler import start_profiling, stop_profiling
-
-    _MEMORY_PROFILER_AVAILABLE = True
-except ImportError:
-    _MEMORY_PROFILER_AVAILABLE = False
-
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
@@ -82,7 +75,9 @@ def should_hide_to_tray(tray_available: bool, tray_visible: bool) -> bool:
 class QmlAthanApp:
     def __init__(self, argv, azan_path):
         QQuickStyle.setStyle("Fusion")
-        self._app = QApplication(argv)
+        # Reuse an existing instance when embedded (tests/tools); the real
+        # entry point never has one, so production behavior is unchanged.
+        self._app = QApplication.instance() or QApplication(argv)
         self._app.setDesktopFileName("com.azanprayer.app")
         self._app.setQuitOnLastWindowClosed(False)
 
@@ -536,6 +531,7 @@ AZAN_DEFAULT = os.path.join(ASSETS_DIR, "muezzins", "قطامي.mp3")
 
 def main():
     import argparse
+    import signal
 
     parser = argparse.ArgumentParser(description="أذان الأوقات الخمس – Athan Five Times App")
     parser.add_argument("--azan", default=AZAN_DEFAULT, help="Path to Azan MP3 file")
@@ -545,19 +541,47 @@ def main():
     )
     args = parser.parse_args()
 
-    if args.profile_memory and _MEMORY_PROFILER_AVAILABLE:
-        start_profiling(args.profile_interval)
-        logger.info("Memory profiling enabled (interval: %.1fs)", args.profile_interval)
+    _memory_stop = None
+    if args.profile_memory:
+        try:
+            from .memory_profiler import start_profiling, stop_profiling
+
+            start_profiling(args.profile_interval)
+            _memory_stop = stop_profiling
+            logger.info("Memory profiling enabled (interval: %.1fs)", args.profile_interval)
+        except ImportError:
+            logger.warning("Memory profiling requested but backend.memory_profiler is unavailable")
 
     if not os.path.isfile(args.azan):
         logger.warning("Azan file not found at '%s'. Audio disabled.", args.azan)
         args.azan = ""
 
     app = QmlAthanApp(sys.argv, args.azan)
+
+    def _graceful_exit(signum, frame):
+        logger.info("Received signal %s — saving state and quitting", signum)
+        try:
+            app._save_window_geometry()
+        except (AttributeError, RuntimeError, OSError):
+            pass
+        QTimer.singleShot(0, app._app.quit)
+
+    for _sig in (signal.SIGTERM, signal.SIGINT):
+        try:
+            signal.signal(_sig, _graceful_exit)
+        except (OSError, ValueError, RuntimeError) as exc:
+            logger.debug("Could not install handler for signal %s: %s", _sig, exc)
+
+    # Keep-alive tick so CPython signal handlers run while Qt owns the
+    # event loop (they only fire when the interpreter regains control).
+    _signal_tick = QTimer()
+    _signal_tick.timeout.connect(lambda: None)
+    _signal_tick.start(500)
+
     exit_code = app.run()
 
-    if args.profile_memory and _MEMORY_PROFILER_AVAILABLE:
-        stop_profiling()
+    if _memory_stop is not None:
+        _memory_stop()
 
     sys.exit(exit_code)
 

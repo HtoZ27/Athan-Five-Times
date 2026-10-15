@@ -157,7 +157,10 @@
     "🔄 إعادة تعيين": "🔄 Reset",
     "افتراضي": "Default",
     " (نسخة)": " (Salinan)",
-    "تطوير": "Dibuat oleh"
+    "تطوير": "Dibuat oleh",
+    "اختيار المنطقة الزمنية لحساب مواقيت الصلاة بدقة": "Pilih zona waktu untuk perhitungan akurat",
+    "❓ حول التطبيق": "❓ Tentang Aplikasi",
+    "📋": "📋"
   },
   "prayer_names": {
     "fajr": "الفجر",

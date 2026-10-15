@@ -16,6 +16,7 @@ _LANG_DIR = os.path.join(_PACKAGE_DIR, "translations")
 _CURRENT: dict = {}
 _CURRENT_CODE: str = "ar"
 _FALLBACK_CACHE: dict | None = None
+_EN_CACHE: dict | None = None
 
 FALLBACK = "ar"
 
@@ -37,6 +38,18 @@ def _get_fallback() -> dict:
         if _CURRENT_CODE != FALLBACK:
             _FALLBACK_CACHE.pop("cities", None)
     return _FALLBACK_CACHE
+
+
+def _get_english() -> dict:
+    """English strings as last-resort fallback for non-Arabic UI.
+
+    Keys missing from both the current language and Arabic (e.g. newly
+    added settings labels) render in English instead of Arabic text.
+    """
+    global _EN_CACHE
+    if _EN_CACHE is None:
+        _EN_CACHE = _load_file("en")
+    return _EN_CACHE
 
 
 def current_code() -> str:
@@ -64,8 +77,11 @@ def u(key: str, **kwargs: str) -> str:
     d = _get_dict().get("ui", {})
     val = d.get(key)
     if val is None:
-        fallback = _get_fallback().get("ui", {}).get(key)
-        val = fallback if fallback is not None else key
+        val = _get_fallback().get("ui", {}).get(key)
+    if val is None and _CURRENT_CODE not in (FALLBACK, "en"):
+        val = _get_english().get("ui", {}).get(key)
+    if val is None:
+        val = key
     if kwargs:
         try:
             val = val.format(**kwargs)

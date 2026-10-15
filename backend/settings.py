@@ -38,7 +38,7 @@ _SETTINGS_CACHE: dict | None = None
 _SETTINGS_VERSION: int = 0
 _SETTINGS_LOCK = threading.RLock()
 
-SETTINGS_VERSION: int = 3
+SETTINGS_VERSION: int = 4
 
 PRAYER_KEYS: tuple = ("fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha")
 
@@ -76,6 +76,7 @@ class SettingsSchema:
         }
     )
     muezzins: Dict[str, str] = field(default_factory=dict)
+    removed_muezzins: List[str] = field(default_factory=list)
     azan_enabled: Dict[str, bool] = field(
         default_factory=lambda: {
             "fajr": True,
@@ -108,7 +109,6 @@ class SettingsSchema:
     athkar_popup_delay: int = 60
     athkarCount: int = 33
     athkarMethod: str = "after_prayer"
-    update_url: str = ""
     time_format: str = "12h"
     schema_version: int = SETTINGS_VERSION
     custom_coords: bool = False
@@ -298,6 +298,18 @@ def _migrate_v2_to_v3(settings: Dict[str, Any]) -> Dict[str, Any]:
     return result
 
 
+@_register_migration(3)
+def _migrate_v3_to_v4(settings: Dict[str, Any]) -> Dict[str, Any]:
+    """Migrate from version 3 to version 4.
+    - Add removed_muezzins (user-deleted builtin muezzins stay deleted).
+    """
+    result = dict(settings)
+    if "removed_muezzins" not in result or not isinstance(result.get("removed_muezzins"), list):
+        result["removed_muezzins"] = []
+    result["schema_version"] = 4
+    return result
+
+
 def _run_migrations(settings: Dict[str, Any]) -> Dict[str, Any]:
     """Run any pending migrations on the settings dict (immutable)."""
     current_version: int = settings.get("schema_version", 0)
@@ -436,13 +448,17 @@ def load() -> Dict[str, Any]:
         merged = validate_and_coerce(merged)
         merged = _validate_nested(merged)
         builtin: Dict[str, str] = discover_builtin_muezzins()
-        merged_muezzins: Dict[str, str] = dict(merged.get("muezzins", {}))
+        removed = set(merged.get("removed_muezzins", []) or [])
+        merged_muezzins: Dict[str, str] = {
+            k: v for k, v in dict(merged.get("muezzins", {})).items() if k not in removed
+        }
         for k, v in builtin.items():
-            merged_muezzins[k] = v
+            if k not in removed:
+                merged_muezzins[k] = v
         default_azan: str = os.path.join(
             os.path.dirname(__file__), "assets", "muezzins", "قطامي.mp3"
         )
-        if os.path.isfile(default_azan):
+        if os.path.isfile(default_azan) and "افتراضي" not in removed:
             merged_muezzins["افتراضي"] = default_azan
         merged_muezzins = {k: resolve_azan_path(v) for k, v in merged_muezzins.items()}
         merged_audio: Dict[str, str] = dict(merged.get("audio", {}))

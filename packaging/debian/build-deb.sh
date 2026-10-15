@@ -68,8 +68,9 @@ Description: Islamic prayer times with azan audio and adhkar
  adhkar library, system-tray integration, do-not-disturb automation and
  17 interface languages. Built with PySide6/Qt6.
  .
- Prayer calculation (adhan) and audio decoding (miniaudio) come from PyPI:
-     pip install adhan miniaudio
+ Prayer calculation (adhan) and audio decoding (miniaudio) come from PyPI.
+ Debian/Ubuntu mark system Python as externally managed (PEP 668), so use:
+     pip install --break-system-packages adhan miniaudio
 EOF
 
 dpkg-deb --root-owner-group --build "$PKGDIR" "$ROOT/athan-five-times_${VERSION}_all.deb"

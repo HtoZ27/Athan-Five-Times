@@ -38,11 +38,11 @@ class TestResolveAzanPath:
 
     def test_known_muezzin_name_resolves(self):
         result = resolve_azan_path("قطامي")
-        assert os.path.isfile(result) or result == "قطامي"
+        assert os.path.isfile(result), result
 
     def test_alternate_muezzin_name(self):
         result = resolve_azan_path("نعيم")
-        assert result == "" or os.path.isfile(result)
+        assert result == "", result
 
 
 class TestLoadSave:
@@ -208,7 +208,7 @@ class TestMigrationSystem:
         current = {"schema_version": 1, "language": "fr"}
         migrated = _run_migrations(deepcopy(current))
         assert migrated["language"] == "fr"
-        assert migrated["schema_version"] == 3
+        assert migrated["schema_version"] == SETTINGS_VERSION
 
     def test_all_migrations_registered_sequentially(self):
         versions = sorted(MIGRATIONS.keys())
@@ -232,3 +232,17 @@ class TestSettingsSchema:
         schema = SettingsSchema()
         for prayer in ("fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha", "default"):
             assert prayer in schema.audio
+
+    def test_removed_muezzins_default_empty(self):
+        assert SettingsSchema().removed_muezzins == []
+
+    def test_dead_update_url_setting_removed(self):
+        assert not hasattr(SettingsSchema(), "update_url")
+        assert "update_url" not in schema_to_dict()
+
+    def test_legacy_update_url_still_loads(self):
+        s = S.load()
+        s["update_url"] = "https://example.invalid/appcast"
+        assert S.save(s)
+        S.invalidate_cache()
+        assert S.load()["language"] == s["language"]

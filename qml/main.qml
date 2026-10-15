@@ -9,7 +9,7 @@ ApplicationWindow {
     id: appWindow
     visible: true
     minimumWidth: 460
-    minimumHeight: 795
+    minimumHeight: 680
     maximumWidth: 1590
     maximumHeight: 1080
     width: 500
@@ -184,12 +184,15 @@ ApplicationWindow {
                     acceptedButtons: Qt.LeftButton
                     property point pressGlobal: Qt.point(0, 0)
                     property point winPos: Qt.point(0, 0)
+                    property bool sysMoveFailed: false
                     onPressed: {
                         pressGlobal = mapToGlobal(mouse.x, mouse.y)
                         winPos = Qt.point(appWindow.x, appWindow.y)
+                        sysMoveFailed = false
+                        try { appWindow.startSystemMove() } catch (e) { sysMoveFailed = true }
                     }
                     onPositionChanged: {
-                        if (pressed) {
+                        if (pressed && sysMoveFailed) {
                             var g = mapToGlobal(mouse.x, mouse.y)
                             appWindow.x = winPos.x + g.x - pressGlobal.x
                             appWindow.y = winPos.y + g.y - pressGlobal.y
@@ -218,7 +221,7 @@ ApplicationWindow {
 
                 Button {
                     id: minimizeBtn
-                    width: 26; height: 22
+                    Layout.preferredWidth: 26; Layout.preferredHeight: 22
                     background: Rectangle { color: theme.cardColor; border.color: theme.borderColor; border.width: 1; radius: 4 }
                     contentItem: Text { text: "—"; font.pixelSize: 12; font.bold: true; color: theme.textMutedColor; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
                     onClicked: appWindow.showMinimized()
@@ -226,7 +229,7 @@ ApplicationWindow {
 
                 Button {
                     id: maxRestoreBtn
-                    width: 26; height: 22
+                    Layout.preferredWidth: 26; Layout.preferredHeight: 22
                     background: Rectangle { color: theme.cardColor; border.color: theme.borderColor; border.width: 1; radius: 4 }
                     contentItem: Text { id: maxRestoreText; text: "□"; font.pixelSize: 12; font.bold: true; color: theme.textMutedColor; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
                     onClicked: {
@@ -240,7 +243,7 @@ ApplicationWindow {
 
                 Button {
                     id: closeBtn
-                    width: 26; height: 22
+                    Layout.preferredWidth: 26; Layout.preferredHeight: 22
                     background: Rectangle { color: theme.dangerColor; radius: 4 }
                     contentItem: Text { text: "×"; font.pixelSize: 14; font.bold: true; color: "#fff"; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
                     onClicked: { saveGeometry(); appWindow.close() }
@@ -413,8 +416,6 @@ ApplicationWindow {
                     function onNextPrayerChanged() {
                         nextNameText.text = prayerEngine.getNextPrayerName()
                         nextPrayerIcon.prayerKey = prayerEngine.getNextPrayerKey()
-                        nextNameText.opacity = 0.0
-                        nextNameText.opacity = 1.0
                     }
                     function onCountdownChanged(text) { countdownText.text = text }
                     function onPreAlertChanged(text) {

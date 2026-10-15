@@ -81,9 +81,12 @@ Dialog {
             Label {
                 id: appDescLabel
                 Layout.alignment: Qt.AlignHCenter
+                Layout.fillWidth: true
                 text: tr("تطبيق مفتوح المصدر لأوقات الصلاة والأذان")
                 font.pixelSize: 13
                 color: theme.textMutedColor
+                wrapMode: Text.WordWrap
+                horizontalAlignment: Text.AlignHCenter
             }
         }
     }

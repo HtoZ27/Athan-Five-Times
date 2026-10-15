@@ -5,12 +5,65 @@ Uses ip-api.com with HTTPS, retry, and fallback.
 
 import json
 import logging
+import os
 import threading
 import time
+from pathlib import Path
 from urllib.request import Request, urlopen
 from urllib.error import URLError
 
 logger = logging.getLogger(__name__)
+
+# Disk cache for auto-detected location (ported from original prayer_app:
+# 24h TTL under XDG_CACHE_HOME/prayer-times/location.json). Avoids hitting
+# the network on every cold start and works offline while fresh.
+_CACHE_TTL = 86400
+
+
+def _cache_file() -> Path:
+    return Path(
+        os.environ.get("XDG_CACHE_HOME", Path("~/.cache").expanduser()),
+        "prayer-times",
+        "location.json",
+    )
+
+
+def _get_cached_location() -> dict | None:
+    """Return cached auto-location if fresher than _CACHE_TTL, else None."""
+    try:
+        cache = _cache_file()
+        if cache.is_file():
+            with cache.open(encoding="utf-8") as f:
+                payload = json.load(f)
+            if (
+                isinstance(payload, dict)
+                and time.time() - float(payload.get("timestamp", 0)) < _CACHE_TTL
+                and isinstance(payload.get("data"), dict)
+            ):
+                return payload["data"]
+    except (OSError, ValueError, TypeError, AttributeError) as exc:
+        logger.debug("Failed to read cached location: %s", exc)
+    return None
+
+
+def _save_location_cache(data: dict) -> None:
+    """Persist a successful auto-detection result to disk."""
+    try:
+        cache = _cache_file()
+        cache.parent.mkdir(parents=True, exist_ok=True)
+        with cache.open("w", encoding="utf-8") as f:
+            json.dump({"timestamp": time.time(), "data": data}, f)
+    except (OSError, ValueError, TypeError) as exc:
+        logger.debug("Failed to save location cache: %s", exc)
+
+
+def clear_location_cache() -> None:
+    """Drop the cached auto-location (call on manual city/country change)."""
+    try:
+        _cache_file().unlink(missing_ok=True)
+    except OSError as exc:
+        logger.debug("Failed to clear location cache: %s", exc)
+
 
 COUNTRY_TZ = {
     "Tunisia": "Africa/Tunis",
@@ -93,20 +146,29 @@ def detect() -> dict | None:
 
 
 def _detect_sync(retries: int = 1) -> dict | None:
+    cached = _get_cached_location()
+    if cached:
+        logger.info("Using cached auto-location")
+        return cached
     result = _try_ip_api(retries)
     if result:
+        _save_location_cache(result)
         return result
     result = _try_fallback()
     if result:
+        _save_location_cache(result)
         return result
-    return _try_ipinfo()
+    result = _try_ipinfo()
+    if result:
+        _save_location_cache(result)
+    return result
 
 
 def _try_ip_api(retries: int) -> dict | None:
     for attempt in range(retries + 1):
         try:
             req = Request(
-                "https://ip-api.com/json/", headers={"User-Agent": "AthanFiveTimes/0.3.13b"}
+                "https://ip-api.com/json/", headers={"User-Agent": "AthanFiveTimes/0.3.14b"}
             )
             with urlopen(req, timeout=10) as resp:
                 data = json.loads(resp.read().decode())
@@ -140,7 +202,7 @@ def _try_ip_api(retries: int) -> dict | None:
 def _try_fallback() -> dict | None:
     """Fallback using ipapi.co (HTTPS)."""
     try:
-        req = Request("https://ipapi.co/json/", headers={"User-Agent": "AthanFiveTimes/0.3.13b"})
+        req = Request("https://ipapi.co/json/", headers={"User-Agent": "AthanFiveTimes/0.3.14b"})
         with urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode())
         if data.get("error"):
@@ -170,7 +232,7 @@ def _try_ipinfo() -> dict | None:
     try:
         req = Request(
             "https://ipinfo.io/json",
-            headers={"User-Agent": "AthanFiveTimes/0.3.13b"},
+            headers={"User-Agent": "AthanFiveTimes/0.3.14b"},
         )
         with urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode())

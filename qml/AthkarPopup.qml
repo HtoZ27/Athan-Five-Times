@@ -6,13 +6,16 @@ import Theme 1.0
 Popup {
     id: root
 
-    x: (parent.width - width) / 2
-    y: (parent.height - height) / 2
-    width: Math.min(440, parent ? parent.width * 0.92 : 440)
-    height: implicitHeight
+    // Full-window overlay: covers the application window like the
+    // category dialog in AthkarTab, with a scrollable body so long
+    // athkar are never truncated.
+    x: 12
+    y: 12
+    width: parent ? parent.width - 24 : 440
+    height: parent ? parent.height - 24 : 600
     modal: false
     closePolicy: Popup.CloseOnEscape
-    padding: 20
+    padding: 16
 
     ThemeColors { id: theme }
 
@@ -32,6 +35,7 @@ Popup {
         isDark = dark
         bodyText.text = text
         titleText.text = title
+        bodyScroll.contentY = 0
         open()
         autoTimer.interval = dur
         autoTimer.start()
@@ -67,26 +71,48 @@ Popup {
     }
 
     contentItem: ColumnLayout {
-        spacing: 12
+        spacing: 10
 
-        Text {
-            id: titleText
-            font.pixelSize: 24
-            font.bold: true
-            horizontalAlignment: Text.AlignHCenter
+        RowLayout {
             Layout.fillWidth: true
-            color: theme.accentColor
+            spacing: 8
+
+            Text {
+                id: titleText
+                font.pixelSize: 22
+                font.bold: true
+                horizontalAlignment: Text.AlignHCenter
+                Layout.fillWidth: true
+                wrapMode: Text.WordWrap
+                color: theme.accentColor
+            }
+
+            Button {
+                id: closeBtn
+                text: "×"
+                Layout.preferredWidth: 30
+                Layout.preferredHeight: 28
+                Layout.alignment: Qt.AlignTop
+                background: Rectangle { color: theme.cardColor; border.color: theme.borderColor; border.width: 1; radius: 6 }
+                contentItem: Text { text: parent.text; font.pixelSize: 16; font.bold: true; color: theme.textColor; horizontalAlignment: Text.AlignHCenter; verticalAlignment: Text.AlignVCenter }
+                onClicked: dismissPopup()
+            }
         }
 
-        Text {
-            id: bodyText
-            font.pixelSize: 22
-            wrapMode: Text.WordWrap
-            horizontalAlignment: Text.AlignHCenter
+        ScrollView {
+            id: bodyScroll
             Layout.fillWidth: true
-            maximumLineCount: 6
-            elide: Text.ElideNone
-            color: theme.textColor
+            Layout.fillHeight: true
+            clip: true
+
+            Text {
+                id: bodyText
+                font.pixelSize: 20
+                wrapMode: Text.WordWrap
+                horizontalAlignment: Text.AlignHCenter
+                width: bodyScroll.availableWidth
+                color: theme.textColor
+            }
         }
     }
 }

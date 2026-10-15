@@ -67,8 +67,8 @@ class TestCalculate:
     def test_different_methods(self):
         r1 = calculate(36.8065, 10.1815, method_name="أم القرى (Umm Al-Qura)")
         r2 = calculate(36.8065, 10.1815, method_name="الهيئة المصرية للمساحة")
-        assert r1 is not None
-        assert r2 is not None
+        assert r1 is not None and r2 is not None
+        assert r1.fajr != r2.fajr or r1.isha != r2.isha
 
     def test_unknown_method_falls_back(self):
         r = calculate(36.8065, 10.1815, method_name="non_existent_method")

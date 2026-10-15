@@ -80,3 +80,25 @@ class TestRenderEnvApply:
 
         M.apply_render_env()
         assert "QT_QUICK_BACKEND" not in os.environ
+
+
+class TestMainStartup:
+    def test_profiler_not_imported_at_module_load(self):
+        import sys
+
+        assert "backend.memory_profiler" not in sys.modules
+
+    def test_app_constructs_offscreen(self):
+        import sys
+
+        sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+        from backend.main import QmlAthanApp
+
+        app = QmlAthanApp(["athan", "--azan", ""], "")
+        try:
+            assert app._engine.rootObjects(), "QML failed to load"
+        finally:
+            try:
+                app._app.quit()
+            except (AttributeError, RuntimeError):
+                pass

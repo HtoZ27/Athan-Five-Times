@@ -20,6 +20,7 @@ FILES = [
     "packaging/arch/PKGBUILD",
     "backend/location.py",
     "README.md",
+    ".github/ISSUE_TEMPLATE/bug_report.yml",
 ]
 
 

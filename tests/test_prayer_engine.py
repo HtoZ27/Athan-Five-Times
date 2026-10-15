@@ -146,13 +146,20 @@ class TestPrayerEngineSlots:
 class TestPrayerEngineSettings:
     def test_storeAndRestoreSnapshot(self, engine):
         engine.storeSettingsSnapshot()
-        engine.updateSetting("volume", 0.5)
+        before = engine.getSetting("volume")
+        engine.updateSetting("volume", 0.7 if before == 0.5 else 0.5)
+        assert engine.getSetting("volume") != before
         engine.restoreSettingsSnapshot()
-        assert engine.getSetting("volume") != 0.5 or True
+        assert engine.getSetting("volume") == before
 
     def test_commitSettings(self, engine):
+        import os
+
+        from backend.settings import SETTINGS_FILE
+
         engine.storeSettingsSnapshot()
         engine.commitSettings()
+        assert os.path.isfile(SETTINGS_FILE)
 
 
 class TestPrayerEngineTranslation:
@@ -169,9 +176,14 @@ class TestPrayerEngineTranslation:
 
 class TestPrayerEngineClearCaches:
     def test_clearCaches(self, engine):
+        engine.recalculate()
+        assert len(engine.getPrayerTimes()) == 6
         engine.clearCaches()
+        # display caches drop but the computed result survives and rebuilds
+        assert len(engine.getPrayerTimes()) == 6
 
     def test_resetAllSettings(self, engine):
         engine.resetAllSettings()
         settings = engine.getSettings()
-        assert settings.get("first_run") is True or settings.get("language") == "ar"
+        assert settings.get("first_run") is True
+        assert settings.get("language") == "ar"

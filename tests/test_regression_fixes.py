@@ -230,8 +230,13 @@ class TestNoRawCodesInUI:
 
     def test_ar_sections_exist(self):
         import json
+        import os
 
-        d = json.load(open("backend/translations/ar.json", encoding="utf-8"))
+        repo_root = os.path.join(os.path.dirname(__file__), "..")
+        with open(
+            os.path.join(repo_root, "backend", "translations", "ar.json"), encoding="utf-8"
+        ) as f:
+            d = json.load(f)
         for sec in ("madhab", "themes", "calc_methods"):
             assert sec in d, sec
 

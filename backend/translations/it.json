@@ -157,7 +157,10 @@
     "🔄 إعادة تعيين": "🔄 Resetta",
     "افتراضي": "Predefinito",
     " (نسخة)": " (Copia)",
-    "تطوير": "Creato da"
+    "تطوير": "Creato da",
+    "اختيار المنطقة الزمنية لحساب مواقيت الصلاة بدقة": "Seleziona il fuso orario per un calcolo preciso",
+    "❓ حول التطبيق": "❓ Informazioni",
+    "📋": "📋"
   },
   "prayer_names": {
     "fajr": "Fajr",

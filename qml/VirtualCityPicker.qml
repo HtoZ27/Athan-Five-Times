@@ -30,6 +30,12 @@ Item {
     signal citySelected(string engName, string displayName)
     signal accepted(string text)
 
+    ThemeColors { id: theme }
+
+    // Arrow side follows LayoutMirroring; padding must follow it too
+    // (Qt mirrors anchors but not padding).
+    property bool isRtl: l10n ? l10n.isRtl : true
+
     implicitHeight: 40
     Layout.fillWidth: true
 
@@ -121,8 +127,8 @@ Item {
         anchors.fill: parent
         color: theme.textColor
         placeholderTextColor: theme.textMutedColor
-        rightPadding: 30
-        leftPadding: 10
+        rightPadding: isRtl ? 10 : 30
+        leftPadding: isRtl ? 30 : 10
         font.pixelSize: 13
         verticalAlignment: Text.AlignVCenter
 

@@ -13,7 +13,8 @@ pip install -r requirements-lock.txt
 python3 -m pytest tests/
 ruff check backend/ tests/ && ruff format --check backend/ tests/
 python3 scripts/smoke-qml.py
-bash scripts/sync-appdir.sh --check-only
+python3 scripts/e2e-features.py
+bash scripts/sync-appdir.sh && bash scripts/sync-appdir.sh --check-only
 ```
 
 ## Conventions

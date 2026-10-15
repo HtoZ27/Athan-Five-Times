@@ -1,5 +1,5 @@
 Name:           athan-five-times
-Version:        0.3.13b
+Version:        0.3.14b
 Release:        1%{?dist}
 Summary:        Islamic prayer times with azan audio and adhkar
 License:        MIT
@@ -8,9 +8,8 @@ Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz
 
 BuildArch:      noarch
 Requires:       python3 >= 3.10
-Requires:       python3-pyside6-core python3-pyside6-gui python3-pyside6-widgets
-Requires:       python3-pyside6-qml python3-pyside6-quick python3-pyside6-quickcontrols2
-Requires:       python3-pyside6-svg libnotify
+Requires:       python3-pyside6 libnotify
+# Fedora ships PySide6 as one monolithic package (no -core/-gui split).
 # Prayer calculation (adhan) and audio decoding (miniaudio) come from PyPI:
 #   pip install adhan miniaudio
 
@@ -44,5 +43,5 @@ install -Dm644 LICENSE %{buildroot}%{_docdir}/%{name}/LICENSE
 %{_docdir}/%{name}/LICENSE
 
 %changelog
-* Tue Oct 13 2026 H.Z.Tun <htoz27@users.noreply.github.com> - 0.3.13b-1
+* Tue Oct 13 2026 H.Z.Tun <htoz27@users.noreply.github.com> - 0.3.14b-1
 - Initial RPM packaging.

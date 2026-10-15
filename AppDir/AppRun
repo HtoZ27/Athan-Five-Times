@@ -3,8 +3,34 @@ set -e
 
 HERE="$(dirname "$(readlink -f "${0}")")"
 export PYTHONPATH="${HERE}/usr/share/prayer_app:${PYTHONPATH}"
-export QT_QPA_PLATFORM_PLUGIN_PATH="${HERE}/usr/lib/qt6/plugins"
-export QT_PLUGIN_PATH="${HERE}/usr/lib/qt6/plugins"
+# Only point Qt at bundled plugins when they exist. AppDir ships source
+# only; Qt itself comes from the host system, and a dangling path would
+# break plugin loading.
+if [ -d "${HERE}/usr/lib/qt6/plugins" ]; then
+    export QT_QPA_PLATFORM_PLUGIN_PATH="${HERE}/usr/lib/qt6/plugins"
+    export QT_PLUGIN_PATH="${HERE}/usr/lib/qt6/plugins"
+fi
+
+# This AppImage runs on the host Python: fail early with a clear message
+# instead of a bare traceback when a dependency is missing.
+MISSING=""
+for _mod in PySide6 adhan miniaudio; do
+    if ! python3 -c "import ${_mod}" 2>/dev/null; then
+        MISSING="${MISSING} ${_mod}"
+    fi
+done
+if [ -n "$MISSING" ]; then
+    _msg="Athan Five Times needs host Python packages:${MISSING}
+Install Qt via your distro (Debian/Ubuntu 25.04+: python3-pyside6*; Fedora: python3-pyside6; Arch: pyside6), then: pip install --break-system-packages adhan miniaudio"
+    if command -v notify-send >/dev/null 2>&1; then
+        notify-send -t 8000 "Athan Five Times" "$_msg"
+    elif command -v zenity >/dev/null 2>&1; then
+        zenity --error --text="$_msg"
+    else
+        echo "$_msg" >&2
+    fi
+    exit 1
+fi
 
 # Audio support for AppImage - use host PulseAudio
 if [ -z "$PULSE_SERVER" ] && [ -S "/run/user/$(id -u)/pulse/native" ]; then

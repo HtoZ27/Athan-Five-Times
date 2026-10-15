@@ -46,6 +46,10 @@ _THEMES_CACHE: list | None = None
 
 _COUNTRY_DATA_CACHE: tuple | None = None
 
+# Serializes DND enable/disable command batches from racing daemon
+# threads so a stale "disable" cannot interleave an "enable" sequence.
+_DND_LOCK = threading.Lock()
+
 
 def _ensure_country_data():
     global _COUNTRY_DATA_CACHE
@@ -440,6 +444,10 @@ class PrayerEngine(QObject):
             pass
 
     def _run_dnd_cmds(self, enable: bool):
+        with _DND_LOCK:
+            self._run_dnd_cmds_locked(enable)
+
+    def _run_dnd_cmds_locked(self, enable: bool):
         cmds = [
             ["dunstctl", "set-paused", "true" if enable else "false"],
             ["makoctl", "mode", "-a" if enable else "-r", "do-not-disturb"],
@@ -1080,6 +1088,9 @@ class PrayerEngine(QObject):
                 return
         self._settings = self._update_settings_batch(updates)
         if key in ("country", "city") and not self._settings.get("custom_coords", False):
+            from .location import clear_location_cache
+
+            clear_location_cache()
             self._auto_update_coordinates()
         if key in ("country", "city", "latitude", "longitude", "timezone"):
             self._schedule_recalc(location_changed=True)
@@ -1292,15 +1303,36 @@ class PrayerEngine(QObject):
     def addMuezzin(self, name: str, path: str):
         new_muezzins = dict(self._settings.get("muezzins", {}))
         new_muezzins[name] = path
+        removed = [k for k in (self._settings.get("removed_muezzins", []) or []) if k != name]
         self._settings = dict(self._settings)
         self._settings["muezzins"] = new_muezzins
+        self._settings["removed_muezzins"] = removed
+
+    def _resolve_muezzin_key(self, name: str) -> str:
+        """Map a display name (possibly translated, e.g. 'Default') back
+        to the stored settings key (e.g. 'افتراضي')."""
+        muezzins = self._settings.get("muezzins", {})
+        if name in muezzins:
+            return name
+        for key in muezzins:
+            if key == "افتراضي" and u(key) == name:
+                return key
+        return name
 
     @Slot(str)
     def removeMuezzin(self, name: str):
+        from .settings import discover_builtin_muezzins
+
+        key = self._resolve_muezzin_key(name)
         new_muezzins = dict(self._settings.get("muezzins", {}))
-        new_muezzins.pop(name, None)
+        new_muezzins.pop(key, None)
+        removed = list(self._settings.get("removed_muezzins", []) or [])
+        if key in discover_builtin_muezzins() or key == "افتراضي":
+            if key not in removed:
+                removed.append(key)
         self._settings = dict(self._settings)
         self._settings["muezzins"] = new_muezzins
+        self._settings["removed_muezzins"] = removed
 
     @Slot(str)
     def setDefaultMuezzin(self, path: str):

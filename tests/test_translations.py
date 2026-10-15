@@ -146,3 +146,34 @@ class TestFormatDate:
         assert "الأربعاء" in greg
         assert "يناير" in greg
         assert "هـ" in hijri
+
+
+class TestUiKeyParity:
+    """Recently added settings labels must exist in the main languages,
+    and any remaining gap must fall back to English (never Arabic text)."""
+
+    NEW_KEYS = [
+        "اختيار المنطقة الزمنية لحساب مواقيت الصلاة بدقة",
+        "❓ حول التطبيق",
+        "📋",
+    ]
+    COVERED = ["de", "es", "es_la", "fr", "id", "it", "ms", "ru", "tr"]
+
+    def test_new_keys_present_in_covered_languages(self):
+        import json
+        import os
+
+        base = os.path.join(os.path.dirname(__file__), "..", "backend", "translations")
+        for code in self.COVERED:
+            with open(os.path.join(base, f"{code}.json"), encoding="utf-8") as f:
+                ui = json.load(f)["ui"]
+            for key in self.NEW_KEYS:
+                assert key in ui, f"{key!r} missing in {code}"
+
+    def test_missing_key_falls_back_to_english_not_arabic(self):
+        # 'hi' intentionally lacks the timezone hint: English, not Arabic.
+        set_lang("hi")
+        assert t("اختيار المنطقة الزمنية لحساب مواقيت الصلاة بدقة") == (
+            "Select timezone for accurate prayer calculation"
+        )
+        set_lang("ar")

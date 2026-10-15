@@ -26,6 +26,8 @@ jobs:
           pip install -e .[test]
       - name: Run tests
         run: python -m pytest tests/ -q --tb=short
+      - name: Run isolated end-to-end checks
+        run: python3 scripts/e2e-features.py
       - name: Check imports
         run: |
           python -c "
@@ -73,11 +75,19 @@ jobs:
           pip install build
       - name: Build wheel
         run: python -m build --wheel
-      - name: Upload wheel
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist/
+      - name: Verify wheel ships translations
+        # The wheel is a library artifact only (the runnable app needs qml/
+        # and assets/, delivered by the system packages). It must at least
+        # contain backend/translations/ — never upload it as an app release.
+        run: |
+          python - <<'EOF'
+          import glob
+          import zipfile
+          whl = glob.glob("dist/*.whl")[0]
+          names = zipfile.ZipFile(whl).namelist()
+          assert any("backend/translations/en.json" in n for n in names), names
+          print("wheel contents OK:", whl)
+          EOF
 
   qml-gates:
     runs-on: ubuntu-latest
@@ -96,5 +106,7 @@ jobs:
           pip install -e .[test]
       - name: AppDir sync (regenerate derived staging)
         run: bash scripts/sync-appdir.sh
+      - name: AppDir drift gate (sync must reproduce the tree exactly)
+        run: bash scripts/sync-appdir.sh --check-only
       - name: QML zero-error gate
         run: QT_QPA_PLATFORM=offscreen python3 scripts/smoke-qml.py

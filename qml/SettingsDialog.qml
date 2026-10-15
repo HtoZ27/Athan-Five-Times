@@ -639,12 +639,16 @@ Dialog {
                     function addMuezzin(fileUrl, editIndex) {
                         var path = String(fileUrl).replace("file://", "")
                         var name = path.split("/").pop().split(".")[0]
+                        var oldName = ""
                         if (editIndex >= 0 && editIndex < muezzinsModel.count) {
+                            var old = muezzinsModel.get(editIndex)
+                            if (old) oldName = old.name
                             muezzinsModel.set(editIndex, { name: name, path: path })
                         } else {
                             muezzinsModel.append({ name: name, path: path })
                         }
                         backendController.addMuezzin(name, path)
+                        if (oldName && oldName !== name) backendController.removeMuezzin(oldName)
                     }
 
                     function previewMuezzin(idx) {
@@ -1086,6 +1090,7 @@ Dialog {
                                     langCombo.currentIndex = langIdx >= 0 ? langIdx : 0
                                     var theme = s.theme || "dark"
                                     var themeModel = backendController.getThemes()
+                                    themeCombo.model = themeModel
                                     var themeIdx = -1
                                     for (var i = 0; i < themeModel.length; i++) {
                                         if (themeModel[i].code === theme) {
@@ -1331,8 +1336,11 @@ Dialog {
         y: Math.round((parent ? parent.height : 720) / 2 - height / 2)
         Label {
             id: resetConfirmDlgLabel
+            width: 380
             text: tr("هل أنت متأكد من إعادة تعيين جميع الإعدادات؟")
             color: theme.textColor
+            wrapMode: Text.WordWrap
+            horizontalAlignment: Text.AlignHCenter
         }
         onAccepted: {
             backendController.resetAllSettings()
@@ -1355,7 +1363,7 @@ Dialog {
         fileMode: NativeDialogs.FileDialog.OpenFile
         property var _callback: null
         onAccepted: {
-            if (_callback) { _callback(Qt.urlToLocalFile(selectedFile)); _callback = null }
+            if (_callback) { _callback(selectedFile); _callback = null }
         }
         onRejected: _callback = null
     }

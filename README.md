@@ -6,7 +6,7 @@
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
 [![Qt 6 QML](https://img.shields.io/badge/Qt-6_QML-green?logo=qt&logoColor=white)](https://www.qt.io/)
 
-> **Beta (0.3.13b)** — This is a beta release: not yet bug-free, not yet
+> **Beta (0.3.14b)** — This is a beta release: not yet bug-free, not yet
 > tested on all Linux environments, and translations are still unreviewed.
 > Bug reports are welcome via GitHub Issues.
 
@@ -26,7 +26,7 @@ A Linux desktop prayer-times application with azan audio, structured adhkar, do-
 
 ## Features
 
-- **Prayer Times** — Accurate calculation (MWL, Umm Al-Qura, Egyptian, Tunisian + 20 more), per-prayer icons, live countdown, Hijri date
+- **Prayer Times** — Accurate calculation (MWL, Umm Al-Qura, Egyptian, Tunisian + 22 more), per-prayer icons, live countdown, Hijri date
 - **Audio Azan** — Streaming MP3 playback with fade-in, volume control, multiple muezzins + per-prayer audio, takbeer mode
 - **Adhkar Library** — 140 structured categories (382 remembrances) with repetition counts and source references, Arabic-Indic numerals
 - **System Tray** — Mosque icon, next-prayer tooltip, show/quit menu, optional visibility, no-ghost quit
@@ -34,7 +34,7 @@ A Linux desktop prayer-times application with azan audio, structured adhkar, do-
 - **Themes** — Dark/Light/Ottoman Gold/Catppuccin + auto, per-component palettes
 - **Multi-language** — 17 languages with RTL support and live switching
 - **Custom Offsets** — Per-prayer minute adjustments, madhab choice, high-latitude rule
-- **City Search** — Virtual-scrolled picker (240 countries, 9000+ cities) with validation
+- **City Search** — Virtual-scrolled picker (241 countries, 9000+ cities) with validation
 - **Display Backend** — OpenGL/software render selection for GPU-less systems
 - **Single Instance** — Second launch notifies instead of duplicating audio
 
@@ -53,17 +53,22 @@ chmod +x Athan-Five-Times-x86_64.AppImage
 ./Athan-Five-Times-x86_64.AppImage
 ```
 
+> The AppImage runs on the host Python: it needs PySide6 + adhan +
+> miniaudio installed on your system (it tells you exactly what is
+> missing instead of crashing). Install Qt via your distro, then
+> `pip install --break-system-packages adhan miniaudio`.
+
 Or install a native package (also on the releases page):
 
 ```bash
-# Debian / Ubuntu
-sudo dpkg -i athan-five-times_0.3.13b_all.deb
+# Debian / Ubuntu (Qt wheels exist on Debian 13 / Ubuntu 25.04+)
+sudo dpkg -i athan-five-times_0.3.14b_all.deb
 sudo apt-get install -f   # pulls python3-pyside6* if missing
-pip install adhan miniaudio
+pip install --break-system-packages adhan miniaudio
 athan-five-times
 
 # Fedora / openSUSE (from spec)
-sudo dnf install athan-five-times-0.3.13b-1.noarch.rpm
+sudo dnf install athan-five-times-0.3.14b-1.noarch.rpm
 
 # Arch Linux (from PKGBUILD)
 makepkg -si   # inside packaging/arch, or use the AUR
@@ -80,12 +85,13 @@ pip install -r requirements-lock.txt
 
 ```bash
 pip install -e ".[dev]"
-python -m pytest tests/          # 220+ tests
+python -m pytest tests/          # 400 tests
 python3 scripts/smoke-qml.py     # QML zero-error gate
 python3 scripts/e2e-features.py  # isolated end-to-end (44 checks)
 ```
 
-`AppDir/` is derived build staging — regenerate with `bash scripts/sync-appdir.sh` (use `--check-only` in CI).
+`AppDir/` is derived build staging — regenerate with `bash scripts/sync-appdir.sh`
+(CI regenerates it, verifies with `--check-only`, then runs the QML smoke gate).
 
 Native packages live under `packaging/`:
 
@@ -101,11 +107,15 @@ cd packaging/arch && makepkg -si          # Arch
 ‏(`ip-api.com` ثم `ipapi.co` ثم `ipinfo.io`) لضبط الموقع مسبقاً. لا حسابات،
 لا تتبع، ولا أي استخدام آخر للشبكة. يمكنك تغيير المدينة أو حذفها في أي وقت
 من الإعدادات ← الموقع، أو البقاء دون إنترنت للإبقاء على الافتراضي (تونس).
+يُحفظ الموقع المكتشف تلقائياً في كاش محلي لمدة 24 ساعة فقط
+(`~/.cache/prayer-times/location.json`)، ويُمسح عند تغيير المدينة يدوياً.
 
 On first run only, the app attempts one IP-geolocation lookup (`ip-api.com`,
 then `ipapi.co`, then `ipinfo.io`) to preset your city. No accounts, no
 tracking, no other network use. Change or clear the location anytime in
 Settings → Location, or stay offline to keep the default (Tunis).
+The auto-detected location is cached locally for 24h only
+(`~/.cache/prayer-times/location.json`) and cleared on manual city change.
 
 ## License
 
