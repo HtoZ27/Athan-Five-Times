@@ -210,6 +210,17 @@ class TestMigrationSystem:
         assert migrated["language"] == "fr"
         assert migrated["schema_version"] == SETTINGS_VERSION
 
+    def test_migration_v4_to_v5_remaps_farooqi_to_karachi(self):
+        old = {"schema_version": 4, "method": "طريقة فاروقي (باكستان/شمال الهند)"}
+        migrated = _run_migrations(deepcopy(old))
+        assert migrated["method"] == "جامعة العلوم الإسلامية كراتشي"
+        assert migrated["schema_version"] == SETTINGS_VERSION
+
+    def test_migration_v4_to_v5_keeps_other_methods(self):
+        old = {"schema_version": 4, "method": "وزارة الشؤون الدينية التونسية"}
+        migrated = _run_migrations(deepcopy(old))
+        assert migrated["method"] == "وزارة الشؤون الدينية التونسية"
+
     def test_all_migrations_registered_sequentially(self):
         versions = sorted(MIGRATIONS.keys())
         expected = list(range(0, SETTINGS_VERSION))

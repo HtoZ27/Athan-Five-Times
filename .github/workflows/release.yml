@@ -29,7 +29,7 @@ jobs:
           VER="$(python3 -c "import re; print(re.search(r'version\s*=\s*\"([^\"]+)\"', open('pyproject.toml').read()).group(1))")"
           [ "$TAG" = "$VER" ] || { echo "tag v$TAG != pyproject $VER"; exit 1; }
       - name: Run test suite
-        run: python -m pytest tests/ -q --tb=short
+        run: python -m pytest tests/
       - name: AppDir sync (regenerate derived staging)
         run: bash scripts/sync-appdir.sh
       - name: Build .deb

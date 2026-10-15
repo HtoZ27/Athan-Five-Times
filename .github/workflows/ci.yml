@@ -25,7 +25,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e .[test]
       - name: Run tests
-        run: python -m pytest tests/ -q --tb=short
+        run: python -m pytest tests/
       - name: Run isolated end-to-end checks
         run: python3 scripts/e2e-features.py
       - name: Check imports

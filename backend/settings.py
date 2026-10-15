@@ -38,7 +38,7 @@ _SETTINGS_CACHE: dict | None = None
 _SETTINGS_VERSION: int = 0
 _SETTINGS_LOCK = threading.RLock()
 
-SETTINGS_VERSION: int = 4
+SETTINGS_VERSION: int = 5
 
 PRAYER_KEYS: tuple = ("fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha")
 
@@ -307,6 +307,19 @@ def _migrate_v3_to_v4(settings: Dict[str, Any]) -> Dict[str, Any]:
     if "removed_muezzins" not in result or not isinstance(result.get("removed_muezzins"), list):
         result["removed_muezzins"] = []
     result["schema_version"] = 4
+    return result
+
+
+@_register_migration(4)
+def _migrate_v4_to_v5(settings: Dict[str, Any]) -> Dict[str, Any]:
+    """Migrate from version 4 to version 5.
+    - Remap the removed "Farooqi" method to its angle-equivalent (Karachi,
+      both used 18°/18°) instead of silently falling back to Umm Al-Qura.
+    """
+    result = dict(settings)
+    if result.get("method") == "طريقة فاروقي (باكستان/شمال الهند)":
+        result["method"] = "جامعة العلوم الإسلامية كراتشي"
+    result["schema_version"] = 5
     return result
 
 

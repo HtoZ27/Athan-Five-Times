@@ -1,4 +1,5 @@
 from datetime import date
+import os
 
 
 from backend.i18n import t, t_prayer, format_date, set_lang, LANGS, get_lang
@@ -159,9 +160,27 @@ class TestUiKeyParity:
     ]
     COVERED = ["de", "es", "es_la", "fr", "id", "it", "ms", "ru", "tr"]
 
+    QML_DIR = os.path.join(os.path.dirname(__file__), "..", "qml")
+    TRANSLATIONS_DIR = os.path.join(os.path.dirname(__file__), "..", "backend", "translations")
+
+    @staticmethod
+    def _qml_tr_keys():
+        import glob
+        import re
+
+        pattern = re.compile(r'tr\(\s*"((?:[^"\\]|\\.)*)"')
+        keys = set()
+        for path in glob.glob(os.path.join(TestUiKeyParity.QML_DIR, "*.qml")):
+            with open(path, encoding="utf-8") as f:
+                src = f.read()
+            for match in pattern.finditer(src):
+                key = match.group(1).replace('\\"', '"')
+                key = key.replace("\\n", "\n").replace("\\\\", "\\")
+                keys.add(key)
+        return keys
+
     def test_new_keys_present_in_covered_languages(self):
         import json
-        import os
 
         base = os.path.join(os.path.dirname(__file__), "..", "backend", "translations")
         for code in self.COVERED:
@@ -176,4 +195,42 @@ class TestUiKeyParity:
         assert t("اختيار المنطقة الزمنية لحساب مواقيت الصلاة بدقة") == (
             "Select timezone for accurate prayer calculation"
         )
+        set_lang("ar")
+
+    def test_all_qml_tr_keys_present_in_ar_and_en(self):
+        import json
+
+        keys = self._qml_tr_keys()
+        assert len(keys) > 100, f"QML key extraction looks broken: {len(keys)} keys"
+        for code in ("ar", "en"):
+            with open(os.path.join(self.TRANSLATIONS_DIR, f"{code}.json"), encoding="utf-8") as f:
+                ui = json.load(f)["ui"]
+            missing = sorted(k for k in keys if k not in ui)
+            assert not missing, f"{code}.json missing QML keys: {missing[:5]}"
+
+    def test_untranslated_placeholder_falls_back_to_english(self):
+        set_lang("de")
+        assert t("الإزاحة") == "Offsets"
+        set_lang("hi")
+        assert t("الإزاحة") == "Offsets"
+        set_lang("ar")
+
+    def test_arabic_script_languages_keep_their_values(self):
+        set_lang("ur")
+        assert t("الإزاحة") == "الإزاحة"
+        set_lang("ar")
+
+    def test_missing_key_uses_english_before_arabic(self):
+        set_lang("tk")
+        assert t("حفظ") == "Save"
+        assert t("شريط النظام") == "System tray"
+        set_lang("ar")
+
+    def test_translated_value_is_not_replaced_by_fallback(self):
+        import re
+
+        set_lang("de")
+        value = t("المؤذن الافتراضي")
+        assert value
+        assert not re.search(r"[\u0600-\u06FF]", value)
         set_lang("ar")

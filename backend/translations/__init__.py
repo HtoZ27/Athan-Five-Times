@@ -5,6 +5,7 @@ Translation manager — loads language files from JSON and provides lookup.
 import json
 import logging
 import os
+import re
 from datetime import date
 from functools import lru_cache
 
@@ -19,6 +20,17 @@ _FALLBACK_CACHE: dict | None = None
 _EN_CACHE: dict | None = None
 
 FALLBACK = "ar"
+
+_ARABIC_RE = re.compile(r"[\u0600-\u06FF]")
+
+# Languages whose scripts legitimately contain Arabic-script values.
+# Placeholder detection (value == Arabic key) must not rewrite them.
+_ARABIC_SCRIPT_LANGS = {"ar", "ur", "ps"}
+
+
+def _is_untranslated_placeholder(key: str, val) -> bool:
+    """True when a non-Arabic-script language kept the Arabic key as value."""
+    return bool(val == key and _CURRENT_CODE not in _ARABIC_SCRIPT_LANGS and _ARABIC_RE.search(key))
 
 
 def _load_file(code: str) -> dict:
@@ -41,10 +53,11 @@ def _get_fallback() -> dict:
 
 
 def _get_english() -> dict:
-    """English strings as last-resort fallback for non-Arabic UI.
+    """English strings for non-Arabic UI.
 
-    Keys missing from both the current language and Arabic (e.g. newly
-    added settings labels) render in English instead of Arabic text.
+    Used both for keys missing from the current language and for
+    untranslated placeholders (value == Arabic key), so users never see
+    Arabic text in non-Arabic-script languages.
     """
     global _EN_CACHE
     if _EN_CACHE is None:
@@ -73,13 +86,21 @@ def _get_dict() -> dict:
 
 
 def u(key: str, **kwargs: str) -> str:
-    """Look up a UI string in the current language."""
+    """Look up a UI string in the current language.
+
+    Order: current language -> English -> Arabic. Arabic renders the raw
+    key when nothing is found (the key itself is the Arabic text).
+    Untranslated placeholders (value == Arabic key) count as missing so
+    non-Arabic users get English instead of Arabic.
+    """
     d = _get_dict().get("ui", {})
     val = d.get(key)
-    if val is None:
-        val = _get_fallback().get("ui", {}).get(key)
-    if val is None and _CURRENT_CODE not in (FALLBACK, "en"):
+    if _is_untranslated_placeholder(key, val):
+        val = None
+    if val is None and _CURRENT_CODE != FALLBACK:
         val = _get_english().get("ui", {}).get(key)
+        if val is None:
+            val = _get_fallback().get("ui", {}).get(key)
     if val is None:
         val = key
     if kwargs:
