@@ -1,0 +1,104 @@
+name: Packages (RPM + Arch)
+
+# Manual companion to the tag-driven Release workflow (which publishes deb +
+# AppImage). Builds the Fedora RPM and the Arch Linux package from an
+# already-published tag tarball and attaches them to that tag's GitHub
+# release. Dispatch with the tag name (e.g. v0.3.15b) after the Release
+# workflow has finished.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to package (e.g. v0.3.15b)"
+        required: true
+        type: string
+
+jobs:
+  rpm:
+    runs-on: ubuntu-latest
+    container: fedora:latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - name: Install build tools
+        run: dnf install -y rpm-build curl tar gzip python3
+      - name: Fetch tag tarball + spec
+        run: |
+          TAG="${{ inputs.tag }}"
+          VER="${TAG#v}"
+          mkdir -p ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+          curl -sSL "https://github.com/HtoZ27/Athan-Five-Times/archive/refs/tags/$TAG.tar.gz" \
+            -o ~/rpmbuild/SOURCES/"v$VER.tar.gz"
+          curl -sSL "https://raw.githubusercontent.com/HtoZ27/Athan-Five-Times/$TAG/packaging/rpm/athan-five-times.spec" \
+            -o ~/rpmbuild/SPECS/athan-five-times.spec
+          grep -q "Version: *$VER" ~/rpmbuild/SPECS/athan-five-times.spec
+      - name: Build RPM
+        run: |
+          rpmbuild -bb ~/rpmbuild/SPECS/athan-five-times.spec
+          ls -la ~/rpmbuild/RPMS/noarch/
+          rpm -qip ~/rpmbuild/RPMS/noarch/*.rpm | head -8
+      - name: Attach RPM to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          REL=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/tags/$TAG")
+          UPLOAD_URL=$(python3 -c "import json,sys; print(json.load(sys.stdin)['upload_url'].split('{')[0])" <<<"$REL")
+          for FILE in ~/rpmbuild/RPMS/noarch/*.rpm; do
+            curl -s -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Content-Type: application/octet-stream" \
+              --data-binary "@$FILE" "$UPLOAD_URL?name=$(basename "$FILE")"
+          done
+
+  arch:
+    runs-on: ubuntu-latest
+    container: archlinux:latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - name: Install build tools
+        run: |
+          pacman -Sy --noconfirm archlinux-keyring
+          pacman-key --populate archlinux
+          pacman -S --noconfirm --needed base-devel curl tar zstd git sudo python
+      - name: Create unprivileged builder (makepkg refuses root)
+        run: |
+          useradd -m builder
+          printf 'builder ALL=(ALL) NOPASSWD: ALL\n' >> /etc/sudoers
+      - name: Fetch tag tarball + PKGBUILD
+        run: |
+          TAG="${{ inputs.tag }}"
+          mkdir -p /home/builder/build && chown -R builder:builder /home/builder
+          curl -sSL "https://github.com/HtoZ27/Athan-Five-Times/archive/refs/tags/$TAG.tar.gz" \
+            -o /home/builder/build/source.tar.gz
+          curl -sSL "https://raw.githubusercontent.com/HtoZ27/Athan-Five-Times/$TAG/packaging/arch/PKGBUILD" \
+            -o /home/builder/build/PKGBUILD
+          chown -R builder:builder /home/builder/build
+      - name: Build Arch package
+        run: |
+          TAG="${{ inputs.tag }}"
+          VER="${TAG#v}"
+          cd /home/builder/build
+          cp source.tar.gz "athan-five-times-$VER.tar.gz"
+          su builder -c "makepkg -s --noconfirm"
+          ls -la ./*.pkg.tar.zst
+      - name: Show package info
+        run: |
+          su builder -c "pacman -Qip /home/builder/build/*.pkg.tar.zst" | head -12
+      - name: Attach package to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          REL=$(curl -s -H "Authorization: Bearer $GH_TOKEN" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/releases/tags/$TAG")
+          UPLOAD_URL=$(python3 -c "import json,sys; print(json.load(sys.stdin)['upload_url'].split('{')[0])" <<<"$REL")
+          for FILE in /home/builder/build/*.pkg.tar.zst; do
+            curl -s -H "Authorization: Bearer $GH_TOKEN" \
+              -H "Content-Type: application/octet-stream" \
+              --data-binary "@$FILE" "$UPLOAD_URL?name=$(basename "$FILE")"
+          done
