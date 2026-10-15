@@ -107,7 +107,8 @@ cd packaging/arch && makepkg -si          # Arch
 ‏(`ip-api.com` ثم `ipapi.co` ثم `ipinfo.io`) لضبط الموقع مسبقاً. لا حسابات،
 لا تتبع، ولا أي استخدام آخر للشبكة. يمكنك تغيير المدينة في أي وقت
 من الإعدادات ← الموقع، أو إعادة الضبط للافتراضي من
-الإعدادات ← إدارة الإعدادات، أو البقاء دون إنترنت للإبقاء على الافتراضي (تونس).
+الإعدادات ← إدارة الإعدادات، أو البقاء دون إنترنت للإبقاء على اختيارك الحالي
+(تونس عند التشغيل الأول فقط).
 يُحفظ الموقع المكتشف تلقائياً في كاش محلي لمدة 24 ساعة فقط
 (`~/.cache/prayer-times/location.json`)، ويُمسح عند تغيير المدينة يدوياً.
 
@@ -115,7 +116,7 @@ On first run only, the app attempts one IP-geolocation lookup (`ip-api.com`,
 then `ipapi.co`, then `ipinfo.io`) to preset your city. No accounts, no
 tracking, no other network use. Change the location anytime in
 Settings → Location, reset to defaults in Settings → Manage Settings,
-or stay offline to keep the default (Tunis).
+or stay offline to keep your current choice (Tunis on first run only).
 The auto-detected location is cached locally for 24h only
 (`~/.cache/prayer-times/location.json`) and cleared on manual city change.
 
