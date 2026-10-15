@@ -161,6 +161,14 @@ def _detect_sync(retries: int = 1) -> dict | None:
     result = _try_ipinfo()
     if result:
         _save_location_cache(result)
+        return result
+    result = _try_ipwho()
+    if result:
+        _save_location_cache(result)
+        return result
+    result = _try_geojs()
+    if result:
+        _save_location_cache(result)
     return result
 
 
@@ -168,7 +176,7 @@ def _try_ip_api(retries: int) -> dict | None:
     for attempt in range(retries + 1):
         try:
             req = Request(
-                "http://ip-api.com/json/", headers={"User-Agent": "AthanFiveTimes/0.3.15b"}
+                "http://ip-api.com/json/", headers={"User-Agent": "AthanFiveTimes/0.3.16b"}
             )
             with urlopen(req, timeout=10) as resp:
                 data = json.loads(resp.read().decode())
@@ -202,7 +210,7 @@ def _try_ip_api(retries: int) -> dict | None:
 def _try_fallback() -> dict | None:
     """Fallback using ipapi.co (HTTPS)."""
     try:
-        req = Request("https://ipapi.co/json/", headers={"User-Agent": "AthanFiveTimes/0.3.15b"})
+        req = Request("https://ipapi.co/json/", headers={"User-Agent": "AthanFiveTimes/0.3.16b"})
         with urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode())
         if data.get("error"):
@@ -232,7 +240,7 @@ def _try_ipinfo() -> dict | None:
     try:
         req = Request(
             "https://ipinfo.io/json",
-            headers={"User-Agent": "AthanFiveTimes/0.3.15b"},
+            headers={"User-Agent": "AthanFiveTimes/0.3.16b"},
         )
         with urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode())
@@ -254,6 +262,71 @@ def _try_ipinfo() -> dict | None:
         }
     except (URLError, ValueError, AttributeError, KeyError, OSError) as exc:
         logger.warning("ipinfo geolocation failed: %s", exc)
+    return None
+
+
+def _try_ipwho() -> dict | None:
+    """Fourth provider (ipwho.is, HTTPS, keyless, generous free tier)."""
+    try:
+        req = Request(
+            "https://ipwho.is/",
+            headers={"User-Agent": "AthanFiveTimes/0.3.16b"},
+        )
+        with urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read().decode())
+        if not data.get("success"):
+            return None
+        country = data.get("country", "")
+        try:
+            lat, lon = float(data.get("latitude", 0.0)), float(data.get("longitude", 0.0))
+        except (ValueError, TypeError):
+            return None
+        if (lat == 0.0 and lon == 0.0) or not (-90 <= lat <= 90) or not (-180 <= lon <= 180):
+            return None
+        tz = data.get("timezone", "")
+        if isinstance(tz, dict):
+            tz = tz.get("id", "")
+        return {
+            "city": data.get("city", ""),
+            "country": country,
+            "country_code": (data.get("country_code") or "").upper(),
+            "latitude": lat,
+            "longitude": lon,
+            "timezone": tz,
+        }
+    except (URLError, ValueError, AttributeError, KeyError, OSError) as exc:
+        logger.warning("ipwho geolocation failed: %s", exc)
+    return None
+
+
+def _try_geojs() -> dict | None:
+    """Fifth provider (geojs.io, HTTPS, keyless)."""
+    try:
+        req = Request(
+            "https://get.geojs.io/v1/ip/geo.json",
+            headers={"User-Agent": "AthanFiveTimes/0.3.16b"},
+        )
+        with urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read().decode())
+        code = (data.get("country_code") or "").upper()
+        if not code:
+            return None
+        try:
+            lat, lon = float(data.get("latitude", 0.0)), float(data.get("longitude", 0.0))
+        except (ValueError, TypeError):
+            return None
+        if (lat == 0.0 and lon == 0.0) or not (-90 <= lat <= 90) or not (-180 <= lon <= 180):
+            return None
+        return {
+            "city": data.get("city", ""),
+            "country": data.get("country", ""),
+            "country_code": code,
+            "latitude": lat,
+            "longitude": lon,
+            "timezone": data.get("timezone", ""),
+        }
+    except (URLError, ValueError, AttributeError, KeyError, OSError) as exc:
+        logger.warning("geojs geolocation failed: %s", exc)
     return None
 
 

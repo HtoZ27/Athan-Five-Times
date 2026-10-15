@@ -4,7 +4,7 @@ import json
 import urllib.error
 from unittest.mock import MagicMock, patch
 
-from backend.location import _try_fallback, _try_ip_api
+from backend.location import _try_fallback, _try_geojs, _try_ip_api, _try_ipwho
 
 
 def _resp(payload):
@@ -87,3 +87,55 @@ class TestTryIpApi:
             return_value=_resp({"status": "fail", "message": "SSL unavailable"}),
         ):
             assert _try_ip_api(0) is None
+
+
+class TestTryIpwho:
+    def test_success_parsed_with_nested_timezone(self):
+        with patch(
+            "backend.location.urlopen",
+            return_value=_resp(
+                {
+                    "success": True,
+                    "city": "Mecca",
+                    "country": "Saudi Arabia",
+                    "country_code": "SA",
+                    "latitude": 21.42,
+                    "longitude": 39.82,
+                    "timezone": {"id": "Asia/Riyadh"},
+                }
+            ),
+        ):
+            r = _try_ipwho()
+        assert r is not None
+        assert r["city"] == "Mecca"
+        assert r["country_code"] == "SA"
+        assert r["timezone"] == "Asia/Riyadh"
+
+    def test_unsuccessful_returns_none(self):
+        with patch("backend.location.urlopen", return_value=_resp({"success": False})):
+            assert _try_ipwho() is None
+
+
+class TestTryGeojs:
+    def test_success_parsed_with_string_coords(self):
+        with patch(
+            "backend.location.urlopen",
+            return_value=_resp(
+                {
+                    "city": "Mecca",
+                    "country": "Saudi Arabia",
+                    "country_code": "SA",
+                    "latitude": "21.42",
+                    "longitude": "39.82",
+                    "timezone": "Asia/Riyadh",
+                }
+            ),
+        ):
+            r = _try_geojs()
+        assert r is not None
+        assert r["city"] == "Mecca"
+        assert r["latitude"] == 21.42
+
+    def test_missing_country_code_returns_none(self):
+        with patch("backend.location.urlopen", return_value=_resp({"city": "X"})):
+            assert _try_geojs() is None

@@ -6,7 +6,7 @@
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
 [![Qt 6 QML](https://img.shields.io/badge/Qt-6_QML-green?logo=qt&logoColor=white)](https://www.qt.io/)
 
-> **Beta (0.3.15b)** — This is a beta release: not yet bug-free, not yet
+> **Beta (0.3.16b)** — This is a beta release: not yet bug-free, not yet
 > tested on all Linux environments, and translations are still unreviewed.
 > Bug reports are welcome via GitHub Issues.
 
@@ -62,13 +62,13 @@ Or install a native package (also on the releases page):
 
 ```bash
 # Debian / Ubuntu (Qt wheels exist on Debian 13 / Ubuntu 25.04+)
-sudo dpkg -i athan-five-times_0.3.15b_all.deb
+sudo dpkg -i athan-five-times_0.3.16b_all.deb
 sudo apt-get install -f   # pulls python3-pyside6* if missing
 pip install --break-system-packages adhan miniaudio
 athan-five-times
 
 # Fedora / openSUSE (from spec)
-sudo dnf install athan-five-times-0.3.15b-1.noarch.rpm
+sudo dnf install athan-five-times-0.3.16b-1.noarch.rpm
 
 # Arch Linux (from PKGBUILD)
 makepkg -si   # inside packaging/arch, or use the AUR
@@ -85,7 +85,7 @@ pip install -r requirements-lock.txt
 
 ```bash
 pip install -e ".[dev]"
-python -m pytest tests/          # 412 tests
+python -m pytest tests/          # 416 tests
 python3 scripts/smoke-qml.py     # QML zero-error gate
 python3 scripts/e2e-features.py  # isolated end-to-end (44 checks)
 ```
@@ -104,7 +104,7 @@ cd packaging/arch && makepkg -si          # Arch
 ## الخصوصية / Privacy
 
 عند التشغيل الأول فقط يحاول التطبيق تخمين مدينتك عبر بحث IP
-‏(`ip-api.com` ثم `ipapi.co` ثم `ipinfo.io`) لضبط الموقع مسبقاً. لا حسابات،
+‏(`ip-api.com` ثم `ipapi.co` ثم `ipinfo.io` ثم `ipwho.is` ثم `geojs.io`) لضبط الموقع مسبقاً. لا حسابات،
 لا تتبع، ولا أي استخدام آخر للشبكة. يمكنك تغيير المدينة في أي وقت
 من الإعدادات ← الموقع، أو إعادة الضبط للافتراضي من
 الإعدادات ← إدارة الإعدادات، أو البقاء دون إنترنت للإبقاء على اختيارك الحالي
@@ -113,7 +113,7 @@ cd packaging/arch && makepkg -si          # Arch
 (`~/.cache/prayer-times/location.json`)، ويُمسح عند تغيير المدينة يدوياً.
 
 On first run only, the app attempts one IP-geolocation lookup (`ip-api.com`,
-then `ipapi.co`, then `ipinfo.io`) to preset your city. No accounts, no
+then `ipapi.co`, then `ipinfo.io`, then `ipwho.is`, then `geojs.io`) to preset your city. No accounts, no
 tracking, no other network use. Change the location anytime in
 Settings → Location, reset to defaults in Settings → Manage Settings,
 or stay offline to keep your current choice (Mecca on first run only).
