@@ -155,7 +155,8 @@ class TestValidateAndCoerce:
 
     def test_missing_keys_filled_with_defaults(self):
         result = validate_and_coerce({})
-        assert result["country"] == "TN"
+        assert result["country"] == "SA"
+        assert result["city"] == "Mecca"
         assert result["language"] == "ar"
         assert result["theme"] == "dark"
 

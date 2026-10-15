@@ -24,7 +24,7 @@ import backend.backend_controller as BC
 def engine():
     e = PrayerEngine()
     e.recalculate()
-    assert e._result is not None, "default Tunis calculation must succeed"
+    assert e._result is not None, "default Mecca calculation must succeed"
     yield e
     e.cleanup()
 

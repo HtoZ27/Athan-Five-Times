@@ -192,7 +192,7 @@ class QmlAthanApp:
 
         def _on_location_detected(loc):
             if not loc:
-                logger.info("Offline or location unavailable; using defaults (Tunis)")
+                logger.info("Offline or location unavailable; using defaults (Mecca)")
                 result = dict(settings)
                 result["first_run"] = False
                 save_settings(result)
@@ -201,16 +201,16 @@ class QmlAthanApp:
             lat, lon = loc["latitude"], loc["longitude"]
             city_ip = loc.get("city", "")
             tz = loc.get("timezone", "")
-            country_code = (loc.get("country_code", "") or "TN").upper()
+            country_code = (loc.get("country_code", "") or "SA").upper()
 
             from .prayer_calc import COUNTRY_CITIES, COUNTRY_METHODS, COUNTRIES
 
             if country_code not in COUNTRIES:
                 logger.warning(
-                    "Auto-location returned unknown country %r, using TN",
+                    "Auto-location returned unknown country %r, using SA",
                     loc.get("country_code", ""),
                 )
-                country_code = "TN"
+                country_code = "SA"
 
             result = dict(settings)
             result["country"] = country_code
@@ -237,7 +237,7 @@ class QmlAthanApp:
                 result["latitude"] = best_lat
                 result["longitude"] = best_lon
             result["timezone"] = tz
-            method = COUNTRY_METHODS.get(country_code, "وزارة الشؤون الدينية التونسية")
+            method = COUNTRY_METHODS.get(country_code, "أم القرى (Umm Al-Qura)")
             result["method"] = method
             logger.info(
                 "Auto-located: %s/%s (%.4f, %.4f) %s", country_code, result["city"], lat, lon, tz

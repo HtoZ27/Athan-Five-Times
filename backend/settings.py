@@ -45,14 +45,14 @@ PRAYER_KEYS: tuple = ("fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha")
 
 @dataclass
 class SettingsSchema:
-    country: str = "TN"
-    city: str = "Tunis"
-    latitude: float = 36.8065
-    longitude: float = 10.1815
-    method: str = "وزارة الشؤون الدينية التونسية"
+    country: str = "SA"
+    city: str = "Mecca"
+    latitude: float = 21.4225
+    longitude: float = 39.8262
+    method: str = "أم القرى (Umm Al-Qura)"
     madhab: str = "shafi"
     language: str = "ar"
-    timezone: str = "Africa/Tunis"
+    timezone: str = "Asia/Riyadh"
     offsets: Dict[str, int] = field(
         default_factory=lambda: {
             "fajr": 0,

@@ -878,10 +878,10 @@ class PrayerEngine(QObject):
         self._pending_location = None
         if loc:
             ok = self._apply_auto_coords(
-                loc.get("country_code", "TN"),
-                loc.get("city", "Tunis"),
-                loc.get("latitude", 36.8065),
-                loc.get("longitude", 10.1815),
+                loc.get("country_code", "SA"),
+                loc.get("city", "Mecca"),
+                loc.get("latitude", 21.4225),
+                loc.get("longitude", 39.8262),
                 loc.get("timezone"),
             )
             if ok:
@@ -907,7 +907,7 @@ class PrayerEngine(QObject):
                 )
                 return
 
-        self._apply_auto_coords("TN", "Tunis", 36.8065, 10.1815, "Africa/Tunis", True)
+        self._apply_auto_coords("SA", "Mecca", 21.4225, 39.8262, "Asia/Riyadh", True)
 
     def _save_theme(self, theme_code: str, emit_signal: bool = True) -> None:
         """Internal method to save theme setting.
