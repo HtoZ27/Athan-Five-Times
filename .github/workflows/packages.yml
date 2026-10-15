@@ -26,7 +26,7 @@ jobs:
           TAG: ${{ inputs.tag }}
         run: |
           python3 - <<'EOF'
-          import json, os, urllib.request
+          import json, os, urllib.request, urllib.error
           token = os.environ["GH_TOKEN"]
           repo = os.environ["GITHUB_REPOSITORY"]
           tag = os.environ["TAG"]
@@ -36,10 +36,15 @@ jobs:
                   headers={"Authorization": f"Bearer {token}",
                            "Accept": "application/vnd.github+json"},
                   method=method)
-              with urllib.request.urlopen(req) as r:
-                  return json.load(r)
-          rel = api("GET", f"/releases/tags/{tag}")
-          for a in rel.get("assets", []):
+              try:
+                  with urllib.request.urlopen(req) as r:
+                      body = r.read().decode()
+                      return r.status, (json.loads(body) if body.strip() else None)
+              except urllib.error.HTTPError as e:
+                  print(f"HTTP {e.code} on {method} {path}: {e.read().decode()[:200]}")
+                  raise SystemExit(1)
+          _, rel = api("GET", f"/releases/tags/{tag}")
+          for a in (rel or {}).get("assets", []):
               if a["name"].endswith((".rpm", ".pkg.tar.zst")):
                   api("DELETE", f"/releases/assets/{a['id']}")
                   print("deleted:", a["name"])
