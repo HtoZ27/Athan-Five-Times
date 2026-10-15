@@ -1,6 +1,6 @@
 """
 Auto-location via IP geolocation.
-Uses ip-api.com with HTTPS, retry, and fallback.
+Uses ip-api.com (plain HTTP: the free tier rejects HTTPS), retry, and fallback.
 """
 
 import json
@@ -168,7 +168,7 @@ def _try_ip_api(retries: int) -> dict | None:
     for attempt in range(retries + 1):
         try:
             req = Request(
-                "https://ip-api.com/json/", headers={"User-Agent": "AthanFiveTimes/0.3.15b"}
+                "http://ip-api.com/json/", headers={"User-Agent": "AthanFiveTimes/0.3.15b"}
             )
             with urlopen(req, timeout=10) as resp:
                 data = json.loads(resp.read().decode())

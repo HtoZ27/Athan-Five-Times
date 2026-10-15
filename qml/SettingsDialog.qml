@@ -22,9 +22,22 @@ Dialog {
         function onLocationChanged() {
             locationTab.populate()
         }
+        function onAutoLocationStatus(status) {
+            detectingLocation = (status === "detecting")
+            if (status === "detecting")
+                locationStatusText = tr("جارٍ تحديد الموقع…")
+            else if (status === "success")
+                locationStatusText = tr("تم تحديد الموقع بنجاح")
+            else if (status === "failed")
+                locationStatusText = tr("تعذّر تحديد الموقع — تحقق من الاتصال بالإنترنت")
+            else
+                locationStatusText = ""
+        }
     }
 
     property bool useCustomCoords: false
+    property bool detectingLocation: false
+    property string locationStatusText: ""
     property string searchText: ""
     property int currentTabIndex: 0
     property string _currentCountryCode: ""
@@ -339,13 +352,21 @@ Dialog {
                                             Layout.fillWidth: true
                                             Layout.preferredHeight: 40
                                             text: tr("تحديد موقعي تلقائياً عبر الإنترنت")
-                                            enabled: !useCustomCoords
+                                            enabled: !useCustomCoords && !detectingLocation
                                             onClicked: {
                                                 if (useCustomCoords) {
                                                     customCoordsCheck.checked = false
                                                 }
                                                 backendController.resetToAutoCoordinates()
                                             }
+                                        }
+                                        Label {
+                                            visible: locationStatusText !== ""
+                                            text: locationStatusText
+                                            color: theme.textColor
+                                            font.italic: true
+                                            wrapMode: Text.Wrap
+                                            Layout.fillWidth: true
                                         }
                                     }
                                 }

@@ -73,6 +73,7 @@ class PrayerEngine(QObject):
     trayInfoChanged = Signal(str, str, str)
     themeChanged = Signal(str)
     locationChanged = Signal()
+    autoLocationStatus = Signal(str)
     settingChanged = Signal(str)
     backgroundEnabledChanged = Signal(bool)
 
@@ -870,6 +871,7 @@ class PrayerEngine(QObject):
             )
 
         self._pending_location = None
+        self.autoLocationStatus.emit("detecting")
         detect_async(_on_result)
 
     @Slot()
@@ -889,8 +891,10 @@ class PrayerEngine(QObject):
                     save_settings(self._settings)
                 except (OSError, TypeError, ValueError) as exc:
                     logger.error("Failed to save after auto-location: %s", exc)
+                self.autoLocationStatus.emit("success")
                 return
             logger.warning("Auto-location rejected, falling back to saved city")
+        self.autoLocationStatus.emit("failed")
 
         country = self._settings.get("country")
         city = self._settings.get("city")

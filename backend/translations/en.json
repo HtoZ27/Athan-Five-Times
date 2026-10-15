@@ -188,7 +188,10 @@
     "حفظ": "Save",
     "شريط النظام": "System tray",
     "عرض المزيد": "Show more",
-    "وضع السكون (فحص أقل في الخلفية)": "Sleep mode (fewer background checks)"
+    "وضع السكون (فحص أقل في الخلفية)": "Sleep mode (fewer background checks)",
+    "جارٍ تحديد الموقع…": "Detecting location…",
+    "تم تحديد الموقع بنجاح": "Location detected successfully",
+    "تعذّر تحديد الموقع — تحقق من الاتصال بالإنترنت": "Could not detect location — check your internet connection"
   },
   "prayer_names": {
     "fajr": "Fajr",

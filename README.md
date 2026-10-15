@@ -85,7 +85,7 @@ pip install -r requirements-lock.txt
 
 ```bash
 pip install -e ".[dev]"
-python -m pytest tests/          # 407 tests
+python -m pytest tests/          # 412 tests
 python3 scripts/smoke-qml.py     # QML zero-error gate
 python3 scripts/e2e-features.py  # isolated end-to-end (44 checks)
 ```

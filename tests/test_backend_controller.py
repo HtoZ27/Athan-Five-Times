@@ -66,6 +66,51 @@ class TestMuezzinManagement:
         assert migrated["removed_muezzins"] == []
 
 
+class TestAutoLocationStatus:
+    def test_reset_emits_detecting(self):
+        from unittest.mock import patch
+
+        e = PrayerEngine()
+        try:
+            seen = []
+            e.autoLocationStatus.connect(seen.append)
+            with patch("backend.location.detect_async") as d:
+                e.resetToAutoCoordinates()
+            assert seen == ["detecting"]
+            assert d.called
+        finally:
+            e.cleanup()
+
+    def test_process_success_emits_success(self):
+        e = PrayerEngine()
+        try:
+            seen = []
+            e.autoLocationStatus.connect(seen.append)
+            e._pending_location = {
+                "country_code": "SA",
+                "city": "Mecca",
+                "latitude": 21.42,
+                "longitude": 39.82,
+                "timezone": "Asia/Riyadh",
+            }
+            e._process_auto_location()
+            assert seen == ["success"]
+            assert e.getSetting("city") == "Mecca"
+        finally:
+            e.cleanup()
+
+    def test_process_none_emits_failed(self):
+        e = PrayerEngine()
+        try:
+            seen = []
+            e.autoLocationStatus.connect(seen.append)
+            e._pending_location = None
+            e._process_auto_location()
+            assert seen == ["failed"]
+        finally:
+            e.cleanup()
+
+
 class TestDndSerialization:
     def test_run_dnd_cmds_executes_all_backends(self):
         from unittest.mock import patch

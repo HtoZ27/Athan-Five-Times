@@ -4,7 +4,7 @@ import json
 import urllib.error
 from unittest.mock import MagicMock, patch
 
-from backend.location import _try_fallback
+from backend.location import _try_fallback, _try_ip_api
 
 
 def _resp(payload):
@@ -58,3 +58,32 @@ class TestTryFallback:
     def test_network_failure_returns_none(self):
         with patch("backend.location.urlopen", side_effect=urllib.error.URLError("offline")):
             assert _try_fallback() is None
+
+
+class TestTryIpApi:
+    def test_uses_plain_http_free_tier(self):
+        # ip-api.com free tier rejects HTTPS ("SSL unavailable"); plain
+        # HTTP is the documented working endpoint.
+        with patch(
+            "backend.location.urlopen",
+            return_value=_resp(
+                {
+                    "status": "success",
+                    "city": "Mecca",
+                    "country": "Saudi Arabia",
+                    "timezone": "Asia/Riyadh",
+                    "lat": 21.42,
+                    "lon": 39.82,
+                }
+            ),
+        ) as u:
+            r = _try_ip_api(0)
+        assert u.call_args[0][0].full_url.startswith("http://ip-api.com/")
+        assert r is not None and r["city"] == "Mecca"
+
+    def test_fail_status_returns_none(self):
+        with patch(
+            "backend.location.urlopen",
+            return_value=_resp({"status": "fail", "message": "SSL unavailable"}),
+        ):
+            assert _try_ip_api(0) is None
