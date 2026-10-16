@@ -136,3 +136,62 @@ class TestNoDuplication:
         for c in AdhkarRepository().get_index():
             total += len(AdhkarRepository().load_category(c["id"])["items"])
         assert total == 382, total
+
+
+def _bare_arabic(s: str) -> str:
+    """Arabic text stripped of diacritics/tatweel for robust matching."""
+    import unicodedata
+
+    out = []
+    for ch in unicodedata.normalize("NFD", s):
+        if unicodedata.category(ch) == "Mn" or ch == "ـ":
+            continue
+        out.append({"أ": "ا", "إ": "ا", "آ": "ا", "ٱ": "ا"}.get(ch, ch))
+    return "".join(out)
+
+
+class TestTextIntegrity:
+    """Guard rails for the adhkar text audit: operational instructions must
+    never live inside recitable text, and key texts must stay complete."""
+
+    BANNED_BARE = [
+        "بعد كل صلاة",
+        "عقب كل صلاة",
+        "بعد السلام من صلاة",
+        # NOTE: "انك لا تخلف الميعاد" deliberately excluded — it occurs
+        # legitimately inside Quran 3:194 (waking/wak06).
+    ]
+
+    def _all_items(self):
+        repo = AdhkarRepository()
+        for c in repo.get_index():
+            for it in repo.load_category(c["id"])["items"]:
+                yield c["id"], it
+
+    def test_no_operational_instructions_in_text(self):
+        bad = []
+        for cid, it in self._all_items():
+            bare = _bare_arabic(it["arabic"])
+            for phrase in self.BANNED_BARE:
+                if phrase in bare:
+                    bad.append((cid, it["id"], phrase))
+        assert not bad, f"instructional text inside dhikr: {bad}"
+
+    def test_kursi_items_complete(self):
+        repo = AdhkarRepository()
+        for cid, iid in [
+            ("morning", "m02"),
+            ("evening", "e02"),
+            ("sleep", "s04"),
+            ("after_prayer", "aft11"),
+        ]:
+            cat = repo.load_category(cid)
+            it = next(i for i in cat["items"] if i["id"] == iid)
+            assert "وهو العلي العظيم" in _bare_arabic(it["arabic"]), (cid, iid)
+
+    def test_istighfar_items_complete(self):
+        repo = AdhkarRepository()
+        for cid, iid in [("morning", "m07"), ("evening", "e05")]:
+            cat = repo.load_category(cid)
+            it = next(i for i in cat["items"] if i["id"] == iid)
+            assert "فانه لا يغفر الذنوب" in _bare_arabic(it["arabic"]), (cid, iid)
