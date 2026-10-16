@@ -8,7 +8,8 @@ Glyph sources (reference geometry fetched into scripts/icons/):
   - Phosphor Icons          (MIT)        https://phosphoricons.com
   - Line Awesome / Icons8   (Apache-2.0) https://icons8.com/line-awesome
   - Font Awesome 6 Solid    (CC BY 4.0)  https://fontawesome.com  [kaaba glyph]
-Custom hand-drawn glyphs: prayer, adhan, tasbih, dua ( servir concept-specific).
+  - Fluent Emoji High Contrast (MIT)     https://github.com/microsoft/fluentui-emoji [dua]
+Custom hand-drawn glyphs: prayer, adhan, tasbih ( concept-specific).
 Run: python3 scripts/gen-adhkar-icons.py  (writes backend/assets/adhkar_icons/*.png)
 """
 import glob
@@ -45,6 +46,8 @@ SVGS = {
     "protection": ("protection", (30, 58, 138), (18, 40, 95), 150),
     "manners": ("manners", (77, 124, 15), (54, 88, 10), 150),
     "nature": ("nature", (7, 89, 133), (4, 62, 96), 150),
+    "dua": ("dua", (218, 152, 48), (174, 109, 24), 168),
+    "tasbih": None,  # custom
     "istighfar": ("istighfar", (49, 46, 129), (32, 30, 88), 150),
     "misc": ("misc", (15, 118, 110), (10, 84, 79), 150),
 }
@@ -132,7 +135,7 @@ def adhan():  # traditional Islamic minaret with balconies, dome, and sound arcs
     save("adhan", img)
 
 
-def tasbih():  # prayer beads loop — tasbih
+def tasbih():
     img, d = badge((120, 53, 15), (84, 36, 10))
     cx, cy, rx, ry = 128, 118, 46, 38
     for i in range(12):
@@ -143,17 +146,6 @@ def tasbih():  # prayer beads loop — tasbih
     d.line([(cx, cy + ry + 14), (cx, 200)], fill=GOLD, width=5)
     d.rectangle([cx - 8, 200, cx + 8, 212], fill=GOLD)
     save("tasbih", img)
-
-
-def dua_spot():  # cupped palms raised skyward with a gold spark — dua
-    img, d = badge((91, 33, 182), (67, 24, 138))
-    left = [(84, 192), (84, 152), (90, 124), (100, 104), (112, 96), (120, 100),
-            (118, 116), (108, 136), (99, 158), (96, 192)]
-    right = [(256 - x, y) for x, y in left]
-    d.polygon(left, fill=CREAM)
-    d.polygon(right, fill=CREAM)
-    d.polygon([(128, 62), (134, 76), (128, 90), (122, 76)], fill=GOLD)
-    save("dua", img)
 
 
 def contact_sheet(names, out_path, cell=96, cols=6):
@@ -173,9 +165,10 @@ def contact_sheet(names, out_path, cell=96, cols=6):
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
     for role in SVGS:
+        if SVGS[role] is None:  # custom glyph
+            continue
         svg_icon(role)
     prayer()
     adhan()
     tasbih()
-    dua_spot()
-    print("wrote", len(SVGS) + 4, "icons to", OUT)
+    print("wrote", len(SVGS) + 2, "icons to", OUT)
