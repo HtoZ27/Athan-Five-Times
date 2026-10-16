@@ -68,6 +68,7 @@ class TestIndex:
             "nature",
             "tasbih",
             "istighfar",
+            "misc",
         }
         for c in AdhkarRepository().get_index():
             icon = c.get("icon") or "dua"

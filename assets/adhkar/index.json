@@ -157,7 +157,7 @@
       "name_ar": "أدعية متنوعة",
       "name_en": "Various Duas",
       "asset": "assets/adhkar/misc.json",
-      "icon": "dua",
+      "icon": "misc",
       "order": 20
     },
     {
