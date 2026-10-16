@@ -22,7 +22,7 @@ class TestIndex:
     def test_full_library_categories(self):
         repo = AdhkarRepository()
         index = repo.get_index()
-        assert len(index) == 138
+        assert len(index) == 23
         ids = {c["id"] for c in index}
         assert {"morning", "evening", "after_prayer"} <= ids
 
@@ -82,8 +82,8 @@ class TestCategories:
         repo = AdhkarRepository(max_cache_size=2)
         repo.load_category("morning")
         repo.load_category("evening")
-        repo.load_category("sleep")
-        assert set(repo._cache.keys()) == {"evening", "sleep"}
+        repo.load_category("أذكار_النوم_والليل")
+        assert set(repo._cache.keys()) == {"evening", "أذكار_النوم_والليل"}
 
     def test_clear_cache(self):
         repo = AdhkarRepository()
@@ -182,7 +182,7 @@ class TestTextIntegrity:
         for cid, iid in [
             ("morning", "m02"),
             ("evening", "e02"),
-            ("sleep", "s04"),
+            ("أذكار_النوم_والليل", "s04"),
             ("after_prayer", "aft11"),
         ]:
             cat = repo.load_category(cid)

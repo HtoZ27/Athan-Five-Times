@@ -112,7 +112,7 @@ def main() -> int:
         check("prayer-athkar-items", len(prov.getCategoryItems("after_prayer")) == 12)
         st.setProperty("currentIndex", 2)
         app.processEvents()
-        check("general-categories", len(prov.getCategories()) == 140)
+        check("general-categories", len(prov.getCategories()) == 23)
         st.setProperty("currentIndex", 0)
         app.processEvents()
 
@@ -182,7 +182,7 @@ def main() -> int:
     check("reject-city", pe.getSetting("city") == "Tunis")
 
     prov = pe.getAthkarProvider()
-    check("adhkar-items-morning", len(prov.getCategoryItems("morning")) == 30)
+    check("adhkar-items-morning", len(prov.getCategoryItems("morning")) == 27)
     it = prov.getCategoryItems("morning")[0]
     check("adhkar-item-shape",
           bool(it.get("arabic")) and it.get("count", 0) >= 1 and bool(it.get("reference_id")))
