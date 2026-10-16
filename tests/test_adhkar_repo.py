@@ -55,6 +55,19 @@ class TestIndex:
             "mosque",
             "travel",
             "dua",
+            "prayer",
+            "adhan",
+            "tahara",
+            "libas",
+            "sick",
+            "hajj",
+            "distress",
+            "ruqya",
+            "protection",
+            "manners",
+            "nature",
+            "tasbih",
+            "istighfar",
         }
         for c in AdhkarRepository().get_index():
             icon = c.get("icon") or "dua"
