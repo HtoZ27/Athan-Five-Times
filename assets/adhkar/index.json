@@ -37,7 +37,7 @@
       "name_ar": "أدعية الصلاة",
       "name_en": "Prayer Duas",
       "asset": "assets/adhkar/أدعية_الصلاة.json",
-      "icon": "dua",
+      "icon": "prayer",
       "order": 5
     },
     {
@@ -53,7 +53,7 @@
       "name_ar": "أذكار الآذان",
       "name_en": "أذكار الآذان",
       "asset": "assets/adhkar/أذكار_الآذان.json",
-      "icon": "dua",
+      "icon": "adhan",
       "order": 7
     },
     {
@@ -61,7 +61,7 @@
       "name_ar": "أذكار الطهارة",
       "name_en": "Purification Adhkar",
       "asset": "assets/adhkar/أذكار_الطهارة.json",
-      "icon": "dua",
+      "icon": "tahara",
       "order": 8
     },
     {
@@ -85,7 +85,7 @@
       "name_ar": "أذكار اللباس",
       "name_en": "Clothing Adhkar",
       "asset": "assets/adhkar/أذكار_اللباس.json",
-      "icon": "dua",
+      "icon": "libas",
       "order": 11
     },
     {
@@ -101,7 +101,7 @@
       "name_ar": "أدعية المرض والجنائز",
       "name_en": "Sickness & Funeral Duas",
       "asset": "assets/adhkar/أدعية_المرض_والجنائز.json",
-      "icon": "dua",
+      "icon": "sick",
       "order": 13
     },
     {
@@ -109,7 +109,7 @@
       "name_ar": "أدعية الحج والعمرة",
       "name_en": "Hajj & Umrah Duas",
       "asset": "assets/adhkar/أدعية_الحج_والعمرة.json",
-      "icon": "dua",
+      "icon": "hajj",
       "order": 14
     },
     {
@@ -117,7 +117,7 @@
       "name_ar": "أدعية الكرب والشدائد",
       "name_en": "Hardship Duas",
       "asset": "assets/adhkar/أدعية_الكرب_والشدائد.json",
-      "icon": "dua",
+      "icon": "distress",
       "order": 15
     },
     {
@@ -125,7 +125,7 @@
       "name_ar": "الرقية الشرعية",
       "name_en": "Ruqyah",
       "asset": "assets/adhkar/الرقية_الشرعية.json",
-      "icon": "dua",
+      "icon": "ruqya",
       "order": 16
     },
     {
@@ -133,7 +133,7 @@
       "name_ar": "أذكار الحفظ والتحصين",
       "name_en": "Protection Adhkar",
       "asset": "assets/adhkar/أذكار_الحفظ_والتحصين.json",
-      "icon": "dua",
+      "icon": "protection",
       "order": 17
     },
     {
@@ -141,7 +141,7 @@
       "name_ar": "آداب وأذكار اجتماعية",
       "name_en": "Social Etiquette Adhkar",
       "asset": "assets/adhkar/آداب_وأذكار_اجتماعية.json",
-      "icon": "dua",
+      "icon": "manners",
       "order": 18
     },
     {
@@ -149,7 +149,7 @@
       "name_ar": "أدعية المطر والطبيعة",
       "name_en": "Rain & Nature Duas",
       "asset": "assets/adhkar/أدعية_المطر_والطبيعة.json",
-      "icon": "dua",
+      "icon": "nature",
       "order": 19
     },
     {
@@ -165,7 +165,7 @@
       "name_ar": "التسبيح، التحميد، التهليل، التكبير",
       "name_en": "التسبيح، التحميد، التهليل، التكبير",
       "asset": "assets/adhkar/التسبيح،_التحميد،_التهليل،_التكبير.json",
-      "icon": "dua",
+      "icon": "tasbih",
       "order": 21
     },
     {
@@ -181,7 +181,7 @@
       "name_ar": "الاستغفار و التوبة",
       "name_en": "الاستغفار و التوبة",
       "asset": "assets/adhkar/الاستغفار_و_التوبة.json",
-      "icon": "dua",
+      "icon": "istighfar",
       "order": 23
     }
   ]

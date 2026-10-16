@@ -209,10 +209,14 @@ class TestTextIntegrity:
         icons_dir = os.path.join(os.path.dirname(__file__), "..", "backend", "assets", "adhkar_icons")
         repo = AdhkarRepository()
         missing = []
+        mismatch = []
         for c in repo.get_index():
             cat = repo.load_category(c["id"])
             icon = cat.get("icon") or "dua"
             path = os.path.join(icons_dir, f"{icon}.png")
             if not os.path.isfile(path):
                 missing.append((c["id"], icon))
+            if c.get("icon") != cat.get("icon"):
+                mismatch.append((c["id"], c.get("icon"), cat.get("icon")))
         assert not missing, f"missing icon files: {missing}"
+        assert not mismatch, f"index/file icon mismatch: {mismatch}"
