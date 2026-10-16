@@ -3,7 +3,7 @@
   "name_ar": "أذكار الأكل والشرب",
   "name_en": "Eating & Drinking Adhkar",
   "icon": "eating",
-  "total": 6,
+  "total": 5,
   "tags": ["eating", "daily"],
   "items": [
     {
@@ -33,14 +33,6 @@
       "count": 1,
       "reference_id": "abudawud",
       "reference_detail": "3/347"
-    },
-    {
-      "id": "et05",
-      "arabic": "الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ",
-      "count": 1,
-      "reference_id": "abudawud",
-      "reference_detail": "4/327",
-      "virtue": "مختلف في ثبوته (ضعفه الألباني)."
     },
     {
       "id": "et06",

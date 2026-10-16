@@ -1,5 +1,5 @@
 """
-Structured adhkar library (140 JSON categories, 382 items).
+Structured adhkar library (138 JSON categories, 373 items).
 
 Source mix and conflict policy (documented, do not change silently):
 - Base: Dart sibling assets (curated, counts/references verified).

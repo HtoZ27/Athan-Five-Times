@@ -22,7 +22,7 @@ class TestIndex:
     def test_full_library_categories(self):
         repo = AdhkarRepository()
         index = repo.get_index()
-        assert len(index) == 140
+        assert len(index) == 138
         ids = {c["id"] for c in index}
         assert {"morning", "evening", "after_prayer"} <= ids
 
@@ -65,7 +65,7 @@ class TestIndex:
 class TestCategories:
     def test_morning_items_structured(self):
         cat = AdhkarRepository().load_category("morning")
-        assert len(cat["items"]) == 30
+        assert len(cat["items"]) == 27
         for it in cat["items"]:
             assert it["arabic"]
             assert it["count"] >= 1
@@ -114,8 +114,8 @@ class TestLegacyCompat:
             assert all(isinstance(t, str) and t for t in texts)
 
     def test_morning_evening(self):
-        assert len(get_structured_texts("morning")) == 30
-        assert len(get_structured_texts("evening")) == 29
+        assert len(get_structured_texts("morning")) == 27
+        assert len(get_structured_texts("evening")) == 26
 
     def test_unknown_key_empty(self):
         assert get_structured_texts("nope") == []
@@ -135,7 +135,7 @@ class TestNoDuplication:
         total = 0
         for c in AdhkarRepository().get_index():
             total += len(AdhkarRepository().load_category(c["id"])["items"])
-        assert total == 382, total
+        assert total == 373, total
 
 
 def _bare_arabic(s: str) -> str:

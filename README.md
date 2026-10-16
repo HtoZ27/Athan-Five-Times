@@ -28,7 +28,7 @@ A Linux desktop prayer-times application with azan audio, structured adhkar, do-
 
 - **Prayer Times** — Accurate calculation (MWL, Umm Al-Qura, Egyptian, Tunisian + 22 more), per-prayer icons, live countdown, Hijri date
 - **Audio Azan** — Streaming MP3 playback with fade-in, volume control, multiple muezzins + per-prayer audio, takbeer mode
-- **Adhkar Library** — 140 structured categories (382 remembrances) with repetition counts and source references, Arabic-Indic numerals
+- **Adhkar Library** — 138 structured categories (373 remembrances) with repetition counts and source references, Arabic-Indic numerals
 - **System Tray** — Mosque icon, next-prayer tooltip, show/quit menu, optional visibility, no-ghost quit
 - **DND Integration** — Auto system-wide do-not-disturb around prayer times (GNOME)
 - **Themes** — Dark/Light/Ottoman Gold/Catppuccin + auto, per-component palettes
