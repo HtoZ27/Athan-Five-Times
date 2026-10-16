@@ -204,3 +204,15 @@ class TestTextIntegrity:
                 if t.count(a) != t.count(b):
                     bad.append((cid, it["id"], a, t.count(a), b, t.count(b)))
         assert not bad, f"unbalanced brackets: {bad}"
+
+    def test_category_icons_exist(self):
+        icons_dir = os.path.join(os.path.dirname(__file__), "..", "backend", "assets", "adhkar_icons")
+        repo = AdhkarRepository()
+        missing = []
+        for c in repo.get_index():
+            cat = repo.load_category(c["id"])
+            icon = cat.get("icon") or "dua"
+            path = os.path.join(icons_dir, f"{icon}.png")
+            if not os.path.isfile(path):
+                missing.append((c["id"], icon))
+        assert not missing, f"missing icon files: {missing}"

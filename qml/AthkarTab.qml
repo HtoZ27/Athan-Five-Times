@@ -24,7 +24,10 @@ Rectangle {
 
     function catIconFile(icon) {
         var known = ["morning", "evening", "after_prayer", "sleep",
-                     "waking", "home", "eating", "mosque", "travel", "dua"]
+                     "waking", "home", "eating", "mosque", "travel", "dua",
+                     "prayer", "adhan", "tahara", "libas", "sick", "hajj",
+                     "distress", "ruqya", "protection", "manners", "nature",
+                     "tasbih", "istighfar"]
         var k = icon || "dua"
         if (known.indexOf(k) < 0) k = "dua"
         return "../assets/adhkar_icons/" + k + ".png"

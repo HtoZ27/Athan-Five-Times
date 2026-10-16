@@ -221,8 +221,8 @@ def main() -> int:
     import glob as _g
     check("prayer-icons-14",
           len(_g.glob(os.path.join(ROOT, "assets", "prayer_icons", "*.png"))) == 14)
-    check("adhkar-icons-10",
-          len(_g.glob(os.path.join(ROOT, "assets", "adhkar_icons", "*.png"))) == 10)
+    check("adhkar-icons-23",
+          len(_g.glob(os.path.join(ROOT, "assets", "adhkar_icons", "*.png"))) == 23)
 
     QTimer.singleShot(1000, pe.quitApp)
     QTimer.singleShot(20000, lambda: app.exit(42))
