@@ -114,24 +114,23 @@ def prayer():  # prayer rug with mihrab arch — Salah
     save("prayer", img)
 
 
-def adhan():  # traditional Islamic minaret with balconies, dome, and sound arcs
+def adhan():  # Ottoman pencil minaret: straight shaft, one balcony, conical spire, crescent
     img, d = badge((180, 83, 9), (130, 60, 6))
-    # Base shaft (tapered Islamic minaret)
-    d.polygon([(112, 190), (144, 190), (140, 96), (116, 96)], fill=CREAM)
-    # Lower balcony
-    d.rectangle([106, 126, 150, 136], fill=CREAM)
-    # Upper balcony
-    d.rectangle([110, 96, 146, 104], fill=CREAM)
-    # Islamic onion/pointed dome cap
-    d.pieslice([112, 60, 144, 98], start=180, end=360, fill=CREAM)
-    d.polygon([(128, 44), (132, 54), (124, 54)], fill=CREAM)  # Crescent finial top
-    # Doorway arch
-    d.pieslice([120, 164, 136, 190], start=180, end=360, fill=(130, 60, 6, 255))
-    d.rectangle([120, 176, 136, 190], fill=(130, 60, 6, 255))
-    # Sound waves (adhan call)
-    for r in (30, 48, 66):
-        d.arc([154 - r, 124 - r, 154 + r, 124 + r], start=-55, end=55, fill=CREAM, width=5)
-        d.arc([102 - r, 124 - r, 102 + r, 124 + r], start=125, end=235, fill=CREAM, width=5)
+    # straight shaft (no taper — not a lighthouse)
+    d.rectangle([114, 100, 142, 190], fill=CREAM)
+    # base flare
+    d.polygon([(108, 190), (148, 190), (142, 174), (114, 174)], fill=CREAM)
+    # single balcony with under-ornament
+    d.rectangle([102, 116, 154, 130], fill=CREAM)
+    d.rectangle([108, 130, 148, 135], fill=CREAM)
+    # conical spire (short relative to shaft)
+    d.polygon([(110, 100), (146, 100), (128, 58)], fill=CREAM)
+    # crenellation teeth under the cone
+    for x in (114, 124, 134):
+        d.rectangle([x, 92, x + 6, 102], fill=CREAM)
+    # crescent finial (open crescent, tilted right)
+    d.ellipse([120, 24, 142, 46], fill=CREAM)
+    d.ellipse([127, 22, 147, 42], fill=(130, 60, 6, 255))
     save("adhan", img)
 
 
