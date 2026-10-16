@@ -195,3 +195,12 @@ class TestTextIntegrity:
             cat = repo.load_category(cid)
             it = next(i for i in cat["items"] if i["id"] == iid)
             assert "فانه لا يغفر الذنوب" in _bare_arabic(it["arabic"]), (cid, iid)
+
+    def test_parentheses_balanced(self):
+        bad = []
+        for cid, it in self._all_items():
+            t = it["arabic"]
+            for a, b in [("(", ")"), ("[", "]"), ("﴾", "﴿")]:
+                if t.count(a) != t.count(b):
+                    bad.append((cid, it["id"], a, t.count(a), b, t.count(b)))
+        assert not bad, f"unbalanced brackets: {bad}"
