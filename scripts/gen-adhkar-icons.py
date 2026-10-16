@@ -16,7 +16,7 @@ import glob
 import math
 import os
 
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 from PySide6.QtCore import QByteArray, QRectF
 from PySide6.QtGui import QImage, QPainter
 from PySide6.QtSvg import QSvgRenderer
@@ -33,7 +33,7 @@ SVGS = {
     "evening": ("evening", (234, 88, 12), (159, 55, 8), 150),
     "sleep": ("sleep", (30, 64, 175), (18, 39, 112), 148),
     "after_prayer": ("after_prayer", (120, 33, 111), (84, 22, 76), 150),
-    "mosque": ("mosque", (13, 111, 76), (8, 76, 51), 150),
+    "mosque": ("mosque", (13, 111, 76), (8, 76, 51), 170),
     "tahara": ("tahara", (2, 132, 199), (2, 100, 150), 150),
     "eating": ("eating", (124, 60, 12), (90, 42, 9), 150),
     "home": ("home", (71, 85, 105), (50, 59, 74), 150),
@@ -54,16 +54,31 @@ SVGS = {
 
 
 def badge(top, bottom):
+    """Rich badge: 3-stop vertical gradient + radial glow + rim ring."""
     img = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
+    hi = tuple(min(255, int(v + (255 - v) * 0.16)) for v in top)
     for y in range(SIZE):
         t = y / (SIZE - 1)
-        d.line([(0, y), (SIZE, y)],
-               fill=tuple(int(top[i] + (bottom[i] - top[i]) * t) for i in range(3)) + (255,))
+        if t < 0.55:
+            k = t / 0.55
+            c = tuple(int(hi[i] + (top[i] - hi[i]) * k) for i in range(3))
+        else:
+            k = (t - 0.55) / 0.45
+            c = tuple(int(top[i] + (bottom[i] - top[i]) * k) for i in range(3))
+        d.line([(0, y), (SIZE, y)], fill=tuple(c) + (255,))
     mask = Image.new("L", (SIZE, SIZE), 0)
     ImageDraw.Draw(mask).ellipse([8, 8, 248, 248], fill=255)
     bg = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
     bg.paste(img, (0, 0), mask)
+    # radial glow behind glyph
+    glow = Image.new("L", (SIZE, SIZE), 0)
+    ImageDraw.Draw(glow).ellipse([58, 52, 198, 192], fill=36)
+    glow = glow.filter(ImageFilter.GaussianBlur(26))
+    white = Image.new("RGBA", (SIZE, SIZE), (255, 255, 255, 255))
+    glowl = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
+    glowl.paste(white, (0, 0), glow)
+    bg.alpha_composite(glowl)
     d = ImageDraw.Draw(bg)
     ring = tuple(min(255, int(top[i] * 0.55 + 255 * 0.45)) for i in range(3)) + (255,)
     d.ellipse([10, 10, 246, 246], outline=ring, width=5)
@@ -75,8 +90,17 @@ def save(name, img):
 
 
 def svg_glyph(stem, glyph):
-    """Render reference SVG (tinted cream) onto a transparent canvas."""
+    """Render reference SVG onto a transparent canvas (cream solid + soft drop shadow)."""
     svg = open(os.path.join(ICONS, stem + ".svg"), encoding="utf-8").read()
+    if "currentColor" not in svg:  # emoji refs use concrete fills; force-cream the paths
+        svg = svg.replace('fill="#e8a30d"', 'fill="currentColor"')
+        lines = []
+        for ln in svg.splitlines():
+            if ln.startswith("<path") and "fill=" in ln and "currentColor" not in ln:
+                import re as _re
+                ln = _re.sub(r'fill="[^"]+"', 'fill="currentColor"', ln)
+            lines.append(ln)
+        svg = "\n".join(lines)
     svg = svg.replace("currentColor", "#f3ead8")
     renderer = QSvgRenderer(QByteArray(svg.encode("utf-8")))
     img = QImage(SIZE, SIZE, QImage.Format_ARGB32)
@@ -90,6 +114,11 @@ def svg_glyph(stem, glyph):
                            bytes(img.constBits()))
     alpha = data.split()[3]
     out = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
+    # soft shadow for depth (offset downward)
+    sh = Image.new("RGBA", (SIZE, SIZE), (0, 0, 0, 0))
+    sh.paste(Image.new("RGBA", (SIZE, SIZE), (20, 10, 30, 190)), (6, 6), alpha)
+    sh = sh.filter(ImageFilter.GaussianBlur(7))
+    out.alpha_composite(sh)
     solid = Image.new("RGBA", (SIZE, SIZE), CREAM)
     out.paste(solid, (0, 0), alpha)
     return out
