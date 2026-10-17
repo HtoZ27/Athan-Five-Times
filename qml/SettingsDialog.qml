@@ -43,7 +43,9 @@ Dialog {
     property string _currentCountryCode: ""
     property bool _populating: true
     property bool _saving: false
-    property var _tabLoaded: [false, false, false, false, false, false, false]
+    property var _tabLoaded: [false, false, false, false, false, false, false, false]
+    property string _editingReminderId: ""
+    property var _remDays: []
 
     onClosed: {
         if (!_saving) backendController.restoreSettingsSnapshot()
@@ -55,10 +57,10 @@ Dialog {
     }
 
     function _ensureTabLoaded(idx) {
-        if (idx < 0 || idx > 6) return
+        if (idx < 0 || idx > 7) return
         if (_tabLoaded[idx]) return
         _tabLoaded[idx] = true
-        var tabs = [locationTab, offsetsTab, muezzinsTab, audioTab, notificationsTab, athkarTab, generalTab]
+        var tabs = [locationTab, offsetsTab, muezzinsTab, audioTab, notificationsTab, athkarTab, remindersTab, generalTab]
         tabs[idx].populate()
     }
     property var _pendingOffsets: ({})
@@ -96,6 +98,7 @@ Dialog {
         tr("الصوت"),
         tr("الإشعارات"),
         tr("الأذكار"),
+        tr("تذكيرات"),
         tr("عام")
     ]
 
@@ -124,6 +127,7 @@ Dialog {
             tr("الصوت"),
             tr("الإشعارات"),
             tr("الأذكار"),
+            tr("تذكيرات"),
             tr("عام")
         ]
         saveBtn.text = tr("حفظ")
@@ -133,10 +137,10 @@ Dialog {
         importDialog.title = tr("اختر ملف إعدادات")
         importDialog.nameFilters = [tr("ملفات JSON (*.json)")]
         _populating = true
-        _tabLoaded = [false, false, false, false, false, false, false]
+        _tabLoaded = [false, false, false, false, false, false, false, false]
         _tabLoaded[0] = true
         locationTab.populate()
-        _tabLoaded[6] = true
+        _tabLoaded[7] = true
         generalTab.populate()
         _populating = false
     }
@@ -1095,6 +1099,153 @@ Dialog {
                 }
 
                     Item {
+                        id: remindersTab
+                        function populate() {
+                            reminderRepeater.model = backendController.getReminders()
+                        }
+                        function refresh() { populate() }
+                        function _daysLabel(days) {
+                            if (!days || days.length === 0) return tr("كل يوم")
+                            var names = dayNames
+                            var out = []
+                            for (var i = 0; i < days.length; i++) {
+                                var di = days[i]
+                                if (di >= 0 && di < names.length) out.push(names[di])
+                            }
+                            return out.join("، ")
+                        }
+                        function _resetForm() {
+                            _editingReminderId = ""
+                            _remDays = []
+                            remText.text = ""
+                            remTime.text = "07:00"
+                        }
+                        property var dayNames: [tr("الإثنين"), tr("الثلاثاء"), tr("الأربعاء"), tr("الخميس"), tr("الجمعة"), tr("السبت"), tr("الأحد")]
+
+                        ScrollView {
+                            anchors.fill: parent; clip: true; contentWidth: availableWidth
+                            ColumnLayout { width: parent.width; spacing: 8
+
+                                GroupBox {
+                                    Layout.fillWidth: true
+                                    label: Label { text: tr("إضافة تذكير"); color: theme.textColor; font.bold: true }
+                                    background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
+                                    ColumnLayout { width: parent.width; spacing: 6
+                                        TextField {
+                                            id: remText; Layout.fillWidth: true
+                                            placeholderText: tr("نص التذكير")
+                                            color: theme.textColor; placeholderTextColor: theme.textMutedColor
+                                            background: Rectangle { color: theme.bgColor; radius: 6; border.color: theme.borderColor; border.width: 1 }
+                                        }
+                                        RowLayout {
+                                            Layout.fillWidth: true
+                                            Label { text: tr("الوقت (HH:MM):"); color: theme.textColor }
+                                            TextField {
+                                                id: remTime; Layout.preferredWidth: 90
+                                                placeholderText: "07:00"; text: "07:00"
+                                                color: theme.textColor; placeholderTextColor: theme.textMutedColor
+                                                background: Rectangle { color: theme.bgColor; radius: 6; border.color: theme.borderColor; border.width: 1 }
+                                            }
+                                            Button {
+                                                text: _editingReminderId === "" ? tr("إضافة") : tr("حفظ")
+                                                onClicked: {
+                                                    if (remText.text.trim() === "") return
+                                                    if (_editingReminderId === "") {
+                                                        backendController.addReminder(remText.text.trim(), remTime.text, _remDays)
+                                                    } else {
+                                                        backendController.updateReminder(_editingReminderId, remText.text.trim(), remTime.text, _remDays)
+                                                    }
+                                                    remindersTab._resetForm()
+                                                    remindersTab.populate()
+                                                }
+                                            }
+                                            Button {
+                                                visible: _editingReminderId !== ""
+                                                text: tr("إلغاء")
+                                                onClicked: remindersTab._resetForm()
+                                            }
+                                        }
+                                        RowLayout {
+                                            Layout.fillWidth: true; spacing: 4
+                                            Label { text: tr("أيام التكرار:"); color: theme.textColor }
+                                            Label { text: tr("(اتركها فارغة لكل يوم)"); color: theme.textMutedColor; font.pixelSize: 11 }
+                                            Item { Layout.fillWidth: true }
+                                        }
+                                        Flow {
+                                            Layout.fillWidth: true; spacing: 2
+                                            Repeater {
+                                                id: remDayRepeater
+                                                model: remindersTab.dayNames
+                                                delegate: CheckBox {
+                                                    id: dayCb
+                                                    property int dayIndex: index
+                                                    text: modelData
+                                                    font.pixelSize: 12
+                                                    Binding on checked {
+                                                        value: _remDays.indexOf(dayCb.dayIndex) >= 0
+                                                        restoreMode: Binding.RestoreBinding
+                                                    }
+                                                    onClicked: {
+                                                        var arr = _remDays.slice()
+                                                        var i = arr.indexOf(dayCb.dayIndex)
+                                                        if (checked && i < 0) arr.push(dayCb.dayIndex)
+                                                        else if (!checked && i >= 0) arr.splice(i, 1)
+                                                        arr.sort()
+                                                        _remDays = arr
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                Repeater {
+                                    id: reminderRepeater
+                                    model: []
+                                    delegate: Rectangle {
+                                        required property var modelData
+                                        width: parent.width; height: 44
+                                        color: theme.cardColor; radius: 6
+                                        border.color: theme.borderColor; border.width: 1
+                                        RowLayout {
+                                            anchors.fill: parent; anchors.margins: 8; spacing: 8
+                                            CheckBox {
+                                                checked: modelData.enabled
+                                                onToggled: {
+                                                    backendController.toggleReminder(modelData.id, checked)
+                                                    remindersTab.populate()
+                                                }
+                                            }
+                                            Label {
+                                                text: modelData.text + "  (" + modelData.time + " · " + remindersTab._daysLabel(modelData.days) + ")"
+                                                color: theme.textColor; Layout.fillWidth: true
+                                                elide: Text.ElideRight
+                                            }
+                                            Button {
+                                                text: "✎"
+                                                onClicked: {
+                                                    _editingReminderId = modelData.id
+                                                    _remDays = modelData.days ? modelData.days.slice() : []
+                                                    remText.text = modelData.text
+                                                    remTime.text = modelData.time
+                                                }
+                                            }
+                                            Button {
+                                                text: "✕"
+                                                onClicked: {
+                                                    backendController.removeReminder(modelData.id)
+                                                    if (_editingReminderId === modelData.id) remindersTab._resetForm()
+                                                    remindersTab.populate()
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Item {
                         id: generalTab
                             function populate() {
                                 _populating = true
@@ -1138,6 +1289,7 @@ Dialog {
                                     autostartCb.checked = s.autostart || false
                                     sleepModeCbGeneral.checked = s.sleep_mode !== false
                                     backgroundEnabledCb.checked = s.background_enabled !== false
+                                    widgetCb.checked = backendController.isWidgetVisible()
                                 } finally {
                                     _populating = false
                                 }
@@ -1261,6 +1413,17 @@ Dialog {
                                     CheckBox { id: backgroundEnabledCb; text: tr("إظهار صورة الخلفية")
                                         ToolTip.text: tr("تفعيل/تعطيل صورة المسجد النبوي في الخلفية")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("background_enabled", checked) } }
+                                }
+                            }
+
+                            GroupBox {
+                                Layout.fillWidth: true
+                                label: Label { text: tr("الودجة المصغرة"); color: theme.textColor; font.bold: true; ToolTip.text: tr("نافذة صغيرة تعرض الصلاة القادمة والعد التنازلي") }
+                                background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
+                                ColumnLayout { width: parent.width
+                                    CheckBox { id: widgetCb; text: tr("إظهار الودجة المصغرة على سطح المكتب")
+                                        ToolTip.text: tr("نافذة صغيرة دائمة العرض تعرض الصلاة القادمة والعد التنازلي")
+                                        onCheckedChanged: { if (_populating) return; backendController.setWidgetVisible(checked) } }
                                 }
                             }
 
@@ -1393,7 +1556,7 @@ Dialog {
         if (visible) {
             _saving = false
             _populating = true
-            _tabLoaded = [false, false, false, false, false, false, false]
+            _tabLoaded = [false, false, false, false, false, false, false, false]
             backendController.storeSettingsSnapshot()
             _tabLoaded[0] = true
             locationTab.populate()

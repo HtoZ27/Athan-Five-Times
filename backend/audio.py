@@ -23,6 +23,13 @@ except (ImportError, OSError, ModuleNotFoundError) as exc:
     miniaudio = None
     _MINIAUDIO_AVAILABLE = False
 
+try:
+    import numpy as np
+    _NUMPY_AVAILABLE = True
+except Exception:
+    np = None
+    _NUMPY_AVAILABLE = False
+
 
 @dataclass
 class AudioConfig:
@@ -109,22 +116,44 @@ class AudioPlayer:
             except StopIteration:
                 src_exhausted = True
                 return
-            chunk = array.array("h", raw_chunk)
-            frames = len(chunk) // nchannels
-            if frame_counter < fade_frames or config.volume < 1.0:
+            frames = len(raw_chunk) // (nchannels * 2)
+            if frames <= 0:
+                src_exhausted = True
+                return
+            if _NUMPY_AVAILABLE and (frame_counter < fade_frames or config.volume < 1.0):
+                arr = np.frombuffer(raw_chunk, dtype=np.int16).astype(np.float32).copy()
                 vol = config.volume
                 fade_left = fade_frames - frame_counter
-                for i in range(frames):
-                    if i < fade_left:
-                        scale = vol * (frame_counter + i) / fade_frames
-                    else:
-                        scale = vol
-                    if scale != 1.0:
-                        base = i * nchannels
-                        for c in range(nchannels):
-                            chunk[base + c] = int(chunk[base + c] * scale)
-            frame_counter += frames
-            pending.extend(chunk.tobytes())
+                if fade_left > 0:
+                    n_fade = min(frames, fade_left)
+                    idx = np.arange(frame_counter, frame_counter + n_fade, dtype=np.float32)
+                    scales = (vol * idx / fade_frames).astype(np.float32)
+                    per_sample = np.repeat(scales, nchannels)
+                    arr[: n_fade * nchannels] *= per_sample
+                    if frames > n_fade and vol != 1.0:
+                        arr[n_fade * nchannels:] *= vol
+                elif vol != 1.0:
+                    arr *= vol
+                arr = np.clip(arr, -32768, 32767).astype(np.int16)
+                frame_counter += frames
+                pending.extend(arr.tobytes())
+            else:
+                chunk = array.array("h", raw_chunk)
+                fr = len(chunk) // nchannels
+                if frame_counter < fade_frames or config.volume < 1.0:
+                    vol = config.volume
+                    fade_left = fade_frames - frame_counter
+                    for ii in range(fr):
+                        if ii < fade_left:
+                            scale = vol * (frame_counter + ii) / fade_frames
+                        else:
+                            scale = vol
+                        if scale != 1.0:
+                            base = ii * nchannels
+                            for c in range(nchannels):
+                                chunk[base + c] = int(chunk[base + c] * scale)
+                frame_counter += fr
+                pending.extend(chunk.tobytes())
 
         def _stream():
             nonlocal emitted_frames, src_exhausted

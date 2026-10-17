@@ -8,6 +8,12 @@ import logging
 import os
 import threading
 import time
+try:
+    import pytz
+    _PYTZ_AVAILABLE = True
+except Exception:
+    pytz = None
+    _PYTZ_AVAILABLE = False
 from pathlib import Path
 from urllib.request import Request, urlopen
 from urllib.error import URLError
@@ -120,6 +126,25 @@ COUNTRY_TZ = {
     "إيران": "Asia/Tehran",
 }
 
+
+def _tz_for_country_code(code: str) -> str:
+    """Resolve an IANA timezone from an ISO country code via pytz (247 countries)."""
+    if not code or not _PYTZ_AVAILABLE:
+        return ""
+    try:
+        zones = pytz.country_timezones.get(code.upper(), [])
+        return zones[0] if zones else ""
+    except Exception:
+        return ""
+
+
+def _tz_for_country(name: str, code: str = "") -> str:
+    """Resolve timezone: prefer ISO code (pytz), then name-based COUNTRY_TZ, then ''."""
+    tz = _tz_for_country_code(code)
+    if tz:
+        return tz
+    return COUNTRY_TZ.get(name, "")
+
 _COUNTRY_REV: dict | None = None
 
 
@@ -183,7 +208,8 @@ def _try_ip_api(retries: int) -> dict | None:
             if data.get("status") == "success":
                 city = data.get("city", "")
                 country = data.get("country", "")
-                tz = data.get("timezone", "") or COUNTRY_TZ.get(country, "")
+                code = (data.get("countryCode") or "").upper()
+                tz = data.get("timezone", "") or _tz_for_country(country, code)
                 lat = data.get("lat", 0.0)
                 lon = data.get("lon", 0.0)
                 if lat == 0.0 and lon == 0.0:
@@ -195,7 +221,7 @@ def _try_ip_api(retries: int) -> dict | None:
                 return {
                     "city": city,
                     "country": country,
-                    "country_code": _country_code(country),
+                    "country_code": code or _country_code(country),
                     "latitude": lat,
                     "longitude": lon,
                     "timezone": tz,
@@ -286,10 +312,13 @@ def _try_ipwho() -> dict | None:
         tz = data.get("timezone", "")
         if isinstance(tz, dict):
             tz = tz.get("id", "")
+        code = (data.get("country_code") or "").upper()
+        if not tz:
+            tz = _tz_for_country(country, code)
         return {
             "city": data.get("city", ""),
             "country": country,
-            "country_code": (data.get("country_code") or "").upper(),
+            "country_code": code,
             "latitude": lat,
             "longitude": lon,
             "timezone": tz,
@@ -317,13 +346,14 @@ def _try_geojs() -> dict | None:
             return None
         if (lat == 0.0 and lon == 0.0) or not (-90 <= lat <= 90) or not (-180 <= lon <= 180):
             return None
+        tz = data.get("timezone", "") or _tz_for_country(data.get("country", ""), code)
         return {
             "city": data.get("city", ""),
             "country": data.get("country", ""),
             "country_code": code,
             "latitude": lat,
             "longitude": lon,
-            "timezone": data.get("timezone", ""),
+            "timezone": tz,
         }
     except (URLError, ValueError, AttributeError, KeyError, OSError) as exc:
         logger.warning("geojs geolocation failed: %s", exc)

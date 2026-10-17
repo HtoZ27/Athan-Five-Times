@@ -15,7 +15,10 @@ import sys
 import tempfile
 
 if "--display" not in sys.argv:
-    os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+    # Default is headless: force offscreen even when the environment presets
+    # QT_QPA_PLATFORM (setdefault would leave e.g. wayland;xcb in place and
+    # leak "Failed to create wl_display" warnings into the error count).
+    os.environ["QT_QPA_PLATFORM"] = "offscreen"
 
 TMP = tempfile.mkdtemp(prefix="athan-e2e-")
 os.environ["XDG_CONFIG_HOME"] = os.path.join(TMP, "config")
@@ -83,6 +86,14 @@ def main() -> int:
             walk(k, out)
         return out
 
+    # The engine computes the first prayer times from a zero-timer; on xcb a
+    # single processEvents() pass is not always enough, so wait briefly.
+    import time as _time
+    _deadline = _time.time() + 5.0
+    while not pe.getPrayerTimes() and _time.time() < _deadline:
+        app.processEvents()
+        _time.sleep(0.02)
+
     times = pe.getPrayerTimes()
     check("prayer-6-rows", len(times) == 6, f"got {len(times)}")
     check("prayer-keys", [t["key"] for t in times] ==
@@ -144,7 +155,7 @@ def main() -> int:
     if dlg is not None:
         dlg.open()
         app.processEvents()
-        for i in range(7):
+        for i in range(8):
             dlg.setProperty("currentTabIndex", i)
             app.processEvents()
         app.processEvents()
@@ -218,11 +229,109 @@ def main() -> int:
     set_autostart(False)
     check("autostart-off", not os.path.isfile(ad))
 
+    # --- Hijri calendar events ---
+    from datetime import date as _date
+    from backend.islamic_events import events_for_date
+    ashura = events_for_date(_date(2025, 7, 6))       # 10 Muharram 1447
+    check("events-ashura", "عاشوراء" in ashura, str(ashura))
+    tarwiya = events_for_date(_date(2026, 5, 25))     # 8 Dhu al-Hijjah 1447
+    check("events-tarwiya", "يوم التروية" in tarwiya, str(tarwiya))
+    qadr = events_for_date(_date(2026, 3, 10))        # 21 Ramadan 1447
+    check("events-laylat-qadr", "ليلة القدر" in qadr, str(qadr))
+    mid_ramadan = events_for_date(_date(2026, 3, 4))  # 15 Ramadan 1447
+    check("events-mid-ramadan", "النصف من رمضان" in mid_ramadan, str(mid_ramadan))
+
+    # --- Reminders (with repeat days) ---
+    check("reminder-add", pe.addReminder("e2e-تذكير", "06:00", [1, 3]) is True)
+    rs = pe.getReminders()
+    check("reminder-list", len(rs) == 1 and rs[0].get("days") == [1, 3], str(rs))
+    if rs:
+        rid = rs[0]["id"]
+        check("reminder-update", pe.updateReminder(rid, "e2e-محدث", "06:30", []) is True)
+        upd = pe.getReminders()[0]
+        check("reminder-updated-values",
+              upd["text"] == "e2e-محدث" and upd["time"] == "06:30" and upd["days"] == [])
+        check("reminder-toggle", pe.toggleReminder(rid, False) is True)
+        check("reminder-disabled", pe.getReminders()[0]["enabled"] is False)
+        check("reminder-remove", pe.removeReminder(rid) is True)
+        check("reminder-empty", pe.getReminders() == [])
+
+    # --- Compact widget (settings + QML component) ---
+    check("widget-default-hidden", pe.isWidgetVisible() is False)
+    pe.setWidgetVisible(True)
+    check("widget-show-setting", pe.isWidgetVisible() is True)
+    pe.setWidgetVisible(False)
+    check("widget-hide-setting", pe.isWidgetVisible() is False)
+    pe.saveWidgetGeometry(15, 25)
+    check("widget-geometry", pe.getWidgetGeometry() == [15, 25])
+
+    from PySide6.QtQml import QQmlComponent
+    wc = QQmlComponent(eng, QUrl.fromLocalFile(os.path.join(QML_DIR, "Widget.qml")))
+    wob = wc.create() if wc.isReady() else None
+    check("widget-qml-loads", wc.isReady() and wob is not None)
+    if wob is not None:
+        wob.setProperty("prayerEngine", pe)
+        app.processEvents()
+        wob.setProperty("visible", True)
+        app.processEvents()
+        check("widget-qml-live", bool(wob.property("nextName")) or
+              bool(wob.property("countdownText")),
+              f"next={wob.property('nextName')}")
+        prog = wob.property("progress")
+        check("widget-progress", isinstance(prog, float) and 0.0 <= prog <= 1.0,
+              f"progress={prog}")
+        foll = wob.property("following")
+        check("widget-following",
+              isinstance(foll, list) and len(foll) >= 1
+              and all("name" in f and "time" in f for f in foll),
+              f"following={foll}")
+
+        # Progress fill must touch the start edge (right in RTL, left in LTR);
+        # regression guard for LayoutMirroring double-flipping its position.
+        def _find_item(name):
+            for ch in wob.findChildren(QQuickItem):
+                if ch.objectName() == name:
+                    return ch
+            return None
+
+        ptrack, pfill = _find_item("progressTrack"), _find_item("progressFill")
+        if ptrack is not None and pfill is not None:
+            wob.setProperty("progress", 0.5)
+            # On a real display the window geometry and the fill's SmoothAnimation
+            # settle asynchronously; wait for both before measuring.
+            import time as _time
+            deadline = _time.time() + 3.0
+            pw = wd = x = 0.0
+            while _time.time() < deadline:
+                app.processEvents()
+                _time.sleep(0.02)
+                pw = float(ptrack.property("width"))
+                wd = float(pfill.property("width"))
+                x = float(pfill.property("x"))
+                if pw > 100 and abs(wd - pw * 0.5) <= 2.0:
+                    break
+            rtl = bool(wob.property("isRtl"))
+            anchored = (pw > 100 and abs(wd - pw * 0.5) <= 2.0
+                        and (abs(x + wd - pw) <= 1.5 if rtl else abs(x) <= 1.5))
+            check("widget-progress-anchor", anchored,
+                  f"rtl={rtl} x={x} w={wd} trackW={pw}")
+        wob.setProperty("visible", False)
+        app.processEvents()
+        wob.deleteLater()
+        app.processEvents()
+
     import glob as _g
     check("prayer-icons-14",
           len(_g.glob(os.path.join(ROOT, "assets", "prayer_icons", "*.png"))) == 14)
-    check("adhkar-icons-23",
-          len(_g.glob(os.path.join(ROOT, "assets", "adhkar_icons", "*.png"))) == 23)
+    import json as _json
+    with open(os.path.join(ROOT, "assets", "adhkar", "index.json"), encoding="utf-8") as _f:
+        _idx = _json.load(_f)
+    _cats = _idx.get("categories", _idx)
+    _missing = [c.get("icon") for c in _cats
+                if not os.path.isfile(os.path.join(ROOT, "assets", "adhkar_icons",
+                                                   str(c.get("icon")) + ".png"))]
+    check("adhkar-icons-complete", len(_cats) == 23 and not _missing,
+          f"categories={len(_cats)} missing={_missing}")
 
     QTimer.singleShot(1000, pe.quitApp)
     QTimer.singleShot(20000, lambda: app.exit(42))

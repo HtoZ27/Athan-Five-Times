@@ -33,6 +33,8 @@ from .i18n import (
 from .translations import calc_method_name, madhab_name, timezone_name, theme_name, u
 from ._constants import PRAYERS_WITH_AZAN, DARK_THEMES, LANGS, LANG_NAMES, THEME_IDS, _display_key
 from .prayer_calc import CALCULATION_METHODS
+from .islamic_events import primary_event as _primary_islamic_event
+from . import reminders as _reminders
 from .athkar_provider import AthkarProvider
 
 logger = logging.getLogger(__name__)
@@ -63,6 +65,7 @@ def _ensure_country_data():
 class PrayerEngine(QObject):
     clockChanged = Signal(str)
     dateChanged = Signal()
+    reminderTriggered = Signal(str)
     nextPrayerChanged = Signal()
     countdownChanged = Signal(str)
     preAlertChanged = Signal(str)
@@ -76,6 +79,7 @@ class PrayerEngine(QObject):
     autoLocationStatus = Signal(str)
     settingChanged = Signal(str)
     backgroundEnabledChanged = Signal(bool)
+    widgetVisibilityRequested = Signal(bool)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -97,6 +101,7 @@ class PrayerEngine(QObject):
         self._prayer_times_cache = None
         self._prayer_times_cache_key = None
         self._hijri_date = ""
+        self._hijri_event = ""
         self._dnd_timer = None
         self._last_tray_info = ("", "", "")
         self._athkar_provider = AthkarProvider(self)
@@ -130,35 +135,79 @@ class PrayerEngine(QObject):
     def _setup_timers(self):
         self._background_mode = False
         self._clock_timer = QTimer(self)
+        self._reminder_timer = QTimer(self)
+        self._reminder_timer.setInterval(60000)
+        self._reminder_timer.timeout.connect(self._check_reminders)
+        self._reminder_timer.start()
+        self._fired_reminders: set = set()
         self._clock_timer.timeout.connect(self._update_clock)
         self._clock_timer.start(1000)
 
-        sleep_mode = self._settings.get("sleep_mode", True)
-        poll_interval = 300000 if sleep_mode else 60000
         self._prayer_timer = QTimer(self)
         self._prayer_timer.timeout.connect(self._check_prayer)
-        self._prayer_timer.start(poll_interval)
+        self._prayer_timer.start(300000)
+        self._apply_timer_intervals()
 
         self._midnight_timer = QTimer(self)
         self._midnight_timer.setSingleShot(True)
         self._midnight_timer.timeout.connect(self.recalculate)
         self._schedule_midnight()
 
-        if sleep_mode:
+        if self._settings.get("sleep_mode", True):
             self._schedule_next_prayer()
+
+    def _apply_timer_intervals(self):
+        """Recalculate timer intervals from background mode + widget visibility.
+
+        The compact widget shows a live countdown, so a visible widget keeps
+        the clock at 1 s even while the main window is hidden to the tray.
+        """
+        widget_visible = False
+        try:
+            widget_visible = bool(self._settings.get("show_widget", False))
+        except (AttributeError, TypeError):
+            widget_visible = False
+        fast_clock = (not self._background_mode) or widget_visible
+        self._clock_timer.setInterval(1000 if fast_clock else 30000)
+        sleep_mode = self._settings.get("sleep_mode", True)
+        poll_interval = 300000 if (sleep_mode or self._background_mode) else 60000
+        self._prayer_timer.setInterval(poll_interval)
 
     @Slot(bool)
     def setBackgroundMode(self, bg: bool):
         self._background_mode = bg
-        self._clock_timer.setInterval(30000 if bg else 1000)
-        sleep_mode = self._settings.get("sleep_mode", True)
-        poll_interval = 300000 if (sleep_mode or bg) else 60000
-        self._prayer_timer.setInterval(poll_interval)
+        self._apply_timer_intervals()
 
     @Slot(bool)
     def setAutostart(self, enabled: bool):
         _set_autostart(enabled)
         self._settings = self._update_setting_immutable("autostart", bool(enabled))
+
+    def _check_reminders(self):
+        try:
+            now = self._now()
+            due = _reminders.due_reminders(now)
+            # reset fired set at minute boundary change
+            key = now.strftime("%Y-%m-%d %H:%M")
+            for r in due:
+                fid = r["id"] + key
+                if fid in self._fired_reminders:
+                    continue
+                self._fired_reminders.add(fid)
+                try:
+                    self.reminderTriggered.emit(r.get("text", ""))
+                except Exception:
+                    pass
+                # tray notification
+                try:
+                    self._notify(r.get("text", ""))
+                except Exception:
+                    pass
+            # prune fired set (keep last 100)
+            if len(self._fired_reminders) > 200:
+                self._fired_reminders = set(list(self._fired_reminders)[-100:])
+        except Exception as exc:
+            logger.warning("reminder check failed: %s", exc)
 
     def _schedule_midnight(self):
         now = self._now()
@@ -582,6 +631,7 @@ class PrayerEngine(QObject):
             self._next_name = "--"
             self._gregorian_date = ""
             self._hijri_date = ""
+            self._hijri_event = ""
             self.dateChanged.emit()
             self.nextPrayerChanged.emit()
             self.countdownChanged.emit("")
@@ -608,6 +658,10 @@ class PrayerEngine(QObject):
         date_part, hijri_part = format_date(today, s.get("hijri_day_offset", 0))
         self._gregorian_date = date_part
         self._hijri_date = hijri_part
+        try:
+            self._hijri_event = _primary_islamic_event(today)
+        except Exception:
+            self._hijri_event = ""
         self.dateChanged.emit()
         now = self._now()
         cached = self._next_prayer(now)
@@ -657,6 +711,138 @@ class PrayerEngine(QObject):
     @Slot(result=str)
     def getHijriDate(self):
         return self._hijri_date
+
+    @Slot(result=str)
+    def getHijriEvent(self):
+        return self._hijri_event
+
+    @Slot(result="QVariantList")
+    def getReminders(self):
+        try:
+            return _reminders.list_reminders()
+        except Exception:
+            return []
+
+    @Slot(str, str, "QVariantList", result=bool)
+    def addReminder(self, text: str, time_str: str, days):
+        try:
+            dlist = [int(x) for x in (days or [])]
+            _reminders.add_reminder(text, time_str, dlist)
+            return True
+        except (ValueError, TypeError) as exc:
+            logger.warning("addReminder failed: %s", exc)
+            return False
+
+    @Slot(str, result=bool)
+    def removeReminder(self, rid: str):
+        try:
+            return _reminders.remove_reminder(rid)
+        except Exception:
+            return False
+
+    @Slot(str, bool, result=bool)
+    def toggleReminder(self, rid: str, enabled: bool):
+        try:
+            return _reminders.toggle_reminder(rid, bool(enabled))
+        except Exception:
+            return False
+
+    @Slot(str, str, str, "QVariantList", result=bool)
+    def updateReminder(self, rid: str, text: str, time_str: str, days):
+        try:
+            dlist = [int(x) for x in (days or [])]
+            return _reminders.update_reminder(rid, text=text, time_str=time_str, days=dlist)
+        except (ValueError, TypeError) as exc:
+            logger.warning("updateReminder failed: %s", exc)
+            return False
+
+    @Slot(result=bool)
+    def isWidgetVisible(self):
+        try:
+            return bool(self._settings.get("show_widget", False))
+        except Exception:
+            return False
+
+    @Slot(bool)
+    def setWidgetVisible(self, visible: bool):
+        visible = bool(visible)
+        try:
+            self._settings = self._update_setting_immutable("show_widget", visible)
+            save_settings(self._settings)
+        except (OSError, TypeError, ValueError) as exc:
+            logger.error("Failed to persist widget visibility: %s", exc)
+        try:
+            self._apply_timer_intervals()
+        except (AttributeError, RuntimeError):
+            pass
+        self.widgetVisibilityRequested.emit(visible)
+
+    @Slot(int, int)
+    def saveWidgetGeometry(self, x: int, y: int):
+        try:
+            self._settings = self._update_setting_immutable("widget_geometry", [int(x), int(y)])
+            save_settings(self._settings)
+        except (OSError, TypeError, ValueError) as exc:
+            logger.error("Failed to persist widget geometry: %s", exc)
+
+    @Slot(result="QVariantList")
+    def getWidgetGeometry(self):
+        try:
+            g = self._settings.get("widget_geometry")
+            if isinstance(g, (list, tuple)) and len(g) == 2:
+                return [int(g[0]), int(g[1])]
+        except (ValueError, TypeError):
+            pass
+        return [-1, -1]
+
+    @Slot(result=float)
+    def getProgressToNext(self):
+        """Fraction (0..1) of the current segment elapsed (previous → next).
+
+        Drives the compact widget's progress bar. Before the day's first
+        prayer the segment is assumed to start at yesterday's last prayer.
+        """
+        try:
+            if not self._cached_next or self._result is None:
+                return 0.0
+            now = self._now()
+            next_dt = self._cached_next[1]
+            times = list(self._result.as_dict().values())
+            earlier = [t for t in times if t <= now]
+            if earlier:
+                prev_dt = max(earlier)
+            else:
+                prev_dt = max(times) - timedelta(days=1)
+            total = (next_dt - prev_dt).total_seconds()
+            if total <= 0:
+                return 0.0
+            return float(max(0.0, min(1.0, (now - prev_dt).total_seconds() / total)))
+        except (AttributeError, KeyError, TypeError, ValueError):
+            return 0.0
+
+    @Slot(result="QVariantList")
+    def getFollowingPrayers(self):
+        """Upcoming prayers after the imminent one: [{name, time, tomorrow}]."""
+        out = []
+        try:
+            rows = self.getPrayerTimes()
+            idx = next((i for i, r in enumerate(rows) if r.get("isNext")), -1)
+            if idx < 0:
+                return out
+            fmt = "%I:%M %p" if self._settings.get("time_format", "12h") == "12h" else "%H:%M"
+            for row in rows[idx + 1: idx + 3]:
+                out.append({"name": row["name"], "time": row["time"], "tomorrow": False})
+            if len(out) < 2:
+                tomorrow_fajr = getattr(self, "_tomorrow_fajr", None)
+                if tomorrow_fajr is not None:
+                    out.append({
+                        "name": t_prayer(_display_key("fajr")),
+                        "time": tomorrow_fajr.strftime(fmt),
+                        "tomorrow": True,
+                    })
+        except (AttributeError, KeyError, TypeError, ValueError):
+            pass
+        return out
 
     @Slot(result=str)
     def getLocationText(self):

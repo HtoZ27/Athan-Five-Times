@@ -28,7 +28,10 @@ A Linux desktop prayer-times application with azan audio, structured adhkar, do-
 
 - **Prayer Times** — Accurate calculation (MWL, Umm Al-Qura, Egyptian, Tunisian + 22 more), per-prayer icons, live countdown, Hijri date
 - **Audio Azan** — Streaming MP3 playback with fade-in, volume control, multiple muezzins + per-prayer audio, takbeer mode
-- **Adhkar Library** — 23 structured categories (373 remembrances) with repetition counts and source references, Arabic-Indic numerals
+- **Adhkar Library** — 23 structured categories (370 remembrances) with repetition counts and source references, Arabic-Indic numerals
+- **Reminders** — User-defined reminders (text + time) with repeat days; checked every minute
+- **Hijri Events** — Islamic calendar events under the Hijri date (Ashura, White Days, Ramadan countdown, Laylat al-Qadr, Eids, Hajj days)
+- **Compact Widget** — Optional always-on-top prayer card in the app's theme: prayer icon + name, live countdown, segment progress bar, Hijri date, clock and the upcoming prayers; RTL-aware, draggable with saved position
 - **System Tray** — Mosque icon, next-prayer tooltip, show/quit menu, optional visibility, no-ghost quit
 - **DND Integration** — Auto system-wide do-not-disturb around prayer times (GNOME)
 - **Themes** — Dark/Light/Ottoman Gold/Catppuccin + auto, per-component palettes
@@ -85,9 +88,9 @@ pip install -r requirements-lock.txt
 
 ```bash
 pip install -e ".[dev]"
-python -m pytest tests/          # 416 tests
+python -m pytest tests/          # 449 tests
 python3 scripts/smoke-qml.py     # QML zero-error gate
-python3 scripts/e2e-features.py  # isolated end-to-end (44 checks)
+python3 scripts/e2e-features.py  # isolated end-to-end (65 checks)
 ```
 
 `AppDir/` is derived build staging — regenerate with `bash scripts/sync-appdir.sh`

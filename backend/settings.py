@@ -115,6 +115,8 @@ class SettingsSchema:
     background_enabled: bool = True
     render_backend: str = "auto"
     render_loop: str = "auto"
+    show_widget: bool = False
+    widget_geometry: List[int] = field(default_factory=lambda: [-1, -1])
 
 
 def schema_to_dict() -> Dict[str, Any]:

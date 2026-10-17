@@ -9,7 +9,9 @@ import os
 import sys
 
 if "--display" not in sys.argv:
-    os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+    # Force offscreen: an environment-preset QT_QPA_PLATFORM (e.g. wayland;xcb)
+    # would otherwise leak "Failed to create wl_display" into the error count.
+    os.environ["QT_QPA_PLATFORM"] = "offscreen"
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from PySide6.QtWidgets import QApplication

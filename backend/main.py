@@ -37,7 +37,7 @@ def apply_render_env():
 from PySide6.QtCore import QUrl, QTimer, Qt, QLockFile
 from PySide6.QtGui import QIcon, QFont, QFontDatabase
 from PySide6.QtWidgets import QApplication
-from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterSingletonType
+from PySide6.QtQml import QQmlApplicationEngine, QQmlComponent, qmlRegisterSingletonType
 from PySide6.QtQuickControls2 import QQuickStyle
 
 from .settings import load as load_settings, save as save_settings, APP_VERSION
@@ -164,6 +164,7 @@ class QmlAthanApp:
         self._theme_controller.themeChanged.connect(self._prayer_engine.persistTheme)
         self._prayer_engine.settingChanged.connect(self._on_setting_changed)
         self._app.aboutToQuit.connect(self._hide_tray)
+        self._app.aboutToQuit.connect(self._save_widget_geometry)
         self._l10n.languageChanged.connect(self._on_language_changed)
 
         qml_file = os.path.join(QML_DIR, "main.qml")
@@ -176,6 +177,28 @@ class QmlAthanApp:
             logger.error("Failed to load QML")
             sys.exit(1)
 
+        # Optional compact widget window (hidden by default)
+        self._widget_window = None
+        try:
+            widget_file = os.path.join(QML_DIR, "Widget.qml")
+            if os.path.isfile(widget_file):
+                self._widget_component = QQmlComponent(self._engine, QUrl.fromLocalFile(widget_file))
+                if self._widget_component.status() == QQmlComponent.Ready:
+                    self._widget_window = self._widget_component.create()
+                    if self._widget_window:
+                        self._widget_window.setProperty("visible", False)
+                        try:
+                            self._widget_window.setProperty("prayerEngine", self._prayer_engine)
+                        except Exception as exc:
+                            logger.warning("Could not bind widget to engine: %s", exc)
+                        self._restore_widget_state()
+                else:
+                    for err in self._widget_component.errors():
+                        logger.warning("Widget QML error: %s", err.toString())
+        except Exception as exc:
+            logger.warning("Widget window init failed: %s", exc)
+            self._widget_window = None
+
         gc.collect()
 
         self._app.setApplicationName(t("app_name"))
@@ -183,9 +206,60 @@ class QmlAthanApp:
         self._restore_window_geometry()
 
         self._prayer_engine.azanPlayingChanged.connect(self._on_azan_playing_changed)
+        self._prayer_engine.widgetVisibilityRequested.connect(self._on_widget_visibility_requested)
 
         QTimer.singleShot(0, self._delayed_init)
         QTimer.singleShot(0, self._setup_tray)
+
+    def _restore_widget_state(self):
+        """Apply persisted widget geometry + visibility after creation."""
+        if self._widget_window is None:
+            return
+        try:
+            geom = self._prayer_engine.getWidgetGeometry()
+            if isinstance(geom, (list, tuple)) and len(geom) == 2:
+                gx, gy = int(geom[0]), int(geom[1])
+                if gx >= 0 and gy >= 0:
+                    self._widget_window.setPosition(gx, gy)
+            if self._prayer_engine.isWidgetVisible():
+                self._widget_window.setProperty("visible", True)
+        except (AttributeError, RuntimeError, TypeError, ValueError) as exc:
+            logger.debug("Could not restore widget state: %s", exc)
+
+    def _on_widget_visibility_requested(self, visible: bool):
+        self.toggle_widget(bool(visible))
+        act = getattr(self, "_tray_widget_act", None)
+        if act is not None:
+            try:
+                act.setChecked(bool(visible))
+            except (AttributeError, RuntimeError):
+                pass
+
+    def _save_widget_geometry(self):
+        w = getattr(self, "_widget_window", None)
+        if w is None:
+            return
+        try:
+            if w.isVisible():
+                self._prayer_engine.saveWidgetGeometry(w.x(), w.y())
+        except (AttributeError, RuntimeError, TypeError):
+            pass
+
+    def toggle_widget(self, visible: bool = None):
+        if self._widget_window is None:
+            return
+        try:
+            if visible is None:
+                visible = not self._widget_window.isVisible()
+            self._widget_window.setProperty("visible", bool(visible))
+        except Exception as exc:
+            logger.warning("toggle_widget failed: %s", exc)
+
+    def show_widget(self):
+        self.toggle_widget(True)
+
+    def hide_widget(self):
+        self.toggle_widget(False)
 
     def _auto_configure(self, settings: dict):
         logger.info("First run – attempting auto-location…")
@@ -331,6 +405,16 @@ class QmlAthanApp:
             menu.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
             self._tray_show_act = menu.addAction(tray_icon, t("tray_show"))
             self._tray_show_act.triggered.connect(self._show_window)
+            if getattr(self, "_widget_window", None) is not None:
+                self._tray_widget_act = menu.addAction(t("الودجة المصغرة"))
+                self._tray_widget_act.setCheckable(True)
+                try:
+                    self._tray_widget_act.setChecked(self._prayer_engine.isWidgetVisible())
+                except (AttributeError, RuntimeError):
+                    pass
+                self._tray_widget_act.triggered.connect(
+                    lambda checked=False: self._prayer_engine.setWidgetVisible(bool(checked))
+                )
             menu.addSeparator()
             self._tray_info_act = QAction(t("tray_loading"), menu)
             self._tray_info_act.setEnabled(False)

@@ -303,6 +303,18 @@ ApplicationWindow {
                     }
 
                     Text {
+                        id: hijriEventText
+                        text: prayerEngine ? prayerEngine.getHijriEvent() : ""
+                        font.pixelSize: 13
+                        font.italic: true
+                        horizontalAlignment: Text.AlignHCenter
+                        Layout.alignment: Qt.AlignHCenter
+                        color: theme.textMutedColor
+                        visible: text.length > 0
+                        wrapMode: Text.WordWrap
+                    }
+
+                    Text {
                         id: locationText
                         text: prayerEngine ? prayerEngine.getLocationText() : ""
                         font.pixelSize: 14
@@ -320,6 +332,7 @@ ApplicationWindow {
                     function onDateChanged() {
                         dateText.text = prayerEngine.getGregorianDate()
                         hijriText.text = prayerEngine.getHijriDate()
+                        hijriEventText.text = prayerEngine.getHijriEvent()
                     }
                     function onLocationChanged() {
                         locationText.text = prayerEngine.getLocationText()
