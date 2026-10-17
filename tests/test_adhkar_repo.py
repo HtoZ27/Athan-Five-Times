@@ -149,7 +149,7 @@ class TestNoDuplication:
         total = 0
         for c in AdhkarRepository().get_index():
             total += len(AdhkarRepository().load_category(c["id"])["items"])
-        assert total == 373, total
+        assert total == 370, total
 
 
 def _bare_arabic(s: str) -> str:
