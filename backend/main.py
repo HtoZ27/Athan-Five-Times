@@ -42,6 +42,7 @@ from PySide6.QtQuickControls2 import QQuickStyle
 
 from .settings import load as load_settings, save as save_settings, APP_VERSION
 from .settings import SETTINGS_FILE
+from .platform_env import prepare_display_env
 from .location import detect_async
 from .i18n import t, set_lang
 from .l10n import LanguageManager
@@ -182,7 +183,9 @@ class QmlAthanApp:
         try:
             widget_file = os.path.join(QML_DIR, "Widget.qml")
             if os.path.isfile(widget_file):
-                self._widget_component = QQmlComponent(self._engine, QUrl.fromLocalFile(widget_file))
+                self._widget_component = QQmlComponent(
+                    self._engine, QUrl.fromLocalFile(widget_file)
+                )
                 if self._widget_component.status() == QQmlComponent.Ready:
                     self._widget_window = self._widget_component.create()
                     if self._widget_window:
@@ -212,15 +215,21 @@ class QmlAthanApp:
         QTimer.singleShot(0, self._setup_tray)
 
     def _restore_widget_state(self):
-        """Apply persisted widget geometry + visibility after creation."""
+        """Apply persisted widget geometry + visibility after creation.
+
+        Wayland compositors own window placement, so restoring x/y is only
+        meaningful under X11 (or when running through XWayland, where Qt
+        reports the xcb platform).
+        """
         if self._widget_window is None:
             return
         try:
-            geom = self._prayer_engine.getWidgetGeometry()
-            if isinstance(geom, (list, tuple)) and len(geom) == 2:
-                gx, gy = int(geom[0]), int(geom[1])
-                if gx >= 0 and gy >= 0:
-                    self._widget_window.setPosition(gx, gy)
+            if not self._prayer_engine.isWaylandRuntime():
+                geom = self._prayer_engine.getWidgetGeometry()
+                if isinstance(geom, (list, tuple)) and len(geom) == 2:
+                    gx, gy = int(geom[0]), int(geom[1])
+                    if gx >= 0 and gy >= 0:
+                        self._widget_window.setPosition(gx, gy)
             if self._prayer_engine.isWidgetVisible():
                 self._widget_window.setProperty("visible", True)
         except (AttributeError, RuntimeError, TypeError, ValueError) as exc:
@@ -240,6 +249,8 @@ class QmlAthanApp:
         if w is None:
             return
         try:
+            if self._prayer_engine.isWaylandRuntime():
+                return  # placement is compositor-owned on Wayland
             if w.isVisible():
                 self._prayer_engine.saveWidgetGeometry(w.x(), w.y())
         except (AttributeError, RuntimeError, TypeError):
@@ -616,6 +627,8 @@ AZAN_DEFAULT = os.path.join(ASSETS_DIR, "muezzins", "قطامي.mp3")
 def main():
     import argparse
     import signal
+
+    prepare_display_env()
 
     parser = argparse.ArgumentParser(description="أذان الأوقات الخمس – Athan Five Times App")
     parser.add_argument("--azan", default=AZAN_DEFAULT, help="Path to Azan MP3 file")

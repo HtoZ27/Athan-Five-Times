@@ -9,6 +9,7 @@ import threading
 from datetime import datetime, timedelta
 
 from PySide6.QtCore import QObject, Signal, Slot, QTimer, QMetaObject, Q_ARG, Qt
+from PySide6.QtGui import QGuiApplication
 
 from .prayer_calc import calculate, PRAYER_ORDER, _resolve_timezone
 from .audio import play_azan, stop_azan, set_volume
@@ -30,11 +31,20 @@ from .i18n import (
     credits_html,
     credits_title,
 )
-from .translations import calc_method_name, madhab_name, timezone_name, theme_name, u
+from .translations import (
+    calc_method_name,
+    madhab_name,
+    timezone_name,
+    theme_name,
+    translate_islamic_event,
+    u,
+)
 from ._constants import PRAYERS_WITH_AZAN, DARK_THEMES, LANGS, LANG_NAMES, THEME_IDS, _display_key
 from .prayer_calc import CALCULATION_METHODS
 from .islamic_events import primary_event as _primary_islamic_event
 from . import reminders as _reminders
+from .platform_env import session_type as _session_type
+from .platform_env import platform_is_wayland as _platform_is_wayland
 from .athkar_provider import AthkarProvider
 
 logger = logging.getLogger(__name__)
@@ -659,7 +669,7 @@ class PrayerEngine(QObject):
         self._gregorian_date = date_part
         self._hijri_date = hijri_part
         try:
-            self._hijri_event = _primary_islamic_event(today)
+            self._hijri_event = translate_islamic_event(_primary_islamic_event(today))
         except Exception:
             self._hijri_event = ""
         self.dateChanged.emit()
@@ -795,6 +805,43 @@ class PrayerEngine(QObject):
             pass
         return [-1, -1]
 
+    @Slot(result=str)
+    def getRenderedPlatform(self):
+        """The Qt platform (QPA) actually in use: wayland, xcb, offscreen…
+
+        Returns "" until a QGuiApplication exists: before that Qt reports its
+        compiled-in default, which is not necessarily the active platform.
+        """
+        try:
+            if QGuiApplication.instance() is None:
+                return ""
+            return QGuiApplication.platformName() or ""
+        except Exception:
+            return ""
+
+    @Slot(result=bool)
+    def isWaylandRuntime(self):
+        """True only when the app really runs on the Wayland QPA.
+
+        On X11 — and on XWayland, where Qt reports "xcb" — the app keeps X11
+        window semantics, so this is the authoritative runtime check.
+        """
+        return _platform_is_wayland(self.getRenderedPlatform())
+
+    @Slot(result="QVariantMap")
+    def getPlatformInfo(self):
+        """Detected desktop session + the QPA in use (for logs and the UI)."""
+        plat = self.getRenderedPlatform()
+        try:
+            sess = _session_type()
+        except Exception:
+            sess = "unknown"
+        return {
+            "session": sess,
+            "platform": plat or "unknown",
+            "wayland": _platform_is_wayland(plat),
+        }
+
     @Slot(result=float)
     def getProgressToNext(self):
         """Fraction (0..1) of the current segment elapsed (previous → next).
@@ -830,16 +877,18 @@ class PrayerEngine(QObject):
             if idx < 0:
                 return out
             fmt = "%I:%M %p" if self._settings.get("time_format", "12h") == "12h" else "%H:%M"
-            for row in rows[idx + 1: idx + 3]:
+            for row in rows[idx + 1 : idx + 3]:
                 out.append({"name": row["name"], "time": row["time"], "tomorrow": False})
             if len(out) < 2:
                 tomorrow_fajr = getattr(self, "_tomorrow_fajr", None)
                 if tomorrow_fajr is not None:
-                    out.append({
-                        "name": t_prayer(_display_key("fajr")),
-                        "time": tomorrow_fajr.strftime(fmt),
-                        "tomorrow": True,
-                    })
+                    out.append(
+                        {
+                            "name": t_prayer(_display_key("fajr")),
+                            "time": tomorrow_fajr.strftime(fmt),
+                            "tomorrow": True,
+                        }
+                    )
         except (AttributeError, KeyError, TypeError, ValueError):
             pass
         return out

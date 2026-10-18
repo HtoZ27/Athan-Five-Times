@@ -256,6 +256,19 @@ def main() -> int:
         check("reminder-remove", pe.removeReminder(rid) is True)
         check("reminder-empty", pe.getReminders() == [])
 
+    # --- Display server detection (Wayland / X11) ---
+    from backend.platform_env import platform_is_wayland
+    _qpa = pe.getRenderedPlatform()
+    _pinfo = pe.getPlatformInfo()
+    _expected = os.environ.get("QT_QPA_PLATFORM", "").split(";")[0]
+    check("platform-runtime", bool(_qpa) and (not _expected or _qpa == _expected),
+          f"qpa={_qpa!r} expected={_expected!r}")
+    check("platform-info",
+          {"session", "platform", "wayland"} <= set(_pinfo)
+          and _pinfo["wayland"] is platform_is_wayland(_pinfo["platform"])
+          and pe.isWaylandRuntime() is platform_is_wayland(_qpa),
+          str(_pinfo))
+
     # --- Compact widget (settings + QML component) ---
     check("widget-default-hidden", pe.isWidgetVisible() is False)
     pe.setWidgetVisible(True)

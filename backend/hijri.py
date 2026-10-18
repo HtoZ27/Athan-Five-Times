@@ -53,10 +53,10 @@ def gregorian_to_hijri(d: date, offset_days: int = 0) -> Tuple[int, int, int]:
 
 def format_hijri(d: date) -> str:
     """Return the Hijri date as a formatted string."""
-    from .translations import hijri_month_name
+    from .translations import hijri_month_name, hijri_suffix
 
     y, m, day = gregorian_to_hijri(d)
-    return f"{day} {hijri_month_name(m)} {y} هـ"
+    return f"{day} {hijri_month_name(m)} {y} {hijri_suffix()}"
 
 
 def _hijri_leap(year: int) -> int:

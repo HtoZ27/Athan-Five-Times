@@ -27,6 +27,9 @@ _ARABIC_RE = re.compile(r"[\u0600-\u06FF]")
 # Placeholder detection (value == Arabic key) must not rewrite them.
 _ARABIC_SCRIPT_LANGS = {"ar", "ur", "ps"}
 
+# "باقي 5 أيام على رمضان" as emitted by backend.islamic_events.
+_RAMADAN_EVENT_RE = re.compile(r"^باقي (\d+) (?:يوم|أيام) على رمضان$")
+
 
 def _is_untranslated_placeholder(key: str, val) -> bool:
     """True when a non-Arabic-script language kept the Arabic key as value."""
@@ -264,12 +267,49 @@ def timezone_name(code: str, display: str) -> str:
     return val
 
 
+def _date_connector() -> str:
+    """Language-appropriate date separator (Arabic comma for Arabic script)."""
+    return "،" if _CURRENT_CODE in _ARABIC_SCRIPT_LANGS else ","
+
+
+def hijri_suffix() -> str:
+    """Era marker for Hijri dates (هـ / AH), via calendar.hijri_suffix."""
+    d = _get_dict().get("calendar", {})
+    val = d.get("hijri_suffix")
+    if not val:
+        val = _get_fallback().get("calendar", {}).get("hijri_suffix")
+    if not val:
+        val = "هـ" if _CURRENT_CODE in _ARABIC_SCRIPT_LANGS else "AH"
+    return val
+
+
+def ramadan_countdown(days: int) -> str:
+    """Localized "N days left until Ramadan" (1/other forms per language)."""
+    key = "باقي %d يوم على رمضان" if days == 1 else "باقي %d أيام على رمضان"
+    template = u(key)
+    try:
+        return template % days
+    except (TypeError, ValueError):
+        logger.warning("Malformed countdown template for %s: %r", _CURRENT_CODE, template)
+        return key % days
+
+
+def translate_islamic_event(event: str) -> str:
+    """Localize a backend.islamic_events string through the ui dictionary."""
+    if not event:
+        return event
+    match = _RAMADAN_EVENT_RE.match(event)
+    if match:
+        return ramadan_countdown(int(match.group(1)))
+    return u(event)
+
+
 def format_date(d: "date", offset_days: int = 0) -> tuple[str, str]:
     """Return (gregorian_line, hijri_line) localized to current language."""
     from ..hijri import gregorian_to_hijri
 
     wd = day_name(d.weekday())
-    greg = f"{wd}، {d.day} {greg_month_name(d.month)} {d.year}"
+    greg = f"{wd}{_date_connector()} {d.day} {greg_month_name(d.month)} {d.year}"
     y, m, day_ = gregorian_to_hijri(d, offset_days)
-    hijri = f"{day_} {hijri_month_name(m)} {y} هـ"
+    hijri = f"{day_} {hijri_month_name(m)} {y} {hijri_suffix()}"
     return greg, hijri

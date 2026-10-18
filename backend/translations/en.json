@@ -166,6 +166,7 @@
     "تلقائي": "Automatic",
     "تغيير العرض يتطلب إعادة تشغيل التطبيق": "Changing the renderer requires an app restart",
     "حلقة العرض:": "Render loop:",
+    "بيئة العرض:": "Display server:",
     "محرك العرض:": "Renderer:",
     "مرات": "times",
     "إضافة مؤذن": "Add muezzin",
@@ -212,7 +213,28 @@
     "إغلاق الودجة": "Close widget",
     "غداً": "tomorrow",
     "نافذة صغيرة تعرض الصلاة القادمة والعد التنازلي": "A small window showing the next prayer and countdown",
-    "نافذة صغيرة دائمة العرض تعرض الصلاة القادمة والعد التنازلي": "An always-on-top mini window showing the next prayer and countdown"
+    "نافذة صغيرة دائمة العرض تعرض الصلاة القادمة والعد التنازلي": "An always-on-top mini window showing the next prayer and countdown",
+    "ذكرى الهجرة النبوية — فاتح السنة الهجرية": "Prophetic Migration — Hijri New Year",
+    "عاشوراء": "Ashura",
+    "العشر الأوائل من رجب": "First ten days of Rajab",
+    "ليلة النصف من شعبان": "Mid-Sha'ban night",
+    "ليلة النصف من رمضان": "Mid-Ramadan night",
+    "النصف من رمضان": "Mid-Ramadan",
+    "العشر الثانية من رمضان": "Second ten days of Ramadan",
+    "العشر الأواخر من رمضان": "Last ten days of Ramadan",
+    "العشر الأوائل من ذي الحجة": "First ten days of Dhu al-Hijjah",
+    "ليلة القدر": "Laylat al-Qadr (Night of Decree)",
+    "عيد الفطر — أول أيام العيد": "Eid al-Fitr — first day",
+    "عيد الفطر — ثاني أيام العيد": "Eid al-Fitr — second day",
+    "يوم التروية": "Day of Tarwiyah",
+    "يوم عرفة": "Day of Arafah",
+    "عيد الأضحى — يوم النحر": "Eid al-Adha — Day of Sacrifice",
+    "أيام التشريق — اليوم الأول": "Days of Tashriq — first day",
+    "أيام التشريق — اليوم الثاني": "Days of Tashriq — second day",
+    "أيام التشريق — اليوم الثالث": "Days of Tashriq — third day",
+    "الأيام البيض": "White Days",
+    "باقي %d يوم على رمضان": "%d day left until Ramadan",
+    "باقي %d أيام على رمضان": "%d days left until Ramadan"
   },
   "prayer_names": {
     "fajr": "Fajr",
@@ -264,7 +286,8 @@
       "Shawwal",
       "Dhu al-Qa'dah",
       "Dhu al-Hijjah"
-    ]
+    ],
+    "hijri_suffix": "AH"
   },
   "countries": {
     "AD": "Andorra",

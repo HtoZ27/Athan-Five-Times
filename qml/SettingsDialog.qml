@@ -63,6 +63,15 @@ Dialog {
         var tabs = [locationTab, offsetsTab, muezzinsTab, audioTab, notificationsTab, athkarTab, remindersTab, generalTab]
         tabs[idx].populate()
     }
+
+    // Human-readable name for the detected display server (runtime QPA).
+    function _displayServerText(info) {
+        var p = (info && info.platform) ? String(info.platform) : ""
+        if (p.indexOf("wayland") === 0) return "Wayland"
+        if (p === "xcb" || p === "x11")
+            return (info && info.session === "wayland") ? "X11 (XWayland)" : "X11"
+        return (p && p !== "unknown") ? p : "—"
+    }
     property var _pendingOffsets: ({})
     property Timer _offsetDebounce: Timer {
         interval: 300
@@ -1112,7 +1121,11 @@ Dialog {
                                 var di = days[i]
                                 if (di >= 0 && di < names.length) out.push(names[di])
                             }
-                            return out.join("، ")
+                            var sep = (typeof l10n !== "undefined" && l10n
+                                       && (l10n.currentLanguage === "ar"
+                                           || l10n.currentLanguage === "ur"
+                                           || l10n.currentLanguage === "ps")) ? "، " : ", "
+                            return out.join(sep)
                         }
                         function _resetForm() {
                             _editingReminderId = ""
@@ -1286,6 +1299,7 @@ Dialog {
                                     var rlCodes = ["auto", "threaded", "basic"]
                                     var rlIdx = rlCodes.indexOf(s.render_loop)
                                     renderLoopCb.currentIndex = rlIdx >= 0 ? rlIdx : 0
+                                    displayServerValue.text = _displayServerText(backendController.getPlatformInfo())
                                     autostartCb.checked = s.autostart || false
                                     sleepModeCbGeneral.checked = s.sleep_mode !== false
                                     backgroundEnabledCb.checked = s.background_enabled !== false
@@ -1380,6 +1394,11 @@ Dialog {
                                         }
                                     }
                                     Label { text: tr("تغيير العرض يتطلب إعادة تشغيل التطبيق"); color: theme.textMutedColor; font.pixelSize: 11; wrapMode: Text.WordWrap; Layout.fillWidth: true }
+                                    RowLayout { Layout.fillWidth: true; spacing: 6
+                                        Label { text: tr("بيئة العرض:"); color: theme.textColor }
+                                        Label { id: displayServerValue; text: "—"; color: theme.textMutedColor }
+                                        Item { Layout.fillWidth: true }
+                                    }
                                 }
                             }
 

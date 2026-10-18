@@ -1,9 +1,18 @@
 from datetime import date
 import os
+import re
 
 
 from backend.i18n import t, t_prayer, format_date, set_lang, LANGS, get_lang
-from backend.translations import city_name, country_name
+from backend.hijri import format_hijri
+from backend.translations import (
+    city_name,
+    country_name,
+    hijri_month_name,
+    hijri_suffix,
+    ramadan_countdown,
+    translate_islamic_event,
+)
 
 
 class TestTranslationFunction:
@@ -222,7 +231,6 @@ class TestUiKeyParity:
 
     def test_missing_key_uses_english_before_arabic(self):
         set_lang("tk")
-        assert t("حفظ") == "Save"
         assert t("شريط النظام") == "System tray"
         set_lang("ar")
 
@@ -233,4 +241,170 @@ class TestUiKeyParity:
         value = t("المؤذن الافتراضي")
         assert value
         assert not re.search(r"[\u0600-\u06FF]", value)
+        set_lang("ar")
+
+
+class TestWidgetFeatureKeys:
+    """Widget/reminders keys must never surface Arabic text in non-Arabic-script
+    languages (localized value or English fallback only)."""
+
+    ARABIC_SCRIPT = {"ar", "ur", "ps"}
+    ARABIC = re.compile(r"[\u0600-\u06FF]")
+
+    FEATURE_KEYS = [
+        "الإثنين",
+        "الثلاثاء",
+        "الأربعاء",
+        "الخميس",
+        "الجمعة",
+        "السبت",
+        "الأحد",
+        "كل يوم",
+        "أيام التكرار:",
+        "الوقت (HH:MM):",
+        "نص التذكير",
+        "إضافة تذكير",
+        "(اتركها فارغة لكل يوم)",
+        "إضافة",
+        "إلغاء",
+        "حفظ",
+        "تذكيرات",
+        "الصلاة القادمة",
+        "إغلاق الودجة",
+        "غداً",
+        "أذان الأوقات الخمس",
+    ]
+
+    def test_no_arabic_for_non_arabic_script_languages(self):
+        for code in LANGS:
+            set_lang(code)
+            for key in self.FEATURE_KEYS:
+                value = t(key)
+                assert value, f"empty value for {code}: {key}"
+                if code not in self.ARABIC_SCRIPT:
+                    assert not self.ARABIC.search(value), f"Arabic leak in {code}: {key} -> {value}"
+        set_lang("ar")
+
+    def test_recently_added_keys_are_translated(self):
+        set_lang("tk")
+        assert t("حفظ") == "Sakla"
+        set_lang("de")
+        assert t("إغلاق الودجة") != "إغلاق الودجة"
+        assert not self.ARABIC.search(t("إغلاق الودجة"))
+        set_lang("hi")
+        assert not self.ARABIC.search(t("غداً"))
+        set_lang("ar")
+
+
+class TestHijriLocalization:
+    """Hijri events, month names, era suffix and countdown must follow the
+    interface language instead of leaking Arabic text."""
+
+    ARABIC_SCRIPT = {"ar", "ur", "ps"}
+    ARABIC = re.compile(r"[\u0600-\u06FF]")
+
+    @staticmethod
+    def _event_keys():
+        path = os.path.join(os.path.dirname(__file__), "..", "backend", "islamic_events.py")
+        with open(path, encoding="utf-8") as f:
+            src = f.read()
+        keys = re.findall(r'events\.append\("([^"]+)"\)', src)
+        assert len(keys) >= 19, f"event extraction looks broken: {len(keys)}"
+        return keys
+
+    def test_every_event_translated_in_every_language(self):
+        for code in LANGS:
+            set_lang(code)
+            for key in self._event_keys():
+                value = translate_islamic_event(key)
+                assert value, f"empty event for {code}: {key}"
+                if code != "ar":
+                    assert value != key, f"untranslated event in {code}: {key}"
+                if code not in self.ARABIC_SCRIPT:
+                    assert not self.ARABIC.search(value), f"Arabic leak in {code}: {value}"
+        set_lang("ar")
+
+    def test_event_translation_spot_checks(self):
+        set_lang("de")
+        assert translate_islamic_event("عاشوراء") == "Aschura"
+        set_lang("tr")
+        assert translate_islamic_event("عاشوراء") == "Aşure"
+        set_lang("ar")
+        assert translate_islamic_event("عاشوراء") == "عاشوراء"
+
+    def test_unknown_event_passthrough(self):
+        set_lang("de")
+        assert translate_islamic_event("__not_an_event__") == "__not_an_event__"
+        assert translate_islamic_event("") == ""
+        set_lang("ar")
+
+    def test_ramadan_countdown_localized(self):
+        set_lang("de")
+        assert ramadan_countdown(5) == "Noch 5 Tage bis Ramadan"
+        set_lang("tk")
+        assert ramadan_countdown(5) == "Remezana 5 gün galdy"
+        set_lang("ar")
+        assert ramadan_countdown(1) == "باقي 1 يوم على رمضان"
+        assert ramadan_countdown(5) == "باقي 5 أيام على رمضان"
+
+    def test_countdown_never_arabic_for_non_script_languages(self):
+        for code in LANGS:
+            set_lang(code)
+            value = ramadan_countdown(5)
+            assert "5" in value, f"missing number for {code}: {value}"
+            if code not in self.ARABIC_SCRIPT:
+                assert not self.ARABIC.search(value), f"Arabic leak in {code}: {value}"
+        set_lang("ar")
+
+    def test_hijri_suffix_per_language(self):
+        set_lang("ar")
+        assert hijri_suffix() == "هـ"
+        set_lang("ur")
+        assert hijri_suffix() == "ھـ"
+        set_lang("ps")
+        assert hijri_suffix() == "هـ"
+        set_lang("de")
+        assert hijri_suffix() == "AH"
+        set_lang("tk")
+        assert hijri_suffix() == "AH"
+        set_lang("ar")
+
+    def test_hijri_months_no_arabic_leak(self):
+        for code in LANGS:
+            set_lang(code)
+            for month in range(1, 13):
+                name = hijri_month_name(month)
+                assert name, f"empty month {month} for {code}"
+                if code not in self.ARABIC_SCRIPT:
+                    assert not self.ARABIC.search(name), f"Arabic month in {code}: {name}"
+        set_lang("ar")
+
+    def test_hijri_month_spot_checks(self):
+        set_lang("tk")
+        assert hijri_month_name(9) == "Remezan"
+        set_lang("so")
+        assert hijri_month_name(9) == "Ramadaan"
+        set_lang("ms")
+        assert hijri_month_name(12) == "Zulhijjah"
+        set_lang("hi")
+        assert hijri_month_name(9) == "रमज़ान"
+        set_lang("ar")
+        assert hijri_month_name(9) == "رمضان"
+
+    def test_format_hijri_localized(self):
+        set_lang("tk")
+        line = format_hijri(date(2026, 10, 18))
+        assert "AH" in line and not self.ARABIC.search(line)
+        set_lang("hi")
+        assert not self.ARABIC.search(format_hijri(date(2026, 10, 18)))
+        set_lang("ar")
+        assert "هـ" in format_hijri(date(2026, 10, 18))
+
+    def test_gregorian_connector_follows_script(self):
+        set_lang("ar")
+        greg, _ = format_date(date(2025, 6, 15))
+        assert "،" in greg
+        set_lang("de")
+        greg, _ = format_date(date(2025, 6, 15))
+        assert "," in greg and "،" not in greg
         set_lang("ar")

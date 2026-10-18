@@ -13,6 +13,10 @@ import Theme 1.0
     progress bar tracking the current segment (previous → next prayer).
     The layout mirrors with the app language (RTL).
 
+    Display-server aware: on the Wayland QPA the widget is moved with a
+    compositor "system move" and its position is not persisted (Wayland
+    compositors own placement); on X11 it is dragged with saved geometry.
+
     Header / body / footer hierarchy:
         🗓 5 جمادى الأولى 1448 هـ      09:54:51  ✕
         ────────────────────────────────────────
@@ -35,6 +39,10 @@ Window {
 
     readonly property bool isRtl:
         (typeof l10n !== "undefined" && l10n) ? l10n.isRtl : true
+
+    /** True only when running on the real Wayland QPA (not X11/XWayland). */
+    readonly property bool isWayland: prayerEngine
+        ? prayerEngine.isWaylandRuntime() : false
 
     // --- live data ---------------------------------------------------------
     property string nextKey: "fajr"
@@ -93,7 +101,9 @@ Window {
     }
 
     function saveGeometry() {
-        if (!prayerEngine)
+        // Wayland compositors own window placement: position persistence is
+        // an X11-only concept (the widget is moved via system move there).
+        if (!prayerEngine || isWayland)
             return
         prayerEngine.saveWidgetGeometry(widgetWindow.x, widgetWindow.y)
     }
@@ -139,13 +149,21 @@ Window {
         LayoutMirroring.enabled: widgetWindow.isRtl
         LayoutMirroring.childrenInherit: true
 
-        // Drag anywhere to move (persisted); double-click closes.
+        // Drag to move (X11: manual + persisted / Wayland: system move).
         MouseArea {
             id: dragArea
             anchors.fill: parent
             property point clickPos: Qt.point(0, 0)
-            onPressed: (mouse) => { clickPos = Qt.point(mouse.x, mouse.y) }
+            onPressed: (mouse) => {
+                if (widgetWindow.isWayland) {
+                    widgetWindow.startSystemMove()
+                } else {
+                    clickPos = Qt.point(mouse.x, mouse.y)
+                }
+            }
             onPositionChanged: (mouse) => {
+                if (widgetWindow.isWayland)
+                    return
                 widgetWindow.x += mouse.x - clickPos.x
                 widgetWindow.y += mouse.y - clickPos.y
             }
