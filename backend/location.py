@@ -204,7 +204,7 @@ def _try_ip_api(retries: int) -> dict | None:
     for attempt in range(retries + 1):
         try:
             req = Request(
-                "http://ip-api.com/json/", headers={"User-Agent": "AthanFiveTimes/0.3.16b"}
+                "http://ip-api.com/json/", headers={"User-Agent": "AthanFiveTimes/0.3.17b"}
             )
             with urlopen(req, timeout=10) as resp:
                 data = json.loads(resp.read().decode())
@@ -239,7 +239,7 @@ def _try_ip_api(retries: int) -> dict | None:
 def _try_fallback() -> dict | None:
     """Fallback using ipapi.co (HTTPS)."""
     try:
-        req = Request("https://ipapi.co/json/", headers={"User-Agent": "AthanFiveTimes/0.3.16b"})
+        req = Request("https://ipapi.co/json/", headers={"User-Agent": "AthanFiveTimes/0.3.17b"})
         with urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode())
         if data.get("error"):
@@ -269,7 +269,7 @@ def _try_ipinfo() -> dict | None:
     try:
         req = Request(
             "https://ipinfo.io/json",
-            headers={"User-Agent": "AthanFiveTimes/0.3.16b"},
+            headers={"User-Agent": "AthanFiveTimes/0.3.17b"},
         )
         with urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode())
@@ -299,7 +299,7 @@ def _try_ipwho() -> dict | None:
     try:
         req = Request(
             "https://ipwho.is/",
-            headers={"User-Agent": "AthanFiveTimes/0.3.16b"},
+            headers={"User-Agent": "AthanFiveTimes/0.3.17b"},
         )
         with urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode())
@@ -336,7 +336,7 @@ def _try_geojs() -> dict | None:
     try:
         req = Request(
             "https://get.geojs.io/v1/ip/geo.json",
-            headers={"User-Agent": "AthanFiveTimes/0.3.16b"},
+            headers={"User-Agent": "AthanFiveTimes/0.3.17b"},
         )
         with urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode())
