@@ -217,27 +217,27 @@
   },
   "calendar": {
     "days": [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday"
+      "Ahad",
+      "Isnin",
+      "Selasa",
+      "Rabu",
+      "Khamis",
+      "Jumaat",
+      "Sabtu"
     ],
     "months_gregorian": [
-      "January",
-      "February",
-      "March",
+      "Januari",
+      "Februari",
+      "Mac",
       "April",
-      "May",
-      "June",
-      "July",
-      "August",
+      "Mei",
+      "Jun",
+      "Julai",
+      "Ogos",
       "September",
-      "October",
+      "Oktober",
       "November",
-      "December"
+      "Disember"
     ],
     "months_hijri": [
       "Muharam",

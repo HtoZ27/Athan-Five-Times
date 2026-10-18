@@ -196,27 +196,27 @@
   },
   "calendar": {
     "days": [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday"
+      "ਐਤਵਾਰ",
+      "ਸੋਮਵਾਰ",
+      "ਮੰਗਲਵਾਰ",
+      "ਬੁੱਧਵਾਰ",
+      "ਵੀਰਵਾਰ",
+      "ਸ਼ੁੱਕਰਵਾਰ",
+      "ਸ਼ਨਿੱਚਰਵਾਰ"
     ],
     "months_gregorian": [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December"
+      "ਜਨਵਰੀ",
+      "ਫ਼ਰਵਰੀ",
+      "ਮਾਰਚ",
+      "ਅਪ੍ਰੈਲ",
+      "ਮਈ",
+      "ਜੂਨ",
+      "ਜੁਲਾਈ",
+      "ਅਗਸਤ",
+      "ਸਤੰਬਰ",
+      "ਅਕਤੂਬਰ",
+      "ਨਵੰਬਰ",
+      "ਦਸੰਬਰ"
     ],
     "months_hijri": [
       "ਮੁਹੱਰਮ",

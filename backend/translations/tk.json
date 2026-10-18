@@ -183,12 +183,12 @@
   },
   "prayer_names": {
     "fajr": "Ertir",
-    "sunrise": "Gün doguşy",
+    "sunrise": "Gün dogşy",
     "dhuhr": "Öýle",
     "jumuah": "Juma",
     "asr": "Ikindi",
     "maghrib": "Agşam",
-    "isha": "Ýatsy"
+    "isha": "Ýassy"
   },
   "credits": {
     "title": "Credits",
@@ -196,27 +196,27 @@
   },
   "calendar": {
     "days": [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday"
+      "Ýekşenbe",
+      "Duşenbe",
+      "Sişenbe",
+      "Çarşenbe",
+      "Penşenbe",
+      "Anna",
+      "Şenbe"
     ],
     "months_gregorian": [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December"
+      "Ýanwar",
+      "Fewral",
+      "Mart",
+      "Aprel",
+      "Maý",
+      "Iýun",
+      "Iýul",
+      "Awgust",
+      "Sentýabr",
+      "Oktýabr",
+      "Noýabr",
+      "Dekabr"
     ],
     "months_hijri": [
       "Muharrem",

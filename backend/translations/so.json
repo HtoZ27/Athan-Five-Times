@@ -196,27 +196,27 @@
   },
   "calendar": {
     "days": [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday"
+      "Axad",
+      "Isniin",
+      "Talaado",
+      "Arbaco",
+      "Khamiis",
+      "Jimco",
+      "Sabti"
     ],
     "months_gregorian": [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December"
+      "Janaayo",
+      "Febraayo",
+      "Maarso",
+      "Abriil",
+      "Maayo",
+      "Juun",
+      "Luulyo",
+      "Agosto",
+      "Sebteembar",
+      "Oktoobar",
+      "Nofeembar",
+      "Diseembar"
     ],
     "months_hijri": [
       "Muxarram",

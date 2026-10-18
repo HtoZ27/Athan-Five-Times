@@ -8,6 +8,8 @@ from backend.hijri import format_hijri
 from backend.translations import (
     city_name,
     country_name,
+    day_name,
+    greg_month_name,
     hijri_month_name,
     hijri_suffix,
     ramadan_countdown,
@@ -407,4 +409,61 @@ class TestHijriLocalization:
         set_lang("de")
         greg, _ = format_date(date(2025, 6, 15))
         assert "," in greg and "،" not in greg
+        set_lang("ar")
+
+
+class TestCalendarNames:
+    """Gregorian day/month names must be localized as well — no English or
+    Arabic leftovers in the languages that now carry native lists."""
+
+    ARABIC_SCRIPT = {"ar", "ur", "ps"}
+    ARABIC = re.compile(r"[\u0600-\u06FF]")
+
+    def test_day_and_month_names_localized(self):
+        for code in LANGS:
+            set_lang(code)
+            for weekday in range(7):
+                assert day_name(weekday), f"empty day {weekday} for {code}"
+            for month in range(1, 13):
+                assert greg_month_name(month), f"empty month {month} for {code}"
+        set_lang("ar")
+
+    def test_no_arabic_leak_in_date_lines(self):
+        for code in LANGS:
+            set_lang(code)
+            greg, hijri = format_date(date(2026, 10, 19))
+            assert greg and hijri
+            if code not in self.ARABIC_SCRIPT:
+                assert not self.ARABIC.search(greg), f"Arabic leak in {code}: {greg}"
+                assert not self.ARABIC.search(hijri), f"Arabic leak in {code}: {hijri}"
+        set_lang("ar")
+
+    def test_gregorian_spot_checks(self):
+        set_lang("tk")
+        assert day_name(0) == "Duşenbe"
+        assert greg_month_name(10) == "Oktýabr"
+        set_lang("so")
+        assert greg_month_name(7) == "Luulyo"
+        assert greg_month_name(12) == "Diseembar"
+        set_lang("ms")
+        assert day_name(6) == "Ahad"
+        assert greg_month_name(8) == "Ogos"
+        set_lang("hi")
+        assert day_name(6) == "रविवार"
+        assert greg_month_name(1) == "जनवरी"
+        set_lang("ps")
+        assert greg_month_name(5) == "مۍ"
+        set_lang("ur")
+        assert day_name(0) == "پیر"
+        set_lang("id")
+        assert greg_month_name(8) == "Agustus"
+        set_lang("pa")
+        assert greg_month_name(1) == "ਜਨਵਰੀ"
+        set_lang("ar")
+
+    def test_tk_prayer_names_match_official_sources(self):
+        set_lang("tk")
+        assert t_prayer("fajr") == "Ertir"
+        assert t_prayer("sunrise") == "Gün dogşy"
+        assert t_prayer("isha") == "Ýassy"
         set_lang("ar")
