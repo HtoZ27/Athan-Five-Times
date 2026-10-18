@@ -25,6 +25,7 @@ except (ImportError, OSError, ModuleNotFoundError) as exc:
 
 try:
     import numpy as np
+
     _NUMPY_AVAILABLE = True
 except Exception:
     np = None
@@ -131,7 +132,7 @@ class AudioPlayer:
                     per_sample = np.repeat(scales, nchannels)
                     arr[: n_fade * nchannels] *= per_sample
                     if frames > n_fade and vol != 1.0:
-                        arr[n_fade * nchannels:] *= vol
+                        arr[n_fade * nchannels :] *= vol
                 elif vol != 1.0:
                     arr *= vol
                 arr = np.clip(arr, -32768, 32767).astype(np.int16)

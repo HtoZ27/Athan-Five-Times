@@ -1,7 +1,6 @@
 """Tests for Islamic calendar events, reminders (repeat days) and the compact
 desktop widget settings introduced alongside the Salatuk parity work."""
 
-import os
 from datetime import date, datetime, timedelta
 
 import pytest
@@ -139,7 +138,7 @@ class TestRemindersDays:
 
     def test_days_filter(self):
         reminders.add_reminder("إثنين فقط", "07:00", [0])  # Monday
-        monday = datetime(2026, 10, 19, 7, 0)   # weekday 0
+        monday = datetime(2026, 10, 19, 7, 0)  # weekday 0
         tuesday = datetime(2026, 10, 20, 7, 0)  # weekday 1
         assert len(reminders.due_reminders(monday)) == 1
         assert reminders.due_reminders(tuesday) == []

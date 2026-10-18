@@ -6,6 +6,7 @@ Model: {id, text, time (HH:MM), days (list of weekday ints 0=Mon..6=Sun or []=da
         enabled, created_at}
 Scheduling is driven by the controller's 60s tick (no background thread).
 """
+
 from __future__ import annotations
 
 import json
@@ -14,7 +15,7 @@ import os
 import threading
 import time
 import uuid
-from datetime import datetime, time as dtime
+from datetime import datetime
 from pathlib import Path
 from typing import List, Dict, Optional
 

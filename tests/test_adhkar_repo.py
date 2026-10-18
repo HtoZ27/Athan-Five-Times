@@ -220,7 +220,9 @@ class TestTextIntegrity:
         assert not bad, f"unbalanced brackets: {bad}"
 
     def test_category_icons_exist(self):
-        icons_dir = os.path.join(os.path.dirname(__file__), "..", "backend", "assets", "adhkar_icons")
+        icons_dir = os.path.join(
+            os.path.dirname(__file__), "..", "backend", "assets", "adhkar_icons"
+        )
         repo = AdhkarRepository()
         missing = []
         mismatch = []

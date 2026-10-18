@@ -7,6 +7,7 @@ Ashura, White Days, first 10 of Rajab, Mid-Sha'ban, Ramadan countdown,
 second/last 10 of Ramadan, Mid-Ramadan, plus the standard Eids, Hajj days
 (Tarwiyah, Arafah, sacrifice day and Tashriq days).
 """
+
 from __future__ import annotations
 
 from datetime import date
@@ -16,9 +17,18 @@ from .hijri import gregorian_to_hijri, _hijri_leap
 
 
 _HIJRI_MONTH_NAMES = {
-    1: "محرم", 2: "صفر", 3: "ربيع الأول", 4: "ربيع الثاني",
-    5: "جمادى الأولى", 6: "جمادى الثانية", 7: "رجب",
-    8: "شعبان", 9: "رمضان", 10: "شوال", 11: "ذو القعدة", 12: "ذو الحجة",
+    1: "محرم",
+    2: "صفر",
+    3: "ربيع الأول",
+    4: "ربيع الثاني",
+    5: "جمادى الأولى",
+    6: "جمادى الثانية",
+    7: "رجب",
+    8: "شعبان",
+    9: "رمضان",
+    10: "شوال",
+    11: "ذو القعدة",
+    12: "ذو الحجة",
 }
 
 
@@ -110,12 +120,14 @@ def events_for_date(d: date) -> List[str]:
 
 def events_for_today() -> List[str]:
     from datetime import date as _d
+
     return events_for_date(_d.today())
 
 
 def primary_event(d: date = None) -> str:
     """Return the most important event for the date, or ''."""
     from datetime import date as _d
+
     evs = events_for_date(d or _d.today())
     # prefer non-countdown events
     for e in evs:
@@ -126,4 +138,5 @@ def primary_event(d: date = None) -> str:
 
 if __name__ == "__main__":
     from datetime import date as _d
+
     print(events_for_date(_d.today()))
