@@ -5,8 +5,8 @@
   },
   "ui": {
     "app_name": "Waktu Sholat",
-    "athkar_title": "Athkar",
-    "athkar_after_prayer": "Setelah Sholat Athkar",
+    "athkar_title": "Zikir",
+    "athkar_after_prayer": "Zikir Setelah Sholat",
     "tray_show": "Tampilkan Jendela",
     "tray_quit": "Keluar",
     "tray_loading": "Memuat...",

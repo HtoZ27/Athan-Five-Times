@@ -5,8 +5,8 @@
   },
   "ui": {
     "app_name": "Waktu Solat",
-    "athkar_title": "Athkar",
-    "athkar_after_prayer": "Selepas Solat Athkar",
+    "athkar_title": "Zikir",
+    "athkar_after_prayer": "Zikir Selepas Solat",
     "tray_show": "Tunjuk Tetingkap",
     "tray_quit": "Keluar",
     "tray_loading": "Memuatkan...",
@@ -244,8 +244,8 @@
     "تعذّر تحديد الموقع — تحقق من الاتصال بالإنترنت": "Tidak dapat mengesan lokasi — semak sambungan internet anda",
     "إظهار الودجة المصغرة على سطح المكتب": "Tunjuk widget desktop padat",
     "الودجة المصغرة": "Widget padat",
-    "نافذة صغيرة تعرض الصلاة القادمة والعد التنازلي": "Tetingkap kecil yang memaparkan solat seterusnya dan kira detik",
-    "نافذة صغيرة دائمة العرض تعرض الصلاة القادمة والعد التنازلي": "Tetingkap mini sentiasa di atas yang memaparkan solat seterusnya dan kira detik"
+    "نافذة صغيرة تعرض الصلاة القادمة والعد التنازلي": "Tetingkap kecil yang memaparkan solat seterusnya dan kira detik mundur",
+    "نافذة صغيرة دائمة العرض تعرض الصلاة القادمة والعد التنازلي": "Tetingkap mini sentiasa di atas yang memaparkan solat seterusnya dan kira detik mundur"
   },
   "prayer_names": {
     "fajr": "Subuh",
@@ -614,7 +614,7 @@
     "UTC": "Waktu Semesta Berkoordinat (UTC)"
   },
   "themes": {
-    "auto": "Auto",
+    "auto": "Automatik",
     "light": "Terang",
     "dark": "Gelap",
     "ottoman_gold": "Emas Uthmaniyah",
