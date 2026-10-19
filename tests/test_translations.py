@@ -390,7 +390,7 @@ class TestHijriLocalization:
         set_lang("so")
         assert hijri_month_name(9) == "Ramadaan"
         set_lang("ms")
-        assert hijri_month_name(12) == "Zulhijjah"
+        assert hijri_month_name(12) == "Zulhijah"
         set_lang("hi")
         assert hijri_month_name(9) == "रमज़ान"
         set_lang("ar")
@@ -625,3 +625,45 @@ class TestNoArabicLeaks:
             ar_tz = json.load(f).get("timezones", {})
         missing = sorted(k for k in en_tz if k not in ar_tz)
         assert not missing, f"ar.json missing timezones: {missing[:5]}"
+
+    def test_timezones_have_no_iana_suffix(self):
+        import glob
+        import json
+
+        base = os.path.join(os.path.dirname(__file__), "..", "backend", "translations")
+        offenders = {}
+        for path in sorted(glob.glob(os.path.join(base, "*.json"))):
+            code = os.path.basename(path)[:-5]
+            if code == "en":
+                continue
+            with open(path, encoding="utf-8") as f:
+                tz = json.load(f).get("timezones", {})
+            bad = sorted(k for k, v in tz.items() if "/" in v)
+            if bad:
+                offenders[code] = bad[:3]
+        assert not offenders, f"IANA paths leaked into display names: {offenders}"
+
+    def test_timezones_localized_not_english(self):
+        import glob
+        import json
+        import re
+
+        base = os.path.join(os.path.dirname(__file__), "..", "backend", "translations")
+        with open(os.path.join(base, "en.json"), encoding="utf-8") as f:
+            en_tz = json.load(f)["timezones"]
+        offenders = {}
+        for path in sorted(glob.glob(os.path.join(base, "*.json"))):
+            code = os.path.basename(path)[:-5]
+            if code in ("en", "es_la"):
+                continue
+            with open(path, encoding="utf-8") as f:
+                tz = json.load(f).get("timezones", {})
+            same = sorted(
+                k
+                for k, v in tz.items()
+                if v == en_tz.get(k)
+                and not re.search(r"[\u0600-\u06FF\u0900-\u097F\u0A00-\u0A7F\u0400-\u04FF]", v)
+            )
+            if same:
+                offenders[code] = same[:3]
+        assert not offenders, f"timezone labels left in English: {offenders}"
