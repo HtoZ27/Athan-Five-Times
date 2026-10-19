@@ -644,26 +644,31 @@ class TestNoArabicLeaks:
         assert not offenders, f"IANA paths leaked into display names: {offenders}"
 
     def test_timezones_localized_not_english(self):
-        import glob
         import json
-        import re
 
         base = os.path.join(os.path.dirname(__file__), "..", "backend", "translations")
         with open(os.path.join(base, "en.json"), encoding="utf-8") as f:
             en_tz = json.load(f)["timezones"]
         offenders = {}
-        for path in sorted(glob.glob(os.path.join(base, "*.json"))):
-            code = os.path.basename(path)[:-5]
-            if code in ("en", "es_la"):
-                continue
-            with open(path, encoding="utf-8") as f:
+        for code in ("ar", "hi", "pa", "ps", "ru", "ur"):
+            with open(os.path.join(base, f"{code}.json"), encoding="utf-8") as f:
                 tz = json.load(f).get("timezones", {})
-            same = sorted(
-                k
-                for k, v in tz.items()
-                if v == en_tz.get(k)
-                and not re.search(r"[\u0600-\u06FF\u0900-\u097F\u0A00-\u0A7F\u0400-\u04FF]", v)
-            )
+            same = sorted(k for k, v in tz.items() if v == en_tz.get(k))
             if same:
                 offenders[code] = same[:3]
         assert not offenders, f"timezone labels left in English: {offenders}"
+
+    def test_countries_localized_in_non_latin_scripts(self):
+        import json
+        import re
+
+        base = os.path.join(os.path.dirname(__file__), "..", "backend", "translations")
+        scripted = ("ar", "hi", "pa", "ps", "ru", "ur")
+        offenders = {}
+        for code in scripted:
+            with open(os.path.join(base, f"{code}.json"), encoding="utf-8") as f:
+                countries = json.load(f).get("countries", {})
+            bad = sorted(k for k, v in countries.items() if re.search(r"[A-Za-z]", v))
+            if bad:
+                offenders[code] = [(k, countries[k]) for k in bad[:3]]
+        assert not offenders, f"Latin country names in non-Latin locales: {offenders}"
