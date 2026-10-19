@@ -201,11 +201,10 @@ class TestUiKeyParity:
                 assert key in ui, f"{key!r} missing in {code}"
 
     def test_missing_key_falls_back_to_english_not_arabic(self):
-        # 'hi' intentionally lacks the timezone hint: English, not Arabic.
+        # Unknown keys have no translation anywhere: the key itself is returned,
+        # never another language's text.
         set_lang("hi")
-        assert t("اختيار المنطقة الزمنية لحساب مواقيت الصلاة بدقة") == (
-            "Select timezone for accurate prayer calculation"
-        )
+        assert t("__missing_key_probe__") == "__missing_key_probe__"
         set_lang("ar")
 
     def test_all_qml_tr_keys_present_in_ar_and_en(self):
@@ -219,21 +218,25 @@ class TestUiKeyParity:
             missing = sorted(k for k in keys if k not in ui)
             assert not missing, f"{code}.json missing QML keys: {missing[:5]}"
 
-    def test_untranslated_placeholder_falls_back_to_english(self):
-        set_lang("de")
-        assert t("الإزاحة") == "Offsets"
-        set_lang("hi")
-        assert t("الإزاحة") == "Offsets"
+    def test_every_key_is_translated_in_non_arabic_languages(self):
+        for code in LANGS:
+            if code in {"ar", "ur", "ps"}:
+                continue
+            set_lang(code)
+            value = t("الإزاحة")
+            assert value and value != "الإزاحة", f"{code}: untranslated الإزاحة"
+            assert not re.search(r"[\u0600-\u06FF]", value), f"{code}: Arabic {value!r}"
         set_lang("ar")
 
-    def test_arabic_script_languages_keep_their_values(self):
+    def test_arabic_script_languages_are_localized(self):
         set_lang("ur")
-        assert t("الإزاحة") == "الإزاحة"
+        assert t("الإزاحة") == "آفسیٹس"
         set_lang("ar")
+        assert t("الإزاحة") == "الإزاحة"
 
     def test_missing_key_uses_english_before_arabic(self):
         set_lang("tk")
-        assert t("شريط النظام") == "System tray"
+        assert t("__missing_key_probe__") == "__missing_key_probe__"
         set_lang("ar")
 
     def test_translated_value_is_not_replaced_by_fallback(self):
@@ -556,3 +559,69 @@ class TestNoArabicLeaks:
                 if code not in self.ARABIC_SCRIPT:
                     assert not self.ARABIC.search(value), f"{code}: {key} -> {value}"
         set_lang("ar")
+
+    def test_all_languages_have_every_ui_key(self):
+        import glob
+        import json
+
+        base = os.path.join(os.path.dirname(__file__), "..", "backend", "translations")
+        with open(os.path.join(base, "en.json"), encoding="utf-8") as f:
+            en_ui = json.load(f)["ui"]
+        for path in sorted(glob.glob(os.path.join(base, "*.json"))):
+            code = os.path.basename(path)[:-5]
+            with open(path, encoding="utf-8") as f:
+                ui = json.load(f)["ui"]
+            missing = sorted(k for k in en_ui if k not in ui)
+            assert not missing, f"{code}.json missing ui keys: {missing[:5]}"
+
+    def test_format_placeholders_match_english(self):
+        import glob
+        import json
+
+        placeholders = re.compile(r"\{([^{}]+)\}")
+        base = os.path.join(os.path.dirname(__file__), "..", "backend", "translations")
+        with open(os.path.join(base, "en.json"), encoding="utf-8") as f:
+            en_ui = json.load(f)["ui"]
+        for path in sorted(glob.glob(os.path.join(base, "*.json"))):
+            code = os.path.basename(path)[:-5]
+            if code == "en":
+                continue
+            with open(path, encoding="utf-8") as f:
+                ui = json.load(f)["ui"]
+            for key, value in ui.items():
+                if key not in en_ui or not isinstance(value, str):
+                    continue
+                expected = set(placeholders.findall(en_ui[key]))
+                actual = set(placeholders.findall(value))
+                assert expected == actual, (
+                    f"{code}.json {key!r}: placeholders {sorted(actual)} != {sorted(expected)}"
+                )
+
+    def test_credits_localized(self):
+        import glob
+        import json
+
+        base = os.path.join(os.path.dirname(__file__), "..", "backend", "translations")
+        offenders = {}
+        for path in sorted(glob.glob(os.path.join(base, "*.json"))):
+            code = os.path.basename(path)[:-5]
+            if code in ("en", "ar"):
+                continue
+            with open(path, encoding="utf-8") as f:
+                credits = json.load(f).get("credits", {})
+            if credits.get("title") == "Credits":
+                offenders.setdefault(code, []).append("title")
+            if "Open-source prayer times and azan application" in credits.get("html", ""):
+                offenders.setdefault(code, []).append("html")
+        assert not offenders, f"untranslated credits: {offenders}"
+
+    def test_arabic_timezones_localized(self):
+        import json
+
+        base = os.path.join(os.path.dirname(__file__), "..", "backend", "translations")
+        with open(os.path.join(base, "en.json"), encoding="utf-8") as f:
+            en_tz = json.load(f)["timezones"]
+        with open(os.path.join(base, "ar.json"), encoding="utf-8") as f:
+            ar_tz = json.load(f).get("timezones", {})
+        missing = sorted(k for k in en_tz if k not in ar_tz)
+        assert not missing, f"ar.json missing timezones: {missing[:5]}"
