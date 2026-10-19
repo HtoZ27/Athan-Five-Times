@@ -4,7 +4,7 @@
     "name": "Türkmençe"
   },
   "ui": {
-    "app_name": "أذان الصلاة",
+    "app_name": "Namaz wagtlary",
     "athkar_title": "Atkar",
     "athkar_after_prayer": "Namazdan soň Atkar",
     "tray_show": "Window Penjiräni görkez",
@@ -92,7 +92,7 @@
     "أذكار الصلاة": "أذكار الصلاة",
     "ملفات صوتية (*.mp3 *.wav *.ogg *.flac)": "ملفات صوتية (*.mp3 *.wav *.ogg *.flac)",
     "الطول (Longitude)": "الطول (Longitude)",
-    "اختر ملفًا صوتيًا": "اختر ملفًا صوتيًا",
+    "اختر ملفًا صوتيًا": "Ses faýlyny saýla",
     "طريقة العرض:": "طريقة العرض:",
     "📤 تصدير الإعدادات": "📤 تصدير الإعدادات",
     "الوضع الصامت": "الوضع الصامت",
@@ -179,7 +179,18 @@
     "أيام التشريق — اليوم الثالث": "Teşrik günleri — üçünji gün",
     "الأيام البيض": "Ak günler",
     "باقي %d يوم على رمضان": "Remezana %d gün galdy",
-    "باقي %d أيام على رمضان": "Remezana %d gün galdy"
+    "باقي %d أيام على رمضان": "Remezana %d gün galdy",
+    "يعمل التطبيق بالفعل": "Program eýýäm işleýär",
+    "البخاري": "Sahih al-Buhary",
+    "مسلم": "Sahih Muslim",
+    "أبو داود": "Sünen Abu Dawud",
+    "الترمذي": "Jami' at-Tirmizi",
+    "ابن ماجه": "Sünen Ibn Maja",
+    "القرآن الكريم": "Mukaddes Kur'an",
+    "أحمد": "Müsned Ahmad",
+    "النسائي": "Sünen an-Nasa'i",
+    "الحاكم": "Al-Mustadrak al-Hakim",
+    "حصن المسلم": "Hisn al-Muslim"
   },
   "prayer_names": {
     "fajr": "Ertir",

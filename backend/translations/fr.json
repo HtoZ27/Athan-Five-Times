@@ -4,7 +4,7 @@
     "name": "Français"
   },
   "ui": {
-    "app_name": "أذان الصلاة",
+    "app_name": "Heures des Prières",
     "athkar_title": " Adhkâr",
     "athkar_after_prayer": " Adhkâr après la prière",
     "tray_show": "Afficher la fenêtre",
@@ -92,7 +92,7 @@
     "أذكار الصلاة": "أذكار الصلاة",
     "ملفات صوتية (*.mp3 *.wav *.ogg *.flac)": "ملفات صوتية (*.mp3 *.wav *.ogg *.flac)",
     "الطول (Longitude)": "الطول (Longitude)",
-    "اختر ملفًا صوتيًا": "اختر ملفًا صوتيًا",
+    "اختر ملفًا صوتيًا": "Sélectionner un fichier audio",
     "طريقة العرض:": "طريقة العرض:",
     "📤 تصدير الإعدادات": "📤 تصدير الإعدادات",
     "الوضع الصامت": "الوضع الصامت",
@@ -200,7 +200,18 @@
     "أيام التشريق — اليوم الثالث": "Jours de Tachriq — troisième jour",
     "الأيام البيض": "Jours blancs",
     "باقي %d يوم على رمضان": "%d jour avant le Ramadan",
-    "باقي %d أيام على رمضان": "%d jours avant le Ramadan"
+    "باقي %d أيام على رمضان": "%d jours avant le Ramadan",
+    "يعمل التطبيق بالفعل": "L'application est déjà en cours d'exécution",
+    "البخاري": "Sahih al-Bukhari",
+    "مسلم": "Sahih Muslim",
+    "أبو داود": "Sunan Abu Dawud",
+    "الترمذي": "Jami' at-Tirmidhi",
+    "ابن ماجه": "Sunan Ibn Majah",
+    "القرآن الكريم": "Le Noble Coran",
+    "أحمد": "Musnad Ahmad",
+    "النسائي": "Sunan an-Nasa'i",
+    "الحاكم": "Al-Mustadrak al-Hakim",
+    "حصن المسلم": "Hisn al-Muslim"
   },
   "prayer_names": {
     "fajr": "Fajr",

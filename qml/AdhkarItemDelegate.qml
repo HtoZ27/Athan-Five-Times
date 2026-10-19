@@ -34,9 +34,11 @@ Rectangle {
     function refName(id) {
         var m = {
             "bukhari": "البخاري", "muslim": "مسلم", "abudawud": "أبو داود",
-            "tirmidhi": "الترمذي", "ibnmajah": "ابن ماجه", "quran": "القرآن الكريم"
+            "tirmidhi": "الترمذي", "ibnmajah": "ابن ماجه", "quran": "القرآن الكريم",
+            "ahmad": "أحمد", "nasai": "النسائي", "hakim": "الحاكم",
+            "hisn": "حصن المسلم"
         }
-        return m[id] || id
+        return m[id] ? tr(m[id]) : id
     }
 
     ColumnLayout {

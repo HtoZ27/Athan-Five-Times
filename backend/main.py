@@ -137,7 +137,7 @@ class QmlAthanApp:
                 import subprocess
 
                 subprocess.run(
-                    ["notify-send", "-t", "3000", t("app_name"), "يعمل التطبيق بالفعل"],
+                    ["notify-send", "-t", "3000", t("app_name"), t("يعمل التطبيق بالفعل")],
                     capture_output=True,
                     timeout=5,
                 )

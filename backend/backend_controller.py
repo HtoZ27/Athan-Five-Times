@@ -32,6 +32,7 @@ from .i18n import (
     credits_title,
 )
 from .translations import (
+    _date_connector,
     calc_method_name,
     madhab_name,
     timezone_name,
@@ -899,7 +900,7 @@ class PrayerEngine(QObject):
         code = s.get("country", "")
         city = s.get("city", "")
         if code and city:
-            return f"{city_name(city)}، {country_name(code)}"
+            return f"{city_name(city)}{_date_connector()} {country_name(code)}"
         return ""
 
     @Slot(result=str)
@@ -1602,7 +1603,10 @@ class PrayerEngine(QObject):
         try:
             parent = QApplication.activeWindow()
             path, _ = QFileDialog.getOpenFileName(
-                parent, "اختر ملفًا صوتيًا", "", "Audio Files (*.mp3 *.wav *.ogg *.flac)"
+                parent,
+                u("اختر ملفًا صوتيًا"),
+                "",
+                u("ملفات صوتية (*.mp3 *.wav *.ogg *.flac)"),
             )
             if path:
                 path = path.removeprefix("file://")

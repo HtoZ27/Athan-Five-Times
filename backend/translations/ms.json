@@ -4,7 +4,7 @@
     "name": "Bahasa Melayu"
   },
   "ui": {
-    "app_name": "أذان الصلاة",
+    "app_name": "Waktu Solat",
     "athkar_title": "Athkar",
     "athkar_after_prayer": "Selepas Solat Athkar",
     "tray_show": "Tunjuk Tetingkap",
@@ -92,7 +92,7 @@
     "أذكار الصلاة": "أذكار الصلاة",
     "ملفات صوتية (*.mp3 *.wav *.ogg *.flac)": "ملفات صوتية (*.mp3 *.wav *.ogg *.flac)",
     "الطول (Longitude)": "الطول (Longitude)",
-    "اختر ملفًا صوتيًا": "اختر ملفًا صوتيًا",
+    "اختر ملفًا صوتيًا": "Pilih Fail Audio",
     "طريقة العرض:": "طريقة العرض:",
     "📤 تصدير الإعدادات": "📤 تصدير الإعدادات",
     "الوضع الصامت": "الوضع الصامت",
@@ -200,7 +200,18 @@
     "أيام التشريق — اليوم الثالث": "Hari Tasyrik — hari ketiga",
     "الأيام البيض": "Hari-hari Putih",
     "باقي %d يوم على رمضان": "%d hari lagi ke Ramadan",
-    "باقي %d أيام على رمضان": "%d hari lagi ke Ramadan"
+    "باقي %d أيام على رمضان": "%d hari lagi ke Ramadan",
+    "يعمل التطبيق بالفعل": "Aplikasi sudah berjalan",
+    "البخاري": "Sahih Bukhari",
+    "مسلم": "Sahih Muslim",
+    "أبو داود": "Sunan Abu Dawud",
+    "الترمذي": "Jami' at-Tirmidzi",
+    "ابن ماجه": "Sunan Ibnu Majah",
+    "القرآن الكريم": "Al-Quran Al-Karim",
+    "أحمد": "Musnad Ahmad",
+    "النسائي": "Sunan an-Nasa'i",
+    "الحاكم": "Al-Mustadrak al-Hakim",
+    "حصن المسلم": "Hisnul Muslim"
   },
   "prayer_names": {
     "fajr": "Subuh",

@@ -234,7 +234,18 @@
     "أيام التشريق — اليوم الثالث": "Days of Tashriq — third day",
     "الأيام البيض": "White Days",
     "باقي %d يوم على رمضان": "%d day left until Ramadan",
-    "باقي %d أيام على رمضان": "%d days left until Ramadan"
+    "باقي %d أيام على رمضان": "%d days left until Ramadan",
+    "يعمل التطبيق بالفعل": "The app is already running",
+    "البخاري": "Sahih al-Bukhari",
+    "مسلم": "Sahih Muslim",
+    "أبو داود": "Sunan Abu Dawud",
+    "الترمذي": "Jami' at-Tirmidhi",
+    "ابن ماجه": "Sunan Ibn Majah",
+    "القرآن الكريم": "The Noble Quran",
+    "أحمد": "Musnad Ahmad",
+    "النسائي": "Sunan an-Nasa'i",
+    "الحاكم": "Al-Mustadrak al-Hakim",
+    "حصن المسلم": "Hisn al-Muslim"
   },
   "prayer_names": {
     "fajr": "Fajr",

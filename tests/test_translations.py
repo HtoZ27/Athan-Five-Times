@@ -467,3 +467,92 @@ class TestCalendarNames:
         assert t_prayer("sunrise") == "Gün dogşy"
         assert t_prayer("isha") == "Ýassy"
         set_lang("ar")
+
+
+class TestNoArabicLeaks:
+    """No translation file may carry a real Arabic value in a non-Arabic-script
+    language. Placeholders (value == key) are allowed: u() falls back to English
+    for those, so they never reach the user as Arabic text."""
+
+    ARABIC_SCRIPT = {"ar", "ur", "ps"}
+    ARABIC = re.compile(r"[\u0600-\u06FF]")
+
+    @staticmethod
+    def _flatten(node, prefix=""):
+        if isinstance(node, dict):
+            for key, value in node.items():
+                path = f"{prefix}.{key}" if prefix else key
+                if isinstance(value, str):
+                    yield path, key, value
+                else:
+                    yield from TestNoArabicLeaks._flatten(value, path)
+        elif isinstance(node, list):
+            for index, value in enumerate(node):
+                if isinstance(value, str):
+                    yield f"{prefix}[{index}]", None, value
+
+    def test_no_real_arabic_values_outside_arabic_script_languages(self):
+        import glob
+        import json
+
+        base = os.path.join(os.path.dirname(__file__), "..", "backend", "translations")
+        for path in sorted(glob.glob(os.path.join(base, "*.json"))):
+            code = os.path.basename(path)[:-5]
+            if code in self.ARABIC_SCRIPT:
+                continue
+            with open(path, encoding="utf-8") as f:
+                data = json.load(f)
+            leaks = [
+                (full_path, value)
+                for full_path, leaf_key, value in self._flatten(data)
+                if self.ARABIC.search(value) and not (leaf_key is not None and value == leaf_key)
+            ]
+            assert not leaks, f"{code}.json Arabic leaks: {leaks[:5]}"
+
+    def test_app_name_matches_translated_title(self):
+        for code in LANGS:
+            if code in self.ARABIC_SCRIPT:
+                continue
+            set_lang(code)
+            app_name = t("app_name")
+            title = t("أذان الأوقات الخمس")
+            assert app_name == title, f"{code}: app_name {app_name!r} != title {title!r}"
+            assert not self.ARABIC.search(app_name), f"{code}: Arabic app_name {app_name!r}"
+        set_lang("ar")
+
+    def test_runtime_strings_localized(self):
+        runtime_keys = [
+            "اختر ملفًا صوتيًا",
+            "يعمل التطبيق بالفعل",
+            "ملفات صوتية (*.mp3 *.wav *.ogg *.flac)",
+        ]
+        for code in LANGS:
+            set_lang(code)
+            for key in runtime_keys:
+                value = t(key)
+                assert value, f"empty {key!r} for {code}"
+                if code not in self.ARABIC_SCRIPT:
+                    assert not self.ARABIC.search(value), f"{code}: {key} -> {value}"
+        set_lang("ar")
+
+    def test_hadith_source_names_localized(self):
+        sources = [
+            "البخاري",
+            "مسلم",
+            "أبو داود",
+            "الترمذي",
+            "ابن ماجه",
+            "القرآن الكريم",
+            "أحمد",
+            "النسائي",
+            "الحاكم",
+            "حصن المسلم",
+        ]
+        for code in LANGS:
+            set_lang(code)
+            for key in sources:
+                value = t(key)
+                assert value, f"empty source {key!r} for {code}"
+                if code not in self.ARABIC_SCRIPT:
+                    assert not self.ARABIC.search(value), f"{code}: {key} -> {value}"
+        set_lang("ar")

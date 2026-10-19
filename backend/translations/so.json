@@ -4,7 +4,7 @@
     "name": "Soomaali"
   },
   "ui": {
-    "app_name": "أذان الصلاة",
+    "app_name": "Waqtiyada Salaadda",
     "athkar_title": "Athkar",
     "athkar_after_prayer": "Salaada kadib Athkar",
     "tray_show": "Muuji Daaqada",
@@ -92,7 +92,7 @@
     "أذكار الصلاة": "أذكار الصلاة",
     "ملفات صوتية (*.mp3 *.wav *.ogg *.flac)": "ملفات صوتية (*.mp3 *.wav *.ogg *.flac)",
     "الطول (Longitude)": "الطول (Longitude)",
-    "اختر ملفًا صوتيًا": "اختر ملفًا صوتيًا",
+    "اختر ملفًا صوتيًا": "Dooro fayl maqal ah",
     "طريقة العرض:": "طريقة العرض:",
     "📤 تصدير الإعدادات": "📤 تصدير الإعدادات",
     "الوضع الصامت": "الوضع الصامت",
@@ -179,7 +179,18 @@
     "أيام التشريق — اليوم الثالث": "Maalmaha Tashriiq — maalinta saddexaad",
     "الأيام البيض": "Maalmaha Cad",
     "باقي %d يوم على رمضان": "%d maalin ayaa u hadhay Ramadaan",
-    "باقي %d أيام على رمضان": "%d maalin ayaa u hadhay Ramadaan"
+    "باقي %d أيام على رمضان": "%d maalin ayaa u hadhay Ramadaan",
+    "يعمل التطبيق بالفعل": "App-ku hore ayuu u shaqeynayaa",
+    "البخاري": "Saxiix al-Bukhaari",
+    "مسلم": "Saxiix Muslim",
+    "أبو داود": "Sunan Abu Daawuud",
+    "الترمذي": "Jaamic at-Tirmidhi",
+    "ابن ماجه": "Sunan Ibn Maajah",
+    "القرآن الكريم": "Qur'aanka Kariimka",
+    "أحمد": "Musnad Ahmad",
+    "النسائي": "Sunan an-Nasaa'i",
+    "الحاكم": "Al-Mustadrak al-Haakim",
+    "حصن المسلم": "Xisn al-Muslim"
   },
   "prayer_names": {
     "fajr": "Subax",

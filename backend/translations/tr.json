@@ -4,7 +4,7 @@
     "name": "Türkçe"
   },
   "ui": {
-    "app_name": "أذان الصلاة",
+    "app_name": "Namaz Vakitleri",
     "athkar_title": " Tesbihat",
     "athkar_after_prayer": " Namaz Sonrası Tesbihat",
     "tray_show": "Pencereyi Göster",
@@ -92,7 +92,7 @@
     "أذكار الصلاة": "أذكار الصلاة",
     "ملفات صوتية (*.mp3 *.wav *.ogg *.flac)": "ملفات صوتية (*.mp3 *.wav *.ogg *.flac)",
     "الطول (Longitude)": "الطول (Longitude)",
-    "اختر ملفًا صوتيًا": "اختر ملفًا صوتيًا",
+    "اختر ملفًا صوتيًا": "Ses dosyası seç",
     "طريقة العرض:": "طريقة العرض:",
     "📤 تصدير الإعدادات": "📤 تصدير الإعدادات",
     "الوضع الصامت": "الوضع الصامت",
@@ -200,7 +200,18 @@
     "أيام التشريق — اليوم الثالث": "Teşrik Günleri — üçüncü gün",
     "الأيام البيض": "Beyaz Günler",
     "باقي %d يوم على رمضان": "Ramazan'a %d gün kaldı",
-    "باقي %d أيام على رمضان": "Ramazan'a %d gün kaldı"
+    "باقي %d أيام على رمضان": "Ramazan'a %d gün kaldı",
+    "يعمل التطبيق بالفعل": "Uygulama zaten çalışıyor",
+    "البخاري": "Sahih Buhari",
+    "مسلم": "Sahih Müslim",
+    "أبو داود": "Sünen-i Ebu Davud",
+    "الترمذي": "Cami'ut-Tirmizi",
+    "ابن ماجه": "Sünen-i İbn Mace",
+    "القرآن الكريم": "Yüce Kur'an",
+    "أحمد": "Müsned-i Ahmed",
+    "النسائي": "Sünen-i Nesai",
+    "الحاكم": "El-Müstedrek (Hakim)",
+    "حصن المسلم": "Hisnü'l-Müslim"
   },
   "prayer_names": {
     "fajr": "İmsak",
