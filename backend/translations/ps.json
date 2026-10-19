@@ -5,10 +5,10 @@
   },
   "ui": {
     "app_name": "د لمانځه وختونه",
-    "athkar_title": "اتل",
-    "athkar_after_prayer": "له لمانځه وروسته اتاق",
+    "athkar_title": " اذکار",
+    "athkar_after_prayer": " له لمانځه وروسته اذکار",
     "tray_show": "کړکۍ ښکاره کړئ",
-    "tray_quit": "پرېږده",
+    "tray_quit": "وتل",
     "tray_loading": "بار کول...",
     "tray_tooltip": "د لمانځه وختونه\nبل لمونځ: {name}\nپاتې: {remaining}",
     "tray_next": "بل لمونځ: {name} ({remaining})",

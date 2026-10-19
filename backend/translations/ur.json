@@ -5,10 +5,10 @@
   },
   "ui": {
     "app_name": "نماز کے اوقات",
-    "athkar_title": "اتکر",
-    "athkar_after_prayer": "بعد از نماز اطہر",
+    "athkar_title": " اذکار",
+    "athkar_after_prayer": " نماز کے بعد اذکار",
     "tray_show": "ونڈو دکھائیں۔",
-    "tray_quit": "چھوڑو",
+    "tray_quit": "خروج",
     "tray_loading": "لوڈ ہو رہا ہے...",
     "tray_tooltip": "اوقات نماز\nاگلی نماز: {name}\nباقی: {remaining}",
     "tray_next": "اگلی نماز: {name} ({remaining})",
