@@ -123,3 +123,14 @@ class TestUnverifiedMethodRemoved:
 
         assert "طريقة فاروقي (باكستان/شمال الهند)" not in CALCULATION_METHODS
         assert len(CALCULATION_METHODS) == 26
+
+
+class TestTimezoneAliases:
+    def test_legacy_aliases_resolve_to_canonical_zones(self):
+        from zoneinfo import ZoneInfo
+
+        from backend.prayer_calc import _resolve_timezone
+
+        assert _resolve_timezone("Asia/Jeddah", 0.0) == ZoneInfo("Asia/Riyadh")
+        assert _resolve_timezone("Asia/Abu_Dhabi", 0.0) == ZoneInfo("Asia/Dubai")
+        assert _resolve_timezone("Asia/Doha", 0.0) == ZoneInfo("Asia/Qatar")

@@ -431,6 +431,21 @@ class TestCalendarNames:
                 assert greg_month_name(month), f"empty month {month} for {code}"
         set_lang("ar")
 
+    def test_pashto_ui_weekdays_match_calendar_days(self):
+        set_lang("ps")
+        ui_to_calendar = [
+            ("الإثنين", 0),
+            ("الثلاثاء", 1),
+            ("الأربعاء", 2),
+            ("الخميس", 3),
+            ("الجمعة", 4),
+            ("السبت", 5),
+            ("الأحد", 6),
+        ]
+        for key, weekday in ui_to_calendar:
+            assert t(key) == day_name(weekday), f"{key} mismatch"
+        set_lang("ar")
+
     def test_no_arabic_leak_in_date_lines(self):
         for code in LANGS:
             set_lang(code)

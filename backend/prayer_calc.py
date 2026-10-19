@@ -240,8 +240,16 @@ def _utc_hour_to_local_dt(
     return dt_utc.astimezone(tz).replace(tzinfo=None)
 
 
+_TIMEZONE_ALIASES = {
+    "Asia/Jeddah": "Asia/Riyadh",
+    "Asia/Abu_Dhabi": "Asia/Dubai",
+    "Asia/Doha": "Asia/Qatar",
+}
+
+
 def _resolve_timezone(tz_name: str | None, longitude: float) -> timezone | None:
     if tz_name:
+        tz_name = _TIMEZONE_ALIASES.get(tz_name, tz_name)
         try:
             from zoneinfo import ZoneInfo
 

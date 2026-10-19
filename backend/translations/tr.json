@@ -11,7 +11,7 @@
     "tray_quit": "Çıkış",
     "tray_loading": "Yükleniyor...",
     "tray_tooltip": "Namaz Vakitleri\nSonraki Namaz: {name}\nKalan: {remaining}",
-    "tray_next": "Sonraki Namaz: {name}  ({remaining})",
+    "tray_next": "Sonraki namaz: {name}  ({remaining})",
     "notif_prayer_title": "Namaz Vakti",
     "notif_prayer_body": "{prayer} vakti geldi",
     "notif_dnd_title": "Rahatsız Etmeyin",
@@ -257,7 +257,7 @@
     "isha": "Yatsı"
   },
   "credits": {
-    "title": "Hakkında",
+    "title": "Katkıda Bulunanlar",
     "html": "<div style='font-size:13px; text-align:center;'><h3>Namaz Vakitleri</h3><p>Namaz vakitleri ve ezan için açık kaynak uygulama</p><hr><p><b>Kullanılan kütüphaneler ve lisansları:</b></p><p>🐍 <b>Python</b> — PSF License</p><p>🖼️ <b>Qt 6</b> &mdash; LGPL v3</p><p style=\"margin:4px 0;\"><b>PySide6</b> — LGPL v3</p><p>🔊 <b>miniaudio</b> — MIT</p><p>🧮 <b>Adhan</b> — MIT</p><p>🔔 <b>plyer</b> — MIT</p><p>🔗 <b>cffi</b> — MIT</p><p>📄 <b>pycparser</b> — BSD</p><hr><p style='font-size:12px; color:#888;'><b>Oluşturan: H.Z.Tun</b></p></div>"
   },
   "calendar": {
