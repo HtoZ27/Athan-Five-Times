@@ -229,3 +229,23 @@ def _quit(self):
 **المصدر**: azkar-db (345 صفاً) + مكتبة Dart الأساسية (74 عنصراً).
 **النتيجة**: 140 تصنيفاً / 382 عنصراً، 37 مكرراً حُذف، 6 تعارضات أعداد أُبقي فيها على نسختنا.
 **السياسة**: عند التعارض تُحفظ نسختنا (روايات متعددة مشروعة)؛ الغائب عدده يُفترض 1؛ المرجع الغائب يبقى غائباً.
+
+---
+
+## أيقونة الدرج — تغطية freedesktop + أداة تشخيص (2026-10-19)
+
+**الملفات**: `backend/tray_backend.py`, `backend/main.py`, `qml/main.qml`, `scripts/e2e-tray.py`, `scripts/e2e-tray-mocks.py`, `scripts/e2e-tray-xembed.py`, `scripts/e2e-tray-envs.sh`, `scripts/tray-probe.py`, `tests/test_tray_backends.py`, `docs/dev/FREEDESKTOP-TRAY-MATRIX.md`, `docs/dev/WAYLAND-NOTES.md`
+
+**المشكلة**: على غير xcb (Wayland) يرجع Qt `isSystemTrayAvailable() == True` دائمًا حتى بلا host → خطر إخفاء النافذة بلا أيقونة. لا سيناريو e2e لـXEmbed. لا أداة تحقق ميدانية على GNOME/MATE.
+
+**قبل**: بوابة التوفر تعتمد Qt فقط على غير xcb؛ 11 فحص e2e (no-host/xapp/sni) بلا XEmbed.
+
+**بعد**:
+- بوابة `qt_tray_available()` تشترط `org.kde.StatusNotifierWatcher` على غير xcb (`SNI_WATCHER_NAME`)؛ `QtTrayBackend.is_hosted()` يستخدم البوابة → لا إخفاء وهمي.
+- e2e XEmbed حقيقي: مدير وهمي `scripts/e2e-tray-xembed.py` (libX11 عبر ctypes) + سيناريو في `scripts/e2e-tray-envs.sh` → **14/14** خضراء (no-host 1 / xapp 6 / sni 4 / xembed 3)، وأثبت `DOCK window=...` من Qt.
+- أداة `scripts/tray-probe.py` (ثابت + `--live N` بأيقونة وقائمة وأحداث) للتحقق على GNOME X11/Wayland وMATE؛ مُثبتة معزولًا على مساري SNI وXEmbed.
+- توثيق: `FREEDESKTOP-TRAY-MATRIX.md` (مصفوفة كاملة + قسم تحقق GNOME/MATE) + تحديث `WAYLAND-NOTES.md`.
+
+**التأثير**: ✅ pytest 34، ruff نظيف، `git diff --check` نظيف، بلا عمليات متروكة.
+
+**غير مشمول**: التحقق على جلسات Wayland/GNOME/MATE الحقيقية (يُنفَّذ بـprobe من المستخدم)؛ سيناريو host متأخر بعد رفض XEmbed الأول (`_tray_retry_timer`).

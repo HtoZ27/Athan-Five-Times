@@ -49,6 +49,7 @@ from .l10n import LanguageManager
 from .backend_controller import PrayerEngine
 from .theme_controller import ThemeController
 from .audio import set_volume
+from .tray_backend import create_tray_backend, detect_tray_kind, make_transparent_png
 
 apply_render_env()
 
@@ -115,11 +116,22 @@ class QmlAthanApp:
 
         self._azan_path = azan_path
         self._tray = None
+        self._tray_menu = None
+        self._tray_icon_path = ""
+        self._tray_blank_icon_path = ""
         self._tray_original_icon = QIcon()
         self._azan_flash_timer = QTimer()
         self._azan_flash_timer.setInterval(500)
         self._azan_flash_timer.timeout.connect(self._toggle_tray_icon)
         self._tray_icon_visible = True
+        # Panels often start after the app (login races); retry until a host
+        # appears and recreate the icon if the host restarts.
+        self._tray_retry_timer = QTimer()
+        self._tray_retry_timer.setInterval(3000)
+        self._tray_retry_timer.timeout.connect(self._setup_tray)
+        self._tray_watchdog = QTimer()
+        self._tray_watchdog.setInterval(10000)
+        self._tray_watchdog.timeout.connect(self._check_tray_health)
         self._engine = QQmlApplicationEngine()
         self._engine.addImportPath(QML_DIR)
 
@@ -378,89 +390,160 @@ class QmlAthanApp:
             except (AttributeError, RuntimeError):
                 pass
 
-    def _setup_tray(self):
+    def _pick_tray_icon(self) -> str:
+        """Best mosque PNG for the current device pixel ratio ('' if missing)."""
         try:
-            from PySide6.QtWidgets import QSystemTrayIcon, QMenu
-            from PySide6.QtGui import QAction
+            from PySide6.QtGui import QGuiApplication
 
-            if not QSystemTrayIcon.isSystemTrayAvailable():
-                logger.info("System tray not available")
-                return
-            tray_icon = QIcon()
+            dpr = 1.0
             try:
-                from PySide6.QtGui import QGuiApplication
-
-                dpr = 1.0
-                try:
-                    screens = QGuiApplication.screens()
-                    if screens:
-                        dpr = screens[0].devicePixelRatio() or 1.0
-                except (AttributeError, RuntimeError):
-                    pass
-                size = int(22 * dpr)
-                avail = (16, 22, 24, 32, 48)
-                pick = min(avail, key=lambda s: abs(s - size))
-                for cand in (f"mosque-{pick}.png", "mosque-22.png"):
-                    icon_path = os.path.join(ASSETS_DIR, "tray", cand)
-                    if os.path.isfile(icon_path):
-                        tray_icon = QIcon(icon_path)
-                        break
-            except (AttributeError, RuntimeError, OSError) as exc:
-                logger.debug("Tray PNG probe failed: %s", exc)
-            if tray_icon.isNull():
-                icon_path = os.path.join(ASSETS_DIR, "kaaba.png")
-                tray_icon = QIcon(icon_path) if os.path.isfile(icon_path) else QIcon()
-            self._tray = QSystemTrayIcon(tray_icon, self._app)
-            self._tray.setToolTip(t("app_name"))
-            menu = QMenu()
-            menu.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
-            self._tray_show_act = menu.addAction(tray_icon, t("tray_show"))
-            self._tray_show_act.triggered.connect(self._show_window)
-            if getattr(self, "_widget_window", None) is not None:
-                self._tray_widget_act = menu.addAction(t("الودجة المصغرة"))
-                self._tray_widget_act.setCheckable(True)
-                try:
-                    self._tray_widget_act.setChecked(self._prayer_engine.isWidgetVisible())
-                except (AttributeError, RuntimeError):
-                    pass
-                self._tray_widget_act.triggered.connect(
-                    lambda checked=False: self._prayer_engine.setWidgetVisible(bool(checked))
-                )
-            menu.addSeparator()
-            self._tray_info_act = QAction(t("tray_loading"), menu)
-            self._tray_info_act.setEnabled(False)
-            menu.addAction(self._tray_info_act)
-            self._tray_pre_act = QAction("", menu)
-            self._tray_pre_act.setEnabled(False)
-            menu.addAction(self._tray_pre_act)
-            menu.addSeparator()
-            self._tray_quit_act = menu.addAction(t("tray_quit"))
-            self._tray_quit_act.triggered.connect(self._quit)
-            self._tray.setContextMenu(menu)
-            self._tray.show()
-            try:
-                show = self._prayer_engine.getSetting("show_tray")
-                if show is None:
-                    show = True
-                if not show:
-                    self._tray.hide()
-            except (AttributeError, RuntimeError, TypeError):
+                screens = QGuiApplication.screens()
+                if screens:
+                    dpr = screens[0].devicePixelRatio() or 1.0
+            except (AttributeError, RuntimeError):
                 pass
-            self._prayer_engine._tray_notify = self._tray_show_message
+            size = int(22 * dpr)
+            avail = (16, 22, 24, 32, 48)
+            pick = min(avail, key=lambda s: abs(s - size))
+            for cand in (f"mosque-{pick}.png", "mosque-22.png"):
+                path = os.path.join(ASSETS_DIR, "tray", cand)
+                if os.path.isfile(path):
+                    return path
+        except (AttributeError, RuntimeError, OSError) as exc:
+            logger.debug("Tray PNG probe failed: %s", exc)
+        fallback = os.path.join(ASSETS_DIR, "kaaba.png")
+        return fallback if os.path.isfile(fallback) else ""
+
+    def _build_tray_menu(self):
+        """Build the tray context menu once; the backend keeps it alive."""
+        from PySide6.QtWidgets import QMenu
+        from PySide6.QtGui import QAction
+
+        menu = QMenu()
+        self._apply_menu_direction(menu)
+        icon = QIcon(self._tray_icon_path) if self._tray_icon_path else QIcon()
+        self._tray_show_act = menu.addAction(icon, t("tray_show"))
+        self._tray_show_act.triggered.connect(self._show_window)
+        if getattr(self, "_widget_window", None) is not None:
+            self._tray_widget_act = menu.addAction(t("الودجة المصغرة"))
+            self._tray_widget_act.setCheckable(True)
+            try:
+                self._tray_widget_act.setChecked(self._prayer_engine.isWidgetVisible())
+            except (AttributeError, RuntimeError):
+                pass
+            self._tray_widget_act.triggered.connect(
+                lambda checked=False: self._prayer_engine.setWidgetVisible(bool(checked))
+            )
+        menu.addSeparator()
+        self._tray_info_act = QAction(t("tray_loading"), menu)
+        self._tray_info_act.setEnabled(False)
+        menu.addAction(self._tray_info_act)
+        self._tray_pre_act = QAction("", menu)
+        self._tray_pre_act.setEnabled(False)
+        menu.addAction(self._tray_pre_act)
+        menu.addSeparator()
+        self._tray_quit_act = menu.addAction(t("tray_quit"))
+        self._tray_quit_act.triggered.connect(self._quit)
+        return menu
+
+    def _apply_menu_direction(self, menu):
+        try:
+            rtl = bool(self._l10n.isRtl)
+        except (AttributeError, RuntimeError):
+            rtl = True
+        menu.setLayoutDirection(
+            Qt.LayoutDirection.RightToLeft if rtl else Qt.LayoutDirection.LeftToRight
+        )
+
+    def _setup_tray(self):
+        if self._tray is not None:
+            return
+        if not hasattr(self, "_prayer_engine"):
+            return
+        kind = detect_tray_kind()
+        if kind is None:
+            logger.debug("No system tray host detected yet")
+            self._tray_retry_timer.start()
             self._refresh_tray_context()
-            self._tray.activated.connect(self._on_tray_activated)
-            self._tray.messageClicked.connect(self._show_window)
+            return
+        try:
+            self._tray_icon_path = self._pick_tray_icon()
+            if not self._tray_blank_icon_path:
+                self._tray_blank_icon_path = make_transparent_png(22)
+            if self._tray_menu is None:
+                self._tray_menu = self._build_tray_menu()
+            self._tray = create_tray_backend(
+                kind,
+                self._tray_icon_path,
+                t("app_name"),
+                menu=self._tray_menu,
+                parent=self._app,
+            )
+            self._tray.activateRequested.connect(self._show_window)
+            self._tray.menuRequested.connect(self._popup_tray_menu)
+            self._tray_retry_timer.stop()
+            self._tray_watchdog.start()
+            self._apply_show_tray_setting()
+            self._prayer_engine._tray_notify = self._tray_show_message
             self._prayer_engine.trayInfoChanged.connect(self._on_tray_info_changed)
-            self._tray_original_icon = tray_icon
+            self._refresh_tray_context()
+            logger.info("System tray ready (%s backend)", kind)
         except (AttributeError, RuntimeError, OSError) as exc:
             logger.warning("Could not create tray: %s", exc)
+            self._tray = None
+            self._tray_retry_timer.start()
+
+    def _apply_show_tray_setting(self):
+        if self._tray is None:
+            return
+        try:
+            show = self._prayer_engine.getSetting("show_tray")
+        except (AttributeError, RuntimeError):
+            show = True
+        self._tray.set_visible(True if show is None else bool(show))
+
+    def _check_tray_health(self):
+        """Recreate the icon when the panel (host) restarts or appears late."""
+        if self._tray is None:
+            self._setup_tray()
+            return
+        if not self._tray.is_hosted():
+            logger.info("Tray host container disappeared — rebuilding the icon")
+            self._destroy_tray()
+            self._tray_retry_timer.start()
+
+    def _destroy_tray(self):
+        if self._tray is None:
+            return
+        try:
+            self._prayer_engine.trayInfoChanged.disconnect(self._on_tray_info_changed)
+        except (RuntimeError, TypeError, AttributeError):
+            pass
+        try:
+            self._tray.destroy()
+        except (RuntimeError, AttributeError):
+            pass
+        self._tray = None
+        self._refresh_tray_context()
+
+    def _popup_tray_menu(self):
+        """Show the context menu at the cursor (XApp panel ButtonPress path)."""
+        if self._tray_menu is None:
+            return
+        try:
+            from PySide6.QtGui import QCursor
+
+            self._apply_menu_direction(self._tray_menu)
+            self._tray_menu.popup(QCursor.pos())
+        except (AttributeError, RuntimeError):
+            pass
 
     def _tray_usable(self) -> bool:
         tray = getattr(self, "_tray", None)
         if tray is None:
             return False
         try:
-            return bool(tray.isVisible())
+            return bool(tray.is_hosted())
         except (AttributeError, RuntimeError):
             return False
 
@@ -471,36 +554,38 @@ class QmlAthanApp:
             pass
 
     def _hide_tray(self):
-        try:
-            if getattr(self, "_tray", None) is not None:
-                self._tray.hide()
-        except (AttributeError, RuntimeError):
-            pass
+        self._azan_flash_timer.stop()
+        self._tray_watchdog.stop()
+        self._tray_retry_timer.stop()
+        self._destroy_tray()
 
-    def _tray_show_message(self, title: str, body: str):
-        if not self._tray_usable():
-            return
+    def _tray_show_message(self, title: str, body: str) -> bool:
+        tray = getattr(self, "_tray", None)
+        if tray is None or not self._tray_usable():
+            return False
         try:
-            from PySide6.QtWidgets import QSystemTrayIcon
-
-            self._tray.showMessage(title, body, QSystemTrayIcon.Information, 10000)
+            return bool(tray.show_message(title, body))
         except (AttributeError, RuntimeError, TypeError):
-            pass
+            return False
 
     def _on_setting_changed(self, key):
-        if key == "show_tray" and getattr(self, "_tray", None):
-            try:
-                show = self._prayer_engine.getSetting("show_tray")
-                self._tray.setVisible(bool(show) if show is not None else True)
-                self._refresh_tray_context()
-            except (AttributeError, RuntimeError, TypeError):
-                pass
+        if key != "show_tray":
+            return
+        if getattr(self, "_tray", None) is None:
+            self._setup_tray()
+            return
+        try:
+            self._apply_show_tray_setting()
+            self._refresh_tray_context()
+        except (AttributeError, RuntimeError, TypeError):
+            pass
 
     def _on_tray_info_changed(self, next_name, remaining, pre_text):
         try:
             if hasattr(self, "_tray_info_act") and self._tray_info_act:
                 self._tray_info_act.setText(t("tray_next", name=next_name, remaining=remaining))
-                self._tray.setToolTip(t("tray_tooltip", name=next_name, remaining=remaining))
+            if self._tray is not None:
+                self._tray.set_tooltip(t("tray_tooltip", name=next_name, remaining=remaining))
             if hasattr(self, "_tray_pre_act") and self._tray_pre_act:
                 self._tray_pre_act.setText(pre_text)
                 self._tray_pre_act.setVisible(bool(pre_text))
@@ -519,14 +604,22 @@ class QmlAthanApp:
                 pass
 
     def _retranslate_tray(self):
-        if not hasattr(self, "_tray") or self._tray is None:
+        if getattr(self, "_tray_menu", None) is not None:
+            try:
+                self._apply_menu_direction(self._tray_menu)
+                if getattr(self, "_tray_show_act", None):
+                    self._tray_show_act.setText(t("tray_show"))
+                if getattr(self, "_tray_widget_act", None):
+                    self._tray_widget_act.setText(t("الودجة المصغرة"))
+                if getattr(self, "_tray_quit_act", None):
+                    self._tray_quit_act.setText(t("tray_quit"))
+            except (AttributeError, RuntimeError):
+                pass
+        tray = getattr(self, "_tray", None)
+        if tray is None:
             return
         try:
-            self._tray.setToolTip(t("app_name"))
-            if hasattr(self, "_tray_show_act") and self._tray_show_act:
-                self._tray_show_act.setText(t("tray_show"))
-            if hasattr(self, "_tray_quit_act") and self._tray_quit_act:
-                self._tray_quit_act.setText(t("tray_quit"))
+            tray.set_tooltip(t("app_name"))
             if hasattr(self, "_tray_info_act") and self._tray_info_act:
                 prayer_engine = getattr(self, "_prayer_engine", None)
                 if prayer_engine:
@@ -539,7 +632,7 @@ class QmlAthanApp:
                         name = info["next"]
                         remaining = info.get("remaining", "")
                         self._tray_info_act.setText(t("tray_next", name=name, remaining=remaining))
-                        self._tray.setToolTip(t("tray_tooltip", name=name, remaining=remaining))
+                        tray.set_tooltip(t("tray_tooltip", name=name, remaining=remaining))
                     else:
                         self._tray_info_act.setText(t("tray_loading"))
                 else:
@@ -548,20 +641,25 @@ class QmlAthanApp:
             pass
 
     def _on_azan_playing_changed(self, playing: bool):
-        if not hasattr(self, "_tray") or self._tray is None:
+        if getattr(self, "_tray", None) is None:
             return
         if playing:
             self._tray_icon_visible = True
             self._azan_flash_timer.start()
         else:
             self._azan_flash_timer.stop()
-            self._tray.setIcon(self._tray_original_icon)
+            self._tray.set_icon(self._tray_icon_path)
 
     def _toggle_tray_icon(self):
-        if not hasattr(self, "_tray") or self._tray is None:
+        if getattr(self, "_tray", None) is None:
             return
         self._tray_icon_visible = not self._tray_icon_visible
-        self._tray.setIcon(self._tray_original_icon if self._tray_icon_visible else QIcon())
+        if self._tray_icon_visible:
+            self._tray.set_icon(self._tray_icon_path)
+        elif self._tray_blank_icon_path:
+            self._tray.set_icon(self._tray_blank_icon_path)
+        else:
+            self._tray.set_icon("")
 
     def _show_window(self):
         try:
@@ -576,16 +674,6 @@ class QmlAthanApp:
                 root[0].requestActivate()
         except (AttributeError, RuntimeError):
             pass
-
-    def _on_tray_activated(self, reason):
-        from PySide6.QtWidgets import QSystemTrayIcon
-
-        if reason in (
-            QSystemTrayIcon.ActivationReason.Trigger,
-            QSystemTrayIcon.ActivationReason.DoubleClick,
-            QSystemTrayIcon.ActivationReason.MiddleClick,
-        ):
-            self._show_window()
 
     def _quit(self):
         self._azan_flash_timer.stop()

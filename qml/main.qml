@@ -46,9 +46,18 @@ ApplicationWindow {
     readonly property int af: Theme.animFast
     readonly property int am: Theme.animMedium
 
-    onClosing: {
+    onClosing: function(close) {
         saveGeometry()
-        if (prayerEngine) prayerEngine.quitApp()
+        var showTray = prayerEngine ? prayerEngine.getSetting("show_tray") : true
+        if (showTray === undefined || showTray === null) showTray = true
+        var trayOk = (typeof trayAvailable !== "undefined") && trayAvailable
+        if (trayOk && showTray) {
+            // A hosted tray icon keeps the app reachable: hide instead of quitting.
+            close.accepted = false
+            appWindow.hide()
+        } else {
+            if (prayerEngine) prayerEngine.quitApp()
+        }
     }
 
     function saveGeometry() {
