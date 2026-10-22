@@ -752,7 +752,7 @@
       "missing_languages": [
         "ps"
       ],
-      "note": "Item numbers 75-98 map to repo IDs; m05/mor25-27 come from other Hisn sections. e03/e16/e20 evening forms are adapted from the morning wording in several languages; m04/e08 uses 'Messenger' in en/id/ru/tk and 'Profeta' in es/it. Native review pending.",
+      "note": "Item numbers 75-98 map to repo IDs; m05/mor25-27 come from other Hisn sections. e03/e16/e20 evening forms are adapted from the morning wording in several languages; m04/e08 renders 'Messenger' as en 'Messenger', es 'Mensajero', fr 'Messager', id 'rasul', tk 'resul', ru 'посланник'; only it uses 'Profeta'. Native review pending.",
       "sources": {
         "it": "IslamHouse Hisn al-Muslim Italian DOCX (it-fortezza-del-musulmano-finale.docx)",
         "ru": "IslamHouse Hisn al-Muslim Russian DOCX",

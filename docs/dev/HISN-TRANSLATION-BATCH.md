@@ -266,10 +266,10 @@ Verify: `pytest tests/test_adhkar_repo.py -q`, `ruff check backend/ tests/`,
    wording of `e03`/`eve16`/`eve20`.
 4. **`pa`** — 26/51 (17/33); 25 ids / 16 unique missing. HadeethEnc `6093` was the last usable
    source; `3008` is 404 in the Punjabi edition.
-5. **Metadata defect (unfixed):** `hisn_batch.note` claims *"m04/e08 uses 'Messenger' in
-   en/id/ru/tk and 'Profeta' in es/it"* — **wrong for `es`**: the Spanish text says
-   *Mensajero* (= Messenger); only Italian uses *Profeta*. The French/Turkish/Malay
-   batches use *Messager*/*resul*/*Rasul* respectively.
+5. **Metadata note (fixed):** `hisn_batch.note` now spells out the Messenger terms
+   (`en` Messenger, `es` **Mensajero**, `fr` Messager, `id` rasul, `tk` resul, `ru`
+   посланник; `it` alone uses *Profeta*). The earlier claim that `es` used *Profeta* was
+   wrong.
 6. **`es_la` note:** `after_prayer.json` says *"es_la is a mirror of es"*. True for the
    adhkar content (63/63 items identical) but **not** for the UI: 10 of the 264 `ui` keys
    differ between `es.json` and `es_la.json`. Wording should be narrowed.
