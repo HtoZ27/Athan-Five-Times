@@ -193,7 +193,7 @@ def main() -> int:
     check("reject-city", pe.getSetting("city") == "Tunis")
 
     prov = pe.getAthkarProvider()
-    check("adhkar-items-morning", len(prov.getCategoryItems("morning")) == 27)
+    check("adhkar-items-morning", len(prov.getCategoryItems("morning")) == 26)
     it = prov.getCategoryItems("morning")[0]
     check("adhkar-item-shape",
           bool(it.get("arabic")) and it.get("count", 0) >= 1 and bool(it.get("reference_id")))

@@ -14,28 +14,104 @@
       "arabic": "أَسْتَغْفِرُ اللَّهَ (ثَلَاثاً).",
       "count": 3,
       "reference_id": "muslim",
-      "reference_detail": "مسلم 1/414 (أستغفر الله ثلاثاً، اللهم أنت السلام ومنك السلام)"
+      "reference_detail": "مسلم 1/414 (أستغفر الله ثلاثاً، اللهم أنت السلام ومنك السلام)",
+      "translations": {
+        "ar": "أَسْتَغْفِرُ اللَّهَ (ثَلَاثاً).",
+        "en": "I seek forgiveness from Allah (three times).",
+        "fr": "Je demande pardon à Allah (trois fois).",
+        "de": "Ich bitte Allah um Vergebung (dreimal).",
+        "es": "Pido perdón a Allah (tres veces).",
+        "es_la": "Pido perdón a Allah (tres veces).",
+        "it": "Chiedo perdono ad Allah (tre volte).",
+        "ru": "Прошу прощения у Аллаха (трижды).",
+        "tr": "Allah'tan bağışlanma dilerim (üç kere).",
+        "hi": "मैं अल्लाह से माफ़ी माँगता हूँ (तीन बार)।",
+        "ur": "میں اللہ سے معافی مانگتا ہوں (تین بار)۔",
+        "ps": "زه د الله تعالی نه بخښنه غواړم (درې ځلې).",
+        "so": "Waxaan ka dambi dhaaf waydiisanayaa Allah (saddex jeer).",
+        "id": "Aku memohon ampun kepada Allah (tiga kali).",
+        "ms": "Aku memohon ampun kepada Allah (tiga kali).",
+        "pa": "ਮੈਂ ਅੱਲਾਹ ਤੋਂ ਮਾਫ਼ੀ ਮੰਗਦਾ ਹਾਂ (ਤਿੰਨ ਵਾਰ)।",
+        "tk": "Alladan magfiret ötünýärin (üç gezek)."
+      }
     },
     {
       "id": "ap02",
       "arabic": "اللَّهُمَّ أَنْتَ السَّلَامُ وَمِنْكَ السَّلَامُ، تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ",
       "count": 1,
       "reference_id": "muslim",
-      "reference_detail": "البخاري 1/255 ومسلم 1/414 (اللهم أنت السلام ومنك السلام)"
+      "reference_detail": "البخاري 1/255 ومسلم 1/414 (اللهم أنت السلام ومنك السلام)",
+      "translations": {
+        "ar": "اللَّهُمَّ أَنْتَ السَّلَامُ وَمِنْكَ السَّلَامُ، تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ",
+        "en": "O Allah, You are Peace and from You is peace, blessed are You, O Possessor of Majesty and Honor.",
+        "fr": "Ô Allah, Tu es la Paix et de Toi vient la paix, Tu es béni, Ô Détenteur de la Majesté et de l'Honneur.",
+        "de": "O Allah, Du bist der Friede und von Dir kommt der Friede, gesegnet bist Du, o Besitzer der Majestät und der Ehre.",
+        "es": "Oh Allah, Tú eres la Paz y de Ti viene la paz, bendito eres, oh Dueño de la Majestad y el Honor.",
+        "es_la": "Oh Allah, Tú eres la Paz y de Ti viene la paz, bendito eres, oh Dueño de la Majestad y el Honor.",
+        "it": "O Allah, Tu sei la Pace e da Te viene la pace, benedetto sei Tu, o Possessore di Maestà e Onore.",
+        "ru": "О Аллах, Ты — Мир и от Тебя — мир, благословен Ты, о Обладатель Величия и Почёта.",
+        "tr": "Allah'ım, Sen Selam'sın, selamet Sendendir. Ne mübareksin Ey Celal ve İkram sahibi!",
+        "hi": "ऐ अल्लाह! तू ही सलाम है और तुझ ही से सलामती है, बरकतों वाला है तू, ऐ जलाल और इकराम वाले।",
+        "ur": "اے اللہ! تو ہی سلام ہے اور تجھ ہی سے سلامتی ہے، بابرکت ہے تو، اے جلال اور اکرام والے۔",
+        "ps": "اې الله! ته سلام یې، او سلامتیا ستا لخوا ده، ډېر لوړ دی شان ستا، اې د جلال او عزت خاوند.",
+        "so": "Allahow, adiga ayaa salaanta ah, xagaagana salaanta ka timid, waad barakaysan tahay, ya Dhul-Jalaali wal-Ikraam.",
+        "id": "Ya Allah, Engkau Maha Sejahtera, dan dari-Mu kesejahteraan, Maha Suci Engkau wahai Pemilik Keagungan dan Kemuliaan.",
+        "ms": "Ya Allah, Engkaulah sumber keselamatan, daripada-Mu datangnya keselamatan, Maha Suci Engkau wahai Tuhan Yang Memiliki Keagungan dan Kemuliaan.",
+        "pa": "ਹੇ ਅੱਲਾਹ! ਤੂੰ ਹੀ ਸਲਾਮ ਹੈਂ ਅਤੇ ਤੋਂ ਹੀ ਸਲਾਮਤੀ ਹੈ, ਬਰਕਤਾਂ ਵਾਲਾ ਹੈ ਤੂੰ, ਹੇ ਜਲਾਲ ਅਤੇ ਇਕਰਾਮ ਵਾਲੇ।",
+        "tk": "Allahym! Sen Salamsyň, selamlyk Sendendir, mübarek Sen, eý beýiklik we hormat eýesi."
+      }
     },
     {
       "id": "ap03",
       "arabic": "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
       "count": 1,
       "reference_id": "bukhari",
-      "reference_detail": "البخاري 1/255 ومسلم 1/414 (لا إله إلا الله وحده لا شريك له)"
+      "reference_detail": "البخاري 1/255 ومسلم 1/414 (لا إله إلا الله وحده لا شريك له)",
+      "translations": {
+        "ar": "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+        "en": "There is no god but Allah, alone, without partner. His is the sovereignty and His is the praise, and He is over all things competent.",
+        "fr": "Il n'y a de dieu qu'Allah, Seul, sans associé. À Lui la royauté et à Lui la louange, et Il est sur toute chose Omnipotent.",
+        "de": "Es gibt keinen Gott außer Allah, dem Einzigen, ohne Teilhaber. Ihm gehört die Herrschaft und Ihm gebührt alles Lob, und Er hat Macht über alle Dinge.",
+        "es": "No hay más dios que Allah, Solo, sin asociado. Suyo es el reino y Suya es la alabanza, y Él tiene poder sobre todas las cosas.",
+        "es_la": "No hay más dios que Allah, Solo, sin asociado. Suyo es el reino y Suya es la alabanza, y Él tiene poder sobre todas las cosas.",
+        "it": "Non c'è dio all'infuori di Allah, l'Unico, senza associati. Sua è la sovranità e Sua è la lode, ed Egli è su ogni cosa Onnipotente.",
+        "ru": "Нет бога, кроме Аллаха, Единого, нет у Него сотоварища. Ему принадлежит власть и Ему хвала, и Он над всякой вещью Всемогущ.",
+        "tr": "Allah'tan başka ilah yoktur, tekdir, ortağı yoktur. Mülk O'nundur, hamd O'nadır ve O her şeye kadirdir.",
+        "hi": "अल्लाह के सिवा कोई माबूद नहीं, वह अकेला है, उसका कोई शरीक नहीं, उसी के लिए बादशाहत है और उसी के लिए तारीफ़ है, और वह हर चीज़ पर कादिर है।",
+        "ur": "اللہ کے سوا کوئی معبود نہیں، وہ اکیلا ہے، اس کا کوئی شریک نہیں، اسی کے لیے بادشاہت ہے اور اسی کے لیے حمد ہے، اور وہ ہر چیز پر قادر ہے۔",
+        "ps": "د الله نه پرته بل معبود نشته، هغه یوازې دی، د هغه هېڅ شریک نشته، بادشاهي د هغه لپاره ده، ټول حمد د هغه لپاره دی او هغه په هر شي باندې قادر دی.",
+        "so": "Ma jiro Ilaah xaq ah oo la caabudo mooyee Allaah, waa kali, shariig la'aan, isagaa xukunka isagaa mahad leh, oo wax kasta waa kara.",
+        "id": "Tiada Tuhan yang berhak disembah selain Allah, Maha Esa, tiada sekutu bagi-Nya. Milik-Nya kerajaan dan milik-Nya segala pujian, dan Dia Maha Kuasa atas segala sesuatu.",
+        "ms": "Tiada Tuhan yang disembah melainkan Allah, Maha Esa, tiada sekutu bagi-Nya. Milik-Nya kerajaan dan milik-Nya segala pujian, dan Dia Maha Kuasa atas segala sesuatu.",
+        "pa": "ਅੱਲਾਹ ਤੋਂ ਬਿਨਾਂ ਕੋਈ ਮਾਬੂਦ ਨਹੀਂ, ਉਹ ਇਕੱਲਾ ਹੈ, ਉਸ ਦਾ ਕੋਈ ਸ਼ਰੀਕ ਨਹੀਂ, ਉਸੇ ਲਈ ਬਾਦਸ਼ਾਹਤ ਹੈ ਅਤੇ ਉਸੇ ਲਈ ਤਾਰੀਫ਼ ਹੈ, ਅਤੇ ਉਹ ਹਰ ਚੀਜ਼ 'ਤੇ ਕਾਦਰ ਹੈ।",
+        "tk": "Alladan başga ybadata hakly hudaý ýok, ol ýekedir, onuň hiç bir şärigi ýokdur, mülk Onuňkidir, hamd Ona mahsusdur we Ol hemme zada gadyrdyr."
+      }
     },
     {
       "id": "ap04",
       "arabic": "سُبْحَانَ اللَّهِ (ثَلَاثاً وَثَلَاثِينَ) وَالْحَمْدُ لِلَّهِ (ثَلَاثاً وَثَلَاثِينَ) وَاللَّهُ أَكْبَرُ (ثَلَاثاً وَثَلَاثِينَ)، تَمَامُ الْمِائَةِ: لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ.",
       "count": 1,
       "reference_id": "muslim",
-      "reference_detail": "مسلم 1/418 (سبحان الله ثلاثاً وثلاثين، والحمد لله ثلاثاً وثلاثين، والله أكبر ثلاثاً وثلاثين، تمام المائة: لا إله إلا الله وحده لا شريك له)"
+      "reference_detail": "مسلم 1/418 (سبحان الله ثلاثاً وثلاثين، والحمد لله ثلاثاً وثلاثين، والله أكبر ثلاثاً وثلاثين، تمام المائة: لا إله إلا الله وحده لا شريك له)",
+      "translations": {
+        "ar": "سُبْحَانَ اللَّهِ (ثَلَاثاً وَثَلَاثِينَ) وَالْحَمْدُ لِلَّهِ (ثَلَاثاً وَثَلَاثِينَ) وَاللَّهُ أَكْبَرُ (ثَلَاثاً وَثَلَاثِينَ)، تَمَامُ الْمِائَةِ: لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ.",
+        "en": "Glory be to Allah (33 times) Praise be to Allah (33 times) Allah is the Greatest (33 times) Completion of the hundred: There is no god but Allah, alone, without partner. His is the sovereignty and His is the praise, and He is over all things competent.",
+        "fr": "Gloire à Allah (33 fois) Louange à Allah (33 fois) Allah est le Plus Grand (33 fois) Complément de la centaine : Il n'y a de dieu qu'Allah, Seul, sans associé. À Lui la royauté et à Lui la louange, et Il est sur toute chose Omnipotent.",
+        "de": "Subhanallah (33 Mal) Alhamdulillah (33 Mal) Allahu Akbar (33 Mal) Vollendung der Hundert: Es gibt keinen Gott außer Allah, dem Einzigen, ohne Teilhaber. Ihm gehört die Herrschaft und Ihm gebührt alles Lob, und Er hat Macht über alle Dinge.",
+        "es": "Gloria a Allah (33 veces) Alabado sea Allah (33 veces) Allah es el Más Grande (33 veces) Cumplimiento del centenar: No hay más dios que Allah, Solo, sin asociado. Suyo es el reino y Suya es la alabanza, y Él tiene poder sobre todas las cosas.",
+        "es_la": "Gloria a Allah (33 veces) Alabado sea Allah (33 veces) Allah es el Más Grande (33 veces) Cumplimiento del centenar: No hay más dios que Allah, Solo, sin asociado. Suyo es el reino y Suya es la alabanza, y Él tiene poder sobre todas las cosas.",
+        "it": "Gloria ad Allah (33 volte) Lode ad Allah (33 volte) Allah è il Più Grande (33 volte) Completamento del centinaio: Non c'è dio all'infuori di Allah, l'Unico, senza associati. Sua è la sovranità e Sua è la lode, ed Egli è su ogni cosa Onnipotente.",
+        "ru": "Субханаллах (33 раза) Альхамдулиллях (33 раза) Аллаху Акбар (33 раза) Дополнение до сотни: Нет бога, кроме Аллаха, Единого, нет у Него сотоварища. Ему принадлежит власть и Ему хвала, и Он над всякой вещью Всемогущ.",
+        "tr": "Sübhanallah (33 kere) Elhamdülillah (33 kere) Allahu Ekber (33 kere) Yüzü tamamlayan: Allah'tan başka ilah yoktur, tekdir, ortağı yoktur. Mülk O'nundur, hamd O'nadır ve O her şeye kadirdir.",
+        "hi": "सुब्हानल्लाह (33 बार) अल्हम्दुलिल्लाह (33 बार) अल्लाहु अकबर (33 बार) सौ की पूर्ति: अल्लाह के सिवा कोई माबूद नहीं, वह अकेला है, उसका कोई शरीक नहीं, उसी के लिए बादशाहत है और उसी के लिए तारीफ़ है, और वह हर चीज़ पर कादिर है।",
+        "ur": "سبحان اللہ (33 بار) الحمد للہ (33 بار) اللہ اکبر (33 بار) سو کی تکمیل: اللہ کے سوا کوئی معبود نہیں، وہ اکیلا ہے، اس کا کوئی شریک نہیں، اسی کے لیے بادشاہت ہے اور اسی کے لیے حمد ہے، اور وہ ہر چیز پر قادر ہے۔",
+        "ps": "سبحان الله (33 ځله) الحمد لله (33 ځله) الله اکبر (33 ځله) د سلو بشپړول: د الله نه پرته بل معبود نشته، هغه یوازې دی، د هغه هېڅ شریک نشته، بادشاهي د هغه لپاره ده، ټول حمد د هغه لپاره دی او هغه په هر شي باندې قادر دی.",
+        "so": "Subxaanallah (33 jeer) Alxamdu lillaah (33 jeer) Allaahu akbar (33 jeer) Dhamaystirka boqolka: Ma jiro Ilaah xaq ah oo la caabudo mooyee Allaah, waa kali, shariig la'aan, isagaa xukunka isagaa mahad leh, oo wax kasta waa kara.",
+        "id": "Mahasuci Allah (33 kali) Segala puji bagi Allah (33 kali) Allah Maha Besar (33 kali) Penyempurna seratus: Tiada Tuhan yang berhak disembah selain Allah, Maha Esa, tiada sekutu bagi-Nya. Milik-Nya kerajaan dan milik-Nya segala pujian, dan Dia Maha Kuasa atas segala sesuatu.",
+        "ms": "Mahasuci Allah (33 kali) Segala puji bagi Allah (33 kali) Allah Maha Besar (33 kali) Penyempurna seratus: Tiada Tuhan yang disembah melainkan Allah, Maha Esa, tiada sekutu bagi-Nya. Milik-Nya kerajaan dan milik-Nya segala pujian, dan Dia Maha Kuasa atas segala sesuatu.",
+        "pa": "ਸੁਬ੍ਹਾਨ ਅੱਲਾਹ (33 ਵਾਰ) ਅਲਹਮਦੁਲਿਲਾਹ (33 ਵਾਰ) ਅੱਲਾਹੁ ਅਕਬਰ (33 ਵਾਰ) ਸੌ ਦੀ ਪੂਰਤੀ: ਅੱਲਾਹ ਤੋਂ ਬਿਨਾਂ ਕੋਈ ਮਾਬੂਦ ਨਹੀਂ, ਉਹ ਇਕੱਲਾ ਹੈ, ਉਸ ਦਾ ਕੋਈ ਸ਼ਰੀਕ ਨਹੀਂ, ਉਸੇ ਲਈ ਬਾਦਸ਼ਾਹਤ ਹੈ ਅਤੇ ਉਸੇ ਲਈ ਤਾਰੀਫ਼ ਹੈ, ਅਤੇ ਉਹ ਹਰ ਚੀਜ਼ 'ਤੇ ਕਾਦਰ ਹੈ।",
+        "tk": "Subhanallah (33 gezek) Alhamdulillah (33 gezek) Allahu akbar (33 gezek) Ýüzü doldurýan: Alladan başga ybadata hakly hudaý ýok, ol ýekedir, onuň hiç bir şärigi ýokdur, mülk Onuňkidir, hamd Ona mahsusdur we Ol hemme zada gadyrdyr."
+      }
     },
     {
       "id": "ap05",
@@ -44,8 +120,26 @@
       "reference_id": "muslim",
       "reference_detail": "مسلم 1/418 (الحمد لله ثلاثاً وثلاثين — Muslim 597)",
       "virtue": null,
-      "translation": null,
-      "tags": []
+      "tags": [],
+      "translations": {
+        "ar": "الْحَمْدُ لِلَّهِ",
+        "en": "Praise be to Allah (33 times)",
+        "fr": "Louange à Allah (33 fois)",
+        "de": "Alhamdulillah (33 Mal)",
+        "es": "Alabado sea Allah (33 veces)",
+        "es_la": "Alabado sea Allah (33 veces)",
+        "it": "Lode ad Allah (33 volte)",
+        "ru": "Альхамдулиллях (33 раза)",
+        "tr": "Elhamdülillah (33 kere)",
+        "hi": "अल्हम्दुलिल्लाह (33 बार)",
+        "ur": "الحمد للہ (33 بار)",
+        "ps": "الحمد لله (33 ځله)",
+        "so": "Alxamdu lillaah (33 jeer)",
+        "id": "Segala puji bagi Allah (33 kali)",
+        "ms": "Segala puji bagi Allah (33 kali)",
+        "pa": "ਅਲਹਮਦੁਲਿਲਾਹ (33 ਵਾਰ)",
+        "tk": "Alhamdulillah (33 gezek)"
+      }
     },
     {
       "id": "ap06",
@@ -54,39 +148,132 @@
       "reference_id": "muslim",
       "reference_detail": "مسلم 1/418 (الله أكبر ثلاثاً وثلاثين — Muslim 597)",
       "virtue": null,
-      "translation": null,
-      "tags": []
+      "tags": [],
+      "translations": {
+        "ar": "اللَّهُ أَكْبَرُ",
+        "en": "Allah is the Greatest (33 times)",
+        "fr": "Allah est le Plus Grand (33 fois)",
+        "de": "Allahu Akbar (33 Mal)",
+        "es": "Allah es el Más Grande (33 veces)",
+        "es_la": "Allah es el Más Grande (33 veces)",
+        "it": "Allah è il Più Grande (33 volte)",
+        "ru": "Аллаху Акбар (33 раза)",
+        "tr": "Allahu Ekber (33 kere)",
+        "hi": "अल्लाहु अकबर (33 बार)",
+        "ur": "اللہ اکبر (33 بار)",
+        "ps": "الله اکبر (33 ځله)",
+        "so": "Allaahu akbar (33 jeer)",
+        "id": "Allah Maha Besar (33 kali)",
+        "ms": "Allah Maha Besar (33 kali)",
+        "pa": "ਅੱਲਾਹੁ ਅਕਬਰ (33 ਵਾਰ)",
+        "tk": "Allahu akbar (33 gezek)"
+      }
     },
     {
       "id": "ap07",
       "arabic": "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
       "count": 1,
       "reference_id": "muslim",
-      "reference_detail": "مسلم 1/415"
+      "reference_detail": "مسلم 1/415",
+      "translations": {
+        "ar": "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+        "en": "There is no god but Allah, alone, without partner. His is the sovereignty and His is the praise, and He is over all things competent.",
+        "fr": "Il n'y a de dieu qu'Allah, Seul, sans associé. À Lui la royauté et à Lui la louange, et Il est sur toute chose Omnipotent.",
+        "de": "Es gibt keinen Gott außer Allah, dem Einzigen, ohne Teilhaber. Ihm gehört die Herrschaft und Ihm gebührt alles Lob, und Er hat Macht über alle Dinge.",
+        "es": "No hay más dios que Allah, Solo, sin asociado. Suyo es el reino y Suya es la alabanza, y Él tiene poder sobre todas las cosas.",
+        "es_la": "No hay más dios que Allah, Solo, sin asociado. Suyo es el reino y Suya es la alabanza, y Él tiene poder sobre todas las cosas.",
+        "it": "Non c'è dio all'infuori di Allah, l'Unico, senza associati. Sua è la sovranità e Sua è la lode, ed Egli è su ogni cosa Onnipotente.",
+        "ru": "Нет бога, кроме Аллаха, Единого, нет у Него сотоварища. Ему принадлежит власть и Ему хвала, и Он над всякой вещью Всемогущ.",
+        "tr": "Allah'tan başka ilah yoktur, tekdir, ortağı yoktur. Mülk O'nundur, hamd O'nadır ve O her şeye kadirdir.",
+        "hi": "अल्लाह के सिवा कोई माबूद नहीं, वह अकेला है, उसका कोई शरीक नहीं, उसी के लिए बादशाहत है और उसी के लिए तारीफ़ है, और वह हर चीज़ पर कादिर है।",
+        "ur": "اللہ کے سوا کوئی معبود نہیں، وہ اکیلا ہے، اس کا کوئی شریک نہیں، اسی کے لیے بادشاہت ہے اور اسی کے لیے حمد ہے، اور وہ ہر چیز پر قادر ہے۔",
+        "ps": "د الله نه پرته بل معبود نشته، هغه یوازې دی، د هغه هېڅ شریک نشته، بادشاهي د هغه لپاره ده، ټول حمد د هغه لپاره دی او هغه په هر شي باندې قادر دی.",
+        "so": "Ma jiro Ilaah xaq ah oo la caabudo mooyee Allaah, waa kali, shariig la'aan, isagaa xukunka isagaa mahad leh, oo wax kasta waa kara.",
+        "id": "Tiada Tuhan yang berhak disembah selain Allah, Maha Esa, tiada sekutu bagi-Nya. Milik-Nya kerajaan dan milik-Nya segala pujian, dan Dia Maha Kuasa atas segala sesuatu.",
+        "ms": "Tiada Tuhan yang disembah melainkan Allah, Maha Esa, tiada sekutu bagi-Nya. Milik-Nya kerajaan dan milik-Nya segala pujian, dan Dia Maha Kuasa atas segala sesuatu.",
+        "pa": "ਅੱਲਾਹ ਤੋਂ ਬਿਨਾਂ ਕੋਈ ਮਾਬੂਦ ਨਹੀਂ, ਉਹ ਇਕੱਲਾ ਹੈ, ਉਸ ਦਾ ਕੋਈ ਸ਼ਰੀਕ ਨਹੀਂ, ਉਸੇ ਲਈ ਬਾਦਸ਼ਾਹਤ ਹੈ ਅਤੇ ਉਸੇ ਲਈ ਤਾਰੀਫ਼ ਹੈ, ਅਤੇ ਉਹ ਹਰ ਚੀਜ਼ 'ਤੇ ਕਾਦਰ ਹੈ।",
+        "tk": "Alladan başga ybadata hakly hudaý ýok, ol ýekedir, onuň hiç bir şärigi ýokdur, mülk Onuňkidir, hamd Ona mahsusdur we Ol hemme zada gadyrdyr."
+      }
     },
     {
       "id": "ap08",
       "arabic": "اللَّهُمَّ أَعِنِّي عَلَى ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ",
       "count": 1,
       "reference_id": "abudawud",
-      "reference_detail": "أبو داود 2/86 (اللهم أعنّي على ذكرك وشكرك وحسن عبادتك) وصححه الألباني"
+      "reference_detail": "أبو داود 2/86 (اللهم أعنّي على ذكرك وشكرك وحسن عبادتك) وصححه الألباني",
+      "translations": {
+        "ar": "اللَّهُمَّ أَعِنِّي عَلَى ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ",
+        "en": "O Allah, help me to remember You, to thank You, and to worship You perfectly.",
+        "fr": "Ô Allah, aide-moi à T'invoquer, à Te remercier et à T'adorer parfaitement.",
+        "de": "O Allah, hilf mir, Deiner zu gedenken, Dir zu danken und Dich vollkommen anzubeten.",
+        "es": "Oh Allah, ayúdame a recordarte, agradecerte y adorarte perfectamente.",
+        "es_la": "Oh Allah, ayúdame a recordarte, agradecerte y adorarte perfectamente.",
+        "it": "O Allah, aiutami a ricordarTi, a ringraziarTi e ad adorarTi perfettamente.",
+        "ru": "О Аллах, помоги мне поминать Тебя, благодарить Тебя и должным образом поклоняться Тебе.",
+        "tr": "Allah'ım! Seni zikretmek, Sana şükretmek ve Sana güzelce ibadet etmek için bana yardım et.",
+        "hi": "ऐ अल्लाह! अपने ज़िक्र करने, शुक्र करने और बेहतर अंदाज़ में अपनी इबादत करने में मेरी मदद फ़रमा।",
+        "ur": "اے اللہ! اپنا ذکر کرنے، شکر کرنے اور بہتر انداز میں اپنی عبادت کرنے میں میری مدد فرما۔",
+        "ps": "اې الله! زما سره ستا په یادولو، ستا په شکر ادا کولو او ستا په ښه عبادت کولو کې مرسته وکړې.",
+        "so": "Allahow, iga caawi xuskaaga, kugu mahadnaqidda, iyo cibaadadaada fiican.",
+        "id": "Ya Allah, bantulah aku untuk mengingat-Mu, bersyukur kepada-Mu, dan beribadah dengan baik kepada-Mu.",
+        "ms": "Ya Allah, bantulah aku untuk mengingat-Mu, bersyukur kepada-Mu, dan beribadah dengan baik kepada-Mu.",
+        "pa": "ਹੇ ਅੱਲਾਹ! ਆਪਣੇ ਜ਼ਿਕਰ ਕਰਨ, ਸ਼ੁਕਰ ਕਰਨ ਅਤੇ ਚੰਗੀ ਤਰ੍ਹਾਂ ਆਪਣੀ ਇਬਾਦਤ ਕਰਨ ਵਿੱਚ ਮੇਰੀ ਮਦਦ ਕਰ।",
+        "tk": "Allahym! Seni zikr etmäge, Saňa şükür etmege we Saňa gowy gulluk etmäge maňa kömek et."
+      }
     },
     {
       "id": "ap09",
       "arabic": "اللَّهُمَّ لَا مَانِعَ لِمَا أَعْطَيْتَ وَلَا مُعْطِيَ لِمَا مَنَعْتَ وَلَا يَنْفَعُ ذَا الْجَدِّ مِنْكَ الْجَدُّ",
       "count": 1,
       "reference_id": "bukhari",
-      "reference_detail": "البخاري مع الفتح 1/255 (اللهم لا مانع لما أعطيت...)"
+      "reference_detail": "البخاري مع الفتح 1/255 (اللهم لا مانع لما أعطيت...)",
+      "translations": {
+        "ar": "اللَّهُمَّ لَا مَانِعَ لِمَا أَعْطَيْتَ وَلَا مُعْطِيَ لِمَا مَنَعْتَ وَلَا يَنْفَعُ ذَا الْجَدِّ مِنْكَ الْجَدُّ",
+        "en": "O Allah, none can withhold what You give and none can give what You withhold, and riches cannot avail a wealthy person against You.",
+        "fr": "Ô Allah ! Personne ne peut empêcher ce que Tu donnes et personne ne peut donner ce que Tu empêches. Et la fortune de la personne fortunée n'est d'aucune utilité contre Toi.",
+        "de": "O Allah, niemand kann das verhindern, was Du gibst, und niemand kann geben, was Du zurückhältst, und Reichtum nützt dem Reichen vor Dir nichts.",
+        "es": "Oh, Señor, nadie puede impedir lo que Tú das y nadie puede dar lo que Tú niegas. Y la riqueza de la persona afortunada no es de ninguna utilidad ante Ti.",
+        "es_la": "Oh, Señor, nadie puede impedir lo que Tú das y nadie puede dar lo que Tú niegas. Y la riqueza de la persona afortunada no es de ninguna utilidad ante Ti.",
+        "it": "O Iddio, non v'è chi possa impedire ciò che Tu concedi, e non v'è chi possa concedere ciò che Tu impedisci, e non gioveranno a nulla presso di Te le risorse del facoltoso.",
+        "ru": "О Аллах, никто не лишит того, что Ты даровал, и никто не дарует того, чего Ты лишил, и бесполезным перед Тобой окажется богатство обладающего богатством.",
+        "tr": "Allah'ım! Senin verdiğini engelleyecek yoktur, Senin engellediğini verecek yoktur. Zenginlik ve makam sahibine, Senin katında malı fayda vermez.",
+        "hi": "ऐ अल्लाह! तू जो कुछ दे, उसे कोई रोकने वाला नहीं और जो रोक ले, उसे कोई देने वाला नहीं। किसी धनवान का धन तेरे विरुद्ध उसके कुछ काम नहीं आ सकता।",
+        "ur": "اے اللہ! تو جو کچھ دے، اسے کوئی روکنے والا نہیں اور تو جو روک لے، اسے کوئی دینے والا نہیں۔ کسی صاحب دولت کی دولت تیرے خلاف اس کے کچھ کام نہیں آ سکتی۔",
+        "ps": "اې الله! ته چې څه ورکوې، د هغه څوک مانع نشته، او ته چې څه بند کړې، د هغه څوک ورکوونکی نشته، او مالدار لره د هغه مال ستا په وړاندې فائده نه کوي.",
+        "so": "Allahayow, majirto cid diidi karta wax aad bixinaysid, mana jirto cid bixin karta wax aad diido, mid awood lihina awoodiisu xagaaga wax uga tarto.",
+        "id": "Ya Allah! Tidak ada yang mampu menghalangi apa yang Engkau beri dan tidak ada yang dapat memberi apa yang Engkau halangi. Tidak berguna kekayaan dan kemuliaan itu bagi pemiliknya di hadapan-Mu.",
+        "ms": "Ya Allah, tiada yang dapat menghalang apa yang Engkau berikan dan tiada yang dapat memberi apa yang Engkau halang. Kekayaan seseorang tidak berguna di hadapan-Mu.",
+        "pa": "ਹੇ ਅੱਲਾਹ! ਜੋ ਕੁੱਝ ਤੂੰ ਦੇਵੇਂ, ਉਸਨੂੰ ਰੋਕਣ ਵਾਲਾ ਕੋਈ ਨਹੀਂ ਅਤੇ ਜੋ ਕੁੱਝ ਤੂੰ ਰੋਕ ਲਵੇਂ, ਉਸਨੂੰ ਦੇਣ ਵਾਲਾ ਕੋਈ ਨਹੀਂ। ਕਿਸੇ ਅਮੀਰ ਵਿਅਕਤੀ ਦੀ ਅਮੀਰੀ ਤੇਰੇ ਅੱਗੇ ਕਿਸੇ ਕੰਮ ਦੀ ਨਹੀਂ।",
+        "tk": "Allahym! Seniň bereniňi hiç kimse saklap bilmez, Seniň saklanyňy hiç kimse berip bilmez. Baýlyk we mertebe eýesine Seniň huzuryňda peýda bermez."
+      }
     },
     {
       "id": "aft10",
-      "arabic": "بسم الله الرحمن الرحيم ﴿قُلْ هُوَ اللَّهُ أَحَدٌ* اللَّهُ الصَّمَدُ* لَمْ يَلِدْ وَلَمْ يُولَدْ* وَلَمْ يَكُن لَّهُ كُفُواً أَحَدٌ﴾، بسم الله الرحمن الرحيم ﴿قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ* مِن شَرِّ مَا خَلَقَ* وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ* وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ* وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ﴾،بسم الله الرحمن الرحيم ﴿قُلْ أَعُوذُ بِرَبِّ النَّاسِ* مَلِكِ النَّاسِ* إِلَهِ النَّاسِ* مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ* الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ* مِنَ الْجِنَّةِ وَ النَّاسِ﴾.",
+      "arabic": "بسم الله الرحمن الرحيم ﴿قُلْ هُوَ اللَّهُ أَحَدٌ* اللَّهُ الصَّمَدُ* لَمْ يَلِدْ وَلَمْ يُولَدْ* وَلَمْ يَكُن لَّهُ كُفُواً أَحَدٌ﴾، بسم الله الرحمن الرحيم ﴿قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ* مِن شَرِّ مَا خَلَقَ* وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ* وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ* وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ﴾، بسم الله الرحمن الرحيم ﴿قُلْ أَعُوذُ بِرَبِّ النَّاسِ* مَلِكِ النَّاسِ* إِلَهِ النَّاسِ* مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ* الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ* مِنَ الْجِنَّةِ وَ النَّاسِ﴾.",
       "count": 1,
       "reference_id": "abudawud",
       "reference_detail": "أبو داود 1523 والنسائي؛ وصححه الألباني (المعوذات بعد كل صلاة مكتوبة)",
       "virtue": "تقال دبر كل صلاة (أبو داود 1523).",
-      "translation": null,
-      "tags": []
+      "tags": [],
+      "translations": {
+        "ar": "بسم الله الرحمن الرحيم ﴿قُلْ هُوَ اللَّهُ أَحَدٌ* اللَّهُ الصَّمَدُ* لَمْ يَلِدْ وَلَمْ يُولَدْ* وَلَمْ يَكُن لَّهُ كُفُواً أَحَدٌ﴾، بسم الله الرحمن الرحيم ﴿قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ* مِن شَرِّ مَا خَلَقَ* وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ* وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ* وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ﴾، بسم الله الرحمن الرحيم ﴿قُلْ أَعُوذُ بِرَبِّ النَّاسِ* مَلِكِ النَّاسِ* إِلَهِ النَّاسِ* مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ* الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ* مِنَ الْجِنَّةِ وَ النَّاسِ﴾.",
+        "en": "In the name of Allah, the Entirely Merciful, the Especially Merciful. Say, \"He is Allah, [who is] One, Allah, the Eternal Refuge. He neither begets nor is born, Nor is there to Him any equivalent.\" In the name of Allah, the Entirely Merciful, the Especially Merciful. Say, \"I seek refuge in the Lord of daybreak From the evil of that which He created And from the evil of darkness when it settles And from the evil of the blowers in knots And from the evil of an envier when he envies.\" In the name of Allah, the Entirely Merciful, the Especially Merciful. Say, \"I seek refuge in the Lord of mankind, The Sovereign of mankind. The God of mankind, From the evil of the retreating whisperer - Who whispers [evil] into the breasts of mankind - From among the jinn and mankind.\"",
+        "fr": "Au nom d'Allah, le Tout Miséricordieux, le Très Miséricordieux. Dis: «Il est Allah, Unique. Allah, Le Seul à être imploré pour ce que nous désirons. Il n'a jamais engendré, n'a pas été engendré non plus. Et nul n'est égal à Lui». Au nom d'Allah, le Tout Miséricordieux, le Très Miséricordieux. Dis: «Je cherche protection auprès du Seigneur de l'aube naissante, contre le mal des êtres qu'Il a créés, contre le mal de l'obscurité quand elle s'approfondit, contre le mal de celles qui soufflent [les sorcières] sur les nœuds, et contre le mal de l'envieux quand il envie». Au nom d'Allah, le Tout Miséricordieux, le Très Miséricordieux. Dis: «Je cherche protection auprès du Seigneur des hommes. Le Souverain des hommes, Dieu des hommes, contre le mal du mauvais conseiller, furtif, qui souffle le mal dans les poitrines des hommes, qu'il (le conseiller) soit un djinn, ou un être humain».",
+        "de": "Im Namen Allahs, des Allerbarmers, des Barmherzigen. Sag: Er ist Allah, ein Einer, Allah, der Überlegene. Er hat nicht gezeugt und ist nicht gezeugt worden, und niemand ist Ihm jemals gleich. Im Namen Allahs, des Allerbarmers, des Barmherzigen. Sag: Ich nehme Zuflucht beim Herrn des Tagesanbruchs vor dem Übel dessen, was Er erschaffen hat, und vor dem Übel der Dunkelheit, wenn sie zunimmt, und vor dem Übel der Knotenanbläserinnen und vor dem Übel eines (jeden) Neidenden, wenn er neidet. Im Namen Allahs, des Allerbarmers, des Barmherzigen. Sag: Ich nehme Zuflucht beim Herrn der Menschen, dem König der Menschen, dem Gott der Menschen, vor dem Übel des Einflüsterers, des Davonschleichers, der in die Brüste der Menschen einflüstert, von den Ginn und den Menschen.",
+        "es": "¡En el nombre de Alá, el Compasivo, el Misericordioso! Di: «¡Él es Alá, Uno, Dios, el Eterno. No ha engendrado, ni ha sido engendrado. No tiene par». ¡En el nombre de Alá, el Compasivo, el Misericordioso! Di: «Me refugio en el Señor del alba del mal que hacen sus criaturas, del mal de la oscuridad cuando se extiende, del mal de las que soplan en los nudos, del mal envidioso cuando envidia». ¡En el nombre de Alá, el Compasivo, el Misericordioso! Di: «Me refugio en el Señor de los hombres, el Rey de los hombres, el Dios de los hombres, del mal de la insinuación, del que se escabulle, que insinúa en el ánimo de los hombres, sea genio, sea hombre».",
+        "es_la": "¡En el nombre de Alá, el Compasivo, el Misericordioso! Di: «¡Él es Alá, Uno, Dios, el Eterno. No ha engendrado, ni ha sido engendrado. No tiene par». ¡En el nombre de Alá, el Compasivo, el Misericordioso! Di: «Me refugio en el Señor del alba del mal que hacen sus criaturas, del mal de la oscuridad cuando se extiende, del mal de las que soplan en los nudos, del mal envidioso cuando envidia». ¡En el nombre de Alá, el Compasivo, el Misericordioso! Di: «Me refugio en el Señor de los hombres, el Rey de los hombres, el Dios de los hombres, del mal de la insinuación, del que se escabulle, que insinúa en el ánimo de los hombres, sea genio, sea hombre».",
+        "it": "In nome di Allah, il Compassionevole, il Misericordioso Di’: “Egli Allah è Unico, Allah è l’Assoluto. Non ha generato, non è stato generato e nessuno è eguale a Lui”. In nome di Allah, il Compassionevole, il Misericordioso Di’: “Mi rifugio nel Signore dell’alba nascente, contro il male che ha creato, e contro il male dell’oscurità che si estende e contro il male delle soffianti sui nodi, e contro il male dell’invidioso quando invidia”. In nome di Allah, il Compassionevole, il Misericordioso Di’: “Mi rifugio nel Signore degli uomini, Re degli uomini, Dio degli uomini, contro il male del sussurratore furtivo, che soffia il male nei cuori degli uomini, che [venga] dai dèmoni o dagli uomini”.",
+        "ru": "Во имя Аллаха, Милостивого, Милосердного! Скажи: «Он - Аллах Единый, Аллах Самодостаточный. Он не родил и не был рожден, и нет никого равного Ему». Во имя Аллаха, Милостивого, Милосердного! Скажи: «Прибегаю к защите Господа рассвета от зла того, что Он сотворил, от зла мрака, когда он наступает, от зла колдуний, поплевывающих на узлы, от зла завистника, когда он завидует». Во имя Аллаха, Милостивого, Милосердного! Скажи: «Прибегаю к защите Господа людей, Царя людей, Бога людей, от зла искусителя отступающего (или сжимающегося) при поминании Аллаха, который наущает в груди людей и бывает из джиннов и людей».",
+        "tr": "Rahman ve Rahim olan Allah'ın adıyla: De ki: O Allah bir tektir. Allah her şeyden müstağni ve her şey O'na muhtaçtır. O doğurmamış ve doğmamıştır. Hiçbir şey O'na denk değildir. Rahman ve Rahim olan Allah'ın adıyla: De ki: \"Yaratıkların şerrinden, bastırdığı zaman karanlığın şerrinden, düğümlere nefes eden büyücülerin şerrinden, hased ettiği zaman hasedcilerin şerrinden, tan yerini ağartan Rabbe sığınırım.\" Rahman ve Rahim olan Allah'ın adıyla: De ki: \"İnsanlardan ve cinlerden ve insanların gönüllerine vesvese veren o sinsi vesvesecinin şerrinden, insanların Tanrısı, insanların Hükümranı ve insanların Rabbi olan Allah'a sığınırım.\"",
+        "hi": "अल्लाह के नाम से जो रहमान व रहीम है। (ऐ रसूल) तुम कह दो कि ख़ुदा एक है ख़ुदा बरहक़ बेनियाज़ है न उसने किसी को जना न उसको किसी ने जना, और उसका कोई हमसर नहीं अल्लाह के नाम से जो रहमान व रहीम है। (ऐ रसूल) तुम कह दो कि मैं सुबह के मालिक की हर चीज़ की बुराई से जो उसने पैदा की पनाह माँगता हूँ और अंधेरीरात की बुराई से जब उसका अंधेरा छा जाए और गन्डों पर फूँकने वालियों की बुराई से (जब फूँके) और हसद करने वाले की बुराई से अल्लाह के नाम से जो रहमान व रहीम है। (ऐ रसूल) तुम कह दो मैं लोगों के परवरदिगार लोगों के बादशाह लोगों के माबूद की (शैतानी) वसवसे की बुराई से पनाह माँगता हूँ जो (ख़ुदा के नाम से) पीछे हट जाता है जो लोगों के दिलों में वसवसे डाला करता है जिन्नात में से ख्वाह आदमियों में से",
+        "ur": "شروع الله کا نام لے کر جو بڑا مہربان نہایت رحم والا ہے کہو کہ وہ (ذات پاک جس کا نام) الله (ہے) ایک ہے معبود برحق جو بےنیاز ہے نہ کسی کا باپ ہے اور نہ کسی کا بیٹا اور کوئی اس کا ہمسر نہیں شروع الله کا نام لے کر جو بڑا مہربان نہایت رحم والا ہے کہو کہ میں صبح کے پروردگار کی پناہ مانگتا ہوں ہر چیز کی بدی سے جو اس نے پیدا کی اور شب تاریکی کی برائی سے جب اس کااندھیرا چھا جائے اور گنڈوں پر (پڑھ پڑھ کر) پھونکنے والیوں کی برائی سے اور حسد کرنے والے کی برائی سے جب حسد کرنے لگے شروع الله کا نام لے کر جو بڑا مہربان نہایت رحم والا ہے کہو کہ میں لوگوں کے پروردگار کی پناہ مانگتا ہوں (یعنی) لوگوں کے حقیقی بادشاہ کی لوگوں کے معبود برحق کی (شیطان) وسوسہ انداز کی برائی سے جو (خدا کا نام سن کر) پیچھے ہٹ جاتا ہے جو لوگوں کے دلوں میں وسوسے ڈالتا ہے وہ جنّات میں سے (ہو) یا انسانوں میں سے",
+        "ps": "د الله په نامه سره (شروع كوم) چې ډېر زیات مهربان، بې حده رحم كوونكى دى (اى نبي!) ته (دوى ته) ووایه: شان دا دى چی الله یو دى هم دا الله بې نیاز (بې حاجته) دى نه يې (څوك) زېږولى دى او نه دى (له چا) زېږول شوى دى او د ده هیڅوك سیال (او) برابر نشته د الله په نامه سره (شروع كوم) چې ډېر زیات مهربان، بې حده رحم كوونكى دى (اى نبي) ته ووایه: زه په رب د سبا پورې پناه نيسم د هر هغه شي له شر نه چې ده پیدا كړى دى او د تیارې شپې له شر نه كله چې تكه توره (او خوره) شي او له شره د هغو (جادوګرو) ښځو چې په غوټو كې پوكي وهونكې دي او د حسد كوونكي له شر نه كله چی دى حسد (شروع او ښكاره) كړي د الله په نامه سره (شروع كوم) چې ډېر زیات مهربان، بې حده رحم كوونكى دى (اى نبي) ته ووایه: زه د خلقو په رب پورې پناه نیسم چې د خلقو بادشاه دى د خلقو (حقیقي) معبود دى له شره د وسوسې اچوونكي، تښتېدونكي هغه چې د خلقو په سینو كې وسوسې اچوي چی (دغه وسوسې اچوونكي) له پېریانو او انسانانو ځنې دي",
+        "so": "Magaca Eebe yaan kubillaabaynaa ee Naxariis guud iyo mid gaaraba Naxariista. Waxaad dhahdaa (Nabiyow) Eebe waa Kali (wehelna ma leh). Waana Sayid (deeqtoon). Eebe wax ma dhalin, isna lama dhalin. Wax la mid ahna ma jiro. Magaca Eebe yaan kubillaabaynaa ee Naxariis guud iyo mid gaaraba Naxariista. Waxaad dhahdaa (Nabiyow) waxaan ka magangalay Eebeha Subaxa (abuuray). Wixii shar leh sharkiisa. Iyo Habeenka sharkiisa markuu madoobaado. Iyo sharka Sixirrowga wax ku tufa guntimaha. Iyo sharka Xaasidka wax Xasda. Magaca Eebe yaan kubillaabaynaa ee Naxariis guud iyo mid gaaraba Naxariista. Waxaad dhahdaa «Nabiyow» waxaan ka magangeley Eebaha dadka barbaariya. Ee dadka xukuma. Ee ah Ilaaha dadka. Sharka «iyo xumaanta» waswaasiyaha qarsoon. Ee waswaasiya laabta «Qalbiga» dadka. «Kuwaas wax waswaasinayna» oo ah jinni iyo insiba.",
+        "id": "Dengan menyebut nama Allah Yang Maha Pemurah lagi Maha Penyayang. Katakanlah: \"Dialah Allah, Yang Maha Esa. Allah adalah Tuhan yang bergantung kepada-Nya segala sesuatu. Dia tiada beranak dan tidak pula diperanakkan, dan tidak ada seorangpun yang setara dengan Dia\". Dengan menyebut nama Allah Yang Maha Pemurah lagi Maha Penyayang. Katakanlah: \"Aku berlindung kepada Tuhan Yang Menguasai subuh, dari kejahatan makhluk-Nya, dan dari kejahatan malam apabila telah gelap gulita, dan dari kejahatan wanita-wanita tukang sihir yang menghembus pada buhul-buhul, dan dari kejahatan pendengki bila ia dengki\". Dengan menyebut nama Allah Yang Maha Pemurah lagi Maha Penyayang. Katakanlah: \"Aku berlindung kepada Tuhan (yang memelihara dan menguasai) manusia. Raja manusia. Sembahan manusia. Dari kejahatan (bisikan) syaitan yang biasa bersembunyi, yang membisikkan (kejahatan) ke dalam dada manusia, dari (golongan) jin dan manusia.",
+        "ms": "Dengan nama Allah, Yang Maha Pemurah, lagi Maha Mengasihani. Katakanlah (wahai Muhammad): \"(Tuhanku) ialah Allah Yang Maha Esa; \"Allah Yang menjadi tumpuan sekalian makhluk untuk memohon sebarang hajat; \"Ia tiada beranak, dan Ia pula tidak diperanakkan; \"Dan tidak ada sesiapapun yang serupa denganNya\". Dengan nama Allah, Yang Maha Pemurah, lagi Maha Mengasihani. Katakanlah (wahai Muhammad); \"Aku berlindung kepada (Allah) Tuhan yang menciptakan sekalian makhluk, \"Dari bencana makhluk-makhluk yang Ia ciptakan; \"Dan dari bahaya gelap apabila ia masuk; \"Dan dari kejahatan makhluk-makhluk yang menghembus-hembus pada simpulan-simpulan (dan ikatan-ikatan); \"Dan dari kejahatan orang yang dengki apabila ia melakukan dengkinya\". Dengan nama Allah, Yang Maha Pemurah, lagi Maha Mengasihani. Katakanlah (wahai Muhammad): \"Aku berlindung kepada (Allah) Pemulihara sekalian manusia. \"Yang Menguasai sekalian manusia, \"Tuhan yang berhak disembah oleh sekalian manusia, \"Dari kejahatan pembisik penghasut yang timbul tenggelam, - \"Yang melemparkan bisikan dan hasutannya ke dalam hati manusia, - \"(Iaitu pembisik dan penghasut) dari kalangan jin dan manusia\".",
+        "pa": "ਸ਼ੁਰੂ (ਕਰਦਾ ਹਾਂ) ਅੱਲਾਹ ਦੇ ਨਾਂ ਨਾਲ ਜਿਹੜਾ ਅਤਿਅੰਤ ਮਿਹਰਬਾਨ ਅਤੇ ਰਹਿਮ ਫ਼ਰਮਾਉਣ ਵਾਲਾ ਹੈ। (ਹੇ ਨਬੀ!) ਤੁਸੀਂ ਆਖੋ ਕਿ ਉਹ ਅੱਲਾਹ ਇਕ ਹੈ। ਅੱਲਾਹ ਬੇਨਿਆਜ਼ ਹੈ। ਉਸ ਨੇ ਕਿਸੇ ਨੂੰ ਵੀ ਨਹੀਂ ਜਨਮਿਆਂ ਅਤੇ ਨਾ ਹੀ ਉਸ ਨੂੰ ਕਿਸੇ ਨੇ ਜਨਮਿਆਂ ਹੈ ਅਤੇ ਨਾ ਹੀ ਉਸ ਜਿਹਾ ਹੋਰ ਕੋਈ ਹੈ। ਸ਼ੁਰੂ (ਕਰਦਾ ਹਾਂ) ਅੱਲਾਹ ਦੇ ਨਾਂ ਨਾਲ ਜਿਹੜਾ ਅਤਿਅੰਤ ਮਿਹਰਬਾਨ ਅਤੇ ਰਹਿਮ ਫ਼ਰਮਾਉਣ ਵਾਲਾ ਹੈ। (ਹੇ ਨਬੀ!) ਤੁਸੀਂ ਆਖੋ ਕਿ ਮੈਂ ਸਵੇਰੇ ਦੇ ਰੱਬ ਦੀ ਸ਼ਰਨ ਵਿਚ ਆਉਂਦਾ ਹਾਂ। ਹਰੇਕ ਉਸ ਚੀਜ਼ ਦੀ ਬੁਰਾਈ ਤੋਂ (ਬਚਣ ਲਈ) ਜਿਹੜੀ ਉਸ ਨੇ ਪੈਦਾ ਕੀਤੀ ਹੈ। ਅਤੇ ਹਨੇਰੀ ਰਾਤ ਦੀ ਬੁਰਾਈ ਤੋਂ ਜਦੋਂ ਉਹ ਛਾ ਜਾਂਦੀ ਹੈ। ਅਤੇ ਗੰਢਾਂ ਵਿਚ ਫੂਕਾਂ ਮਾਰਨ ਵਾਲਿਆਂ ਦੀ ਬੁਰਾਈ ਤੋਂ। ਅਤੇ ਈਰਖਾ ਰੱਖਣ ਵਾਲਿਆਂ ਦੀ ਬੁਰਾਈ ਤੋਂ ਬਚਣ ਲਈ ਜਦੋਂ ਉਹ ਈਰਖਾ ਕਰੇ। ਸ਼ੁਰੂ (ਕਰਦਾ ਹਾਂ) ਅੱਲਾਹ ਦੇ ਨਾਂ ਨਾਲ ਜਿਹੜਾ ਅਤਿਅੰਤ ਮਿਹਰਬਾਨ ਅਤੇ ਰਹਿਮ ਫ਼ਰਮਾਉਣ ਵਾਲਾ ਹੈ। (ਹੇ ਨਬੀ!) ਆਖ ਦਿਓ ਕਿ ਮੈਂ ਮਨੁੱਖਾਂ ਦੇ ਰੱਬ ਦੀ ਸ਼ਰਨ ਵਿਚ ਆਉਂਦਾ ਹਾਂ। ਸਾਰੇ ਮਨੁੱਖਾਂ ਦੇ ਪਾਤਸ਼ਾਹ ਦੀ (ਸ਼ਰਨ ਵਿਚ)। ਅਤੇ ਸਾਰੇ ਮਨੁੱਖਾਂ ਦੇ ਇਸ਼ਟ (ਅੱਲਾਹ) ਦੀ (ਸ਼ਰਨ ਵਿਚ ਆਉਂਦਾ ਹਾਂ)। ਉਸ ਭਰਮ ਭੁਲੇਖਾ ਪਾਉਣ ਵਾਲੇ ਸ਼ੈਤਾਨ ਦੀ ਬੁਰਾਈ ਤੋਂ (ਬਚਣ ਲਈ), ਜਿਹੜਾ (ਅੱਲਾਹ ਦਾ ਨਾਂ ਸੁਣਦੇ ਹੀ) ਭੱਜ ਜਾਂਦਾ ਹੈ। ਜਿਹੜਾ ਲੋਕਾਂ ਦੇ ਮਨਾਂ ਵਿਚ ਭਰਮ ਭੁਲੇਖੇ ਪਾਉਂਦਾ ਹੈ। ਉਹ ਭਾਵੇਂ ਜਿੰਨਾਂ ਵਿੱਚੋਂ ਹੋਵੇ ਜਾਂ ਮਨੁੱਖਾਂ ਵਿੱਚੋਂ।",
+        "tk": "Rahman (Mähriban) we Rahym (Rehim-şepagatly) Allanyň ady bilen Aýt (eý, Muhammet!): «Ol Alla Ahatdyr (Birdir). Alla Sametdir (hiç zada mätäç däldir, ähli zat Oňa mätäçdir). Ol (hiç kimi) dogran däldir, (hiç kimden) doglan däldir. Onuň hiç bir deňi-taýy ýokdur». Rahman (Mähriban) we Rahym (Rehim-şepagatly) Allanyň ady bilen Aýt (eý, Muhammet!): «Men säheriň Perwerdigärine sygnyp, (Onuň) ýaradan zatlarynyň şerinden, tümlük bürän wagty gijäniň şerinden, düwünlere (üfläp jady edýän) jadygöýleriň şerinden, göriplik edýän wagty göribiň şerinden pena isleýärin!». Rahman (Mähriban) we Rahym (Rehim-şepagatly) Allanyň ady bilen Aýt (eý, Muhammet!): «Men ynsanlaryň Perwerdigärine, ynsanlaryň Hökümdaryna, ynsanlaryň Hudaýyna sygnyp, (gaflatda wagty) ynsanlaryň gursaklaryna (ýüreklerine) was-wasy salýan, (Allany ýatlaýan wagty bolsa gaçýan) ynsanlardan we jynlardan bolan şeýtanyň şerinden pena isleýärin!»."
+      }
     },
     {
       "id": "aft11",
@@ -95,8 +282,26 @@
       "reference_id": "quran",
       "reference_detail": "البقرة: 255؛ والنسائي في عمل اليوم والليلة برقم 100؛ فضل آية الكرسي بعد كل صلاة",
       "virtue": "من قرأها دبر كل صلاة لم يمنعه من دخول الجنة إلا أن يموت (النسائي).",
-      "translation": null,
-      "tags": []
+      "tags": [],
+      "translations": {
+        "ar": "﴿اللَّهُ لاَ إِلَهَ إِلاَّ هُوَ الْحَيُّ الْقَيُّومُ لاَ تَأْخُذُهُ سِنَةٌ وَلاَ نَوْمٌ لَّهُ مَا فِي السَّمَوَاتِ وَمَا فِي الأَرْضِ مَن ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلاَّ بِإِذْنِهِ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ وَلاَ يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلاَّ بِمَا شَاءَ وَسِعَ كُرْسِيُّهُ السَّمَوَاتِ وَالأَرْضَ وَلاَ يَؤُودُهُ حِفْظُهُمَا وَهُوَ الْعَلِيُّ الْعَظِيمُ﴾.",
+        "en": "Allah - there is no deity except Him, the Ever-Living, the Sustainer of [all] existence. Neither drowsiness overtakes Him nor sleep. To Him belongs whatever is in the heavens and whatever is on the earth. Who is it that can intercede with Him except by His permission? He knows what is [presently] before them and what will be after them, and they encompass not a thing of His knowledge except for what He wills. His Kursi extends over the heavens and the earth, and their preservation tires Him not. And He is the Most High, the Most Great.",
+        "fr": "Allah! Point de divinité à part Lui, le Vivant, Celui qui subsiste par lui-même «Al-Qayyûm». Ni somnolence ni sommeil ne Le saisissent. A Lui appartient tout ce qui est dans les cieux et sur la terre. Qui peut intercéder auprès de Lui sans Sa permission? Il connaît leur passé et leur futur. Et, de Sa science, ils n'embrassent que ce qu'Il veut. Son Trône «Kursiy», déborde les cieux et la terre, dont la garde ne Lui coûte aucune peine. Et Il est le Très Haut, le Très Grand.",
+        "de": "Allah - es gibt keinen Gott außer Ihm, dem Lebendigen und Beständigen. Ihn überkommt weder Schlummer noch Schlaf. Ihm gehört (alles), was in den Himmeln und was auf der Erde ist. Wer ist es denn, der bei Ihm Fürsprache einlegen könnte - außer mit Seiner Erlaubnis? Er weiß, was vor ihnen und was hinter ihnen liegt, sie aber umfassen nichts von Seinem Wissen - außer, was Er will. Sein Thronschemel umfaßt die Himmel und die Erde, und ihre Behütung beschwert Ihn nicht. Er ist der Erhabene und Allgewaltige.",
+        "es": "¡Alá! No hay más dios que Él, el Viviente, el Subsistente. Ni la somnolencia ni el sueño se apoderan de Él. Suyo es lo que está en los cielos y en la tierra. ¿Quién podrá interceder ante Él si no es con Su permiso? Conoce su pasado y su futuro, mientras que ellos no abarcan nada de Su ciencia, excepto lo que Él quiere. Su Trono se extiende sobre los cielos y sobre la tierra y su conservación no le resulta onerosa. Él es el Altísimo, el Grandioso.",
+        "es_la": "¡Alá! No hay más dios que Él, el Viviente, el Subsistente. Ni la somnolencia ni el sueño se apoderan de Él. Suyo es lo que está en los cielos y en la tierra. ¿Quién podrá interceder ante Él si no es con Su permiso? Conoce su pasado y su futuro, mientras que ellos no abarcan nada de Su ciencia, excepto lo que Él quiere. Su Trono se extiende sobre los cielos y sobre la tierra y su conservación no le resulta onerosa. Él es el Altísimo, el Grandioso.",
+        "it": "Allah! Non c'è altro dio che Lui, il Vivente, l'Assoluto. Non Lo prendon mai sopore, né sonno. A Lui appartiene tutto quello che è nei cieli e sulla terra. Chi può intercedere presso di Lui senza il Suo permesso? Egli conosce quello che è davanti a loro e quello che è dietro di loro e, della Sua scienza, essi apprendono solo ciò che Egli vuole. Il Suo Trono è più vasto dei cieli e della terra, e custodirli non Gli costa sforzo alcuno. Egli è l'Altissimo, l'Immenso.",
+        "ru": "Аллах - нет божества, кроме Него, Живого, Вседержителя. Им не овладевают ни дремота, ни сон. Ему принадлежит то, что на небесах, и то, что на земле. Кто станет заступаться перед Ним без Его дозволения? Он знает их будущее и прошлое. Они постигают из Его знания только то, что Он пожелает. Его Престол (Подножие Трона) объемлет небеса и землю, и не тяготит Его оберегание их. Он - Возвышенный, Великий.",
+        "tr": "Allah, O'ndan başka tanrı olmayan, kendisini uyuklama ve uyku tutmayan, diri, her an yaratıklarını gözetip durandır. Göklerde olan ve yerde olan ancak O'nundur. O'nun izni olmadan katında şefaat edecek kimdir? Onların işlediklerini ve işleyeceklerini bilir, dilediğinden başka ilminden hiçbir şeyi kavrayamazlar. Hükümranlığı gökleri ve yeri kaplamıştır, onların gözetilmesi O'na ağır gelmez. O yücedir, büyüktür.",
+        "hi": "ख़ुदा ही वो ज़ाते पाक है कि उसके सिवा कोई माबूद नहीं (वह) ज़िन्दा है (और) सारे जहान का संभालने वाला है उसको न ऊँघ आती है न नींद जो कुछ आसमानो में है और जो कुछ ज़मीन में है (गरज़ सब कुछ) उसी का है कौन ऐसा है जो बग़ैर उसकी इजाज़त के उसके पास किसी की सिफ़ारिश करे जो कुछ उनके सामने मौजूद है (वह) और जो कुछ उनके पीछे (हो चुका) है (खुदा सबको) जानता है और लोग उसके इल्म में से किसी चीज़ पर भी अहाता नहीं कर सकते मगर वह जिसे जितना चाहे (सिखा दे) उसकी कुर्सी सब आसमानॊं और ज़मीनों को घेरे हुये है और उन दोनों (आसमान व ज़मीन) की निगेहदाश्त उसपर कुछ भी मुश्किल नहीं और वह आलीशान बुजुर्ग़ मरतबा है",
+        "ur": "خدا (وہ معبود برحق ہے کہ) اس کے سوا کوئی عبادت کے لائق نہیں زندہ ہمیشہ رہنے والا اسے نہ اونگھ آتی ہے نہ نیند جو کچھ آسمانوں میں اور جو کچھ زمین میں ہیں سب اسی کا ہے کون ہے جو اس کی اجازت کے بغیر اس سے (کسی کی) سفارش کر سکے جو کچھ لوگوں کے روبرو ہو رہا ہے اور جو کچھ ان کے پیچھے ہوچکا ہے اسے سب معلوم ہے اور وہ اس کی معلومات میں سے کسی چیز پر دسترس حاصل نہیں کر سکتے ہاں جس قدر وہ چاہتا ہے (اسی قدر معلوم کرا دیتا ہے) اس کی بادشاہی (اور علم) آسمان اور زمین سب پر حاوی ہے اور اسے ان کی حفاظت کچھ بھی دشوار نہیں وہ بڑا عالی رتبہ اور جلیل القدر ہے",
+        "ps": "الله (چې دى) نشته هېڅ لايق د عبادت مګر هم دى دى، همېشه ژوندى دى، د ټول عالم انتظام كوونكى دى، په ده نه پركالي راځي، او نه خوب، خاص هم ده لره دي هغه څه چې په اسمانونو كې دي، او هغه څه چې په ځمكه كې دي، څوك دى هغه كس چې د ده په وړاندې به سفارش كوي مګر د ده په اجازت سره؟ هغه پوهېږي په هر هغه څه چې د دوى په وړاندې دي او په هر هغه څه چې د دوى وروسته دي، او دوى (مخلوق) د هغه له علم نه هېڅ شى هم نشي راګېرولى، مګر هغه څه چې هغه (الله) يې وغواړي۔، د هغه كرسۍ اسمانونه او ځمكه راځای كړي (راګېر) كړي دي او د دې دواړو ساتنه هغه (الله) نه ستړى كوي، او هم هغه ډېر اوچت دى، ډېر لوى دى",
+        "so": "Eebe Ilaahaan isada ahayn ma jiro, waana Eebaha Nool, Khalqigana maamula. Ma qabato Lulmo iyo hurdo (midna) wuxuuna iska leeyahay waxa Samooyinka ka sugan iyo Dhulka, waa kuma kan ka shafeeci agtiisa (Eebe) idankiisa mooyee, wuxuu ogyahay (Eebe) waxa Dadka hortooda ah iyo waxa ka dambeeya mana koobaan wax Cilmigiisa ah, wuxuu Eebe doono mooyee, wuuna u waasacnoqday kursigiisu Samaawaadka iyo Dhulka, mana Cusleeyo ilaalinteedu, Eebana waa sareeye wayn.",
+        "id": "Allah, tidak ada Tuhan (yang berhak disembah) melainkan Dia Yang Hidup kekal lagi terus menerus mengurus (makhluk-Nya); tidak mengantuk dan tidak tidur. Kepunyaan-Nya apa yang di langit dan di bumi. Tiada yang dapat memberi syafa'at di sisi Allah tanpa izin-Nya? Allah mengetahui apa-apa yang di hadapan mereka dan di belakang mereka, dan mereka tidak mengetahui apa-apa dari ilmu Allah melainkan apa yang dikehendaki-Nya. Kursi Allah meliputi langit dan bumi. Dan Allah tidak merasa berat memelihara keduanya, dan Allah Maha Tinggi lagi Maha Besar.",
+        "ms": "Allah, tiada Tuhan (yang berhak disembah) melainkan Dia, Yang Tetap hidup, Yang Kekal selama-lamanya mentadbirkan (sekalian makhlukNya). Yang tidak mengantuk usahkan tidur. Yang memiliki segala yang ada di langit dan yang ada di bumi. Tiada sesiapa yang dapat memberi syafaat (pertolongan) di sisiNya melainkan dengan izinNya. yang mengetahui apa yang ada di hadapan mereka dan apa yang ada di belakang mereka, sedang mereka tidak mengetahui sesuatu pun dari (kandungan) ilmu Allah melainkan apa yang Allah kehendaki (memberitahu kepadanya). Luasnya Kursi Allah (ilmuNya dan kekuasaanNya) meliputi langit dan bumi; dan tiadalah menjadi keberatan kepada Allah menjaga serta memelihara keduanya. Dan Dia lah Yang Maha Tinggi (darjat kemuliaanNya), lagi Maha Besar (kekuasaanNya)",
+        "pa": "ਉਹ ਅੱਲਾਹ ਹੇ ਉਸ ਤੋਂ ਛੁੱਟ ਕੋਈ ਵੀ (ਸੱਚਾ) ਇਸ਼ਟ ਨਹੀਂ (ਸਦਾ ਲਈ) ਜਿਉਂਦਾ ਹੇ, ਸਮੁੱਚੀ (ਸ਼੍ਰਿਸ਼ਟੀ) ਨੂੰ ਸੰਭਾਲਿਆ ਹੋਇਆ ਹੇ, ਨਾ ਹੀ ਉਸ ਨੂੰ ਉਂਘ ਆਉਂਦੀ ਹੇ ਅਤੇ ਨਾ ਹੀ ਉਹ ਸੋਂਦਾ ਹੇ। ਅਕਾਸ਼ਾਂ ਅਤੇ ਧਰਤੀ ਵਿਚ ਜੋ ਕੁੱਝ ਵੀ ਹੇ ਉਹ ਸਭ ਉਸੇ ਦਾ ਹੇ। ਉਹ ਕਿਹੜਾ ਹੇ ਜਿਹੜਾ ਉਸ ਦੇ ਅੱਗੇ ਬਿਨਾਂ ਉਸ ਦੀ ਆਗਿਆ ਤੋਂ ਕਿਸੇ ਦੀ ਸਫ਼ਾਰਸ਼ ਕਰ ਸਕੇ? ਉਹੀਓ ਜਾਣਦਾ ਹੇ ਜੋ ਲੋਕਾਂ (ਦੀਆਂ ਅੱਖਾਂ ਦੇ) ਸਾਹਮਣੇ ਨੂੰ ਅਤੇ ਜੋ ਉਹਨਾਂ ਦੇ ਓਹਲੇ ਰੁ। ਲੋਕੀ ਉਸ ਦੇ ਗਿਆਨ ’ਚੋਂ ਕੁੱਝ ਵੀ ਆਪਣੇ ਅਧੀਨ ਨਹੀਂ ਕਰ ਸਕਦੇ, ਛੁੱਟ ਉਸ ਗੱਲ ਤੋਂ (ਜਿਸ ਦੀ ਜਾਣਕਾਰੀ) ਉਹ ਆਪ ਹੀ ਦੇਣਾ ਚਾਹੇ। ਉਸ ਦੀ ਕੁਰਸੀ (ਬਾਦਸ਼ਾਹੀ ਤਖ਼ਤ) ਨੇ ਅਕਾਸ਼ਾਂ ਤੇ ਧਰਤੀ (ਦੀ ਹਰ ਚੀਜ਼)ਨੂੰ ਆਪਣੇ ਘੇਰੇ ਵਿਚ ਲਿਆ ਹੋਇਆ ਨੂੰ ਅਤੇ ਉਹ (ਅੱਲਾਹ) ਉਹਨਾਂ ਸਭ ਦੀ ਰਾਖੀ ਕਰਦਾ ਹੋਇਆ ਥੱਕਦਾ ਨਹੀਂ। ਉਹ ਇਕ ਮਹਾਨ ਅਤੇ ਸਰਬ-ਉੱਚ ਵਡਿਆਈ ਵਾਲੀ ਹਸਤੀ ਹੇ।",
+        "tk": "(Ol) Özünden başga (ybadata laýyk) hudaý bolmadyk Alladyr. Ol Diridir, Kaýýumdyr (bendeleriň işini ýöredýändir). Ol uklamaz, (hatda) irkilmezem. Asmanlardaky we ýerdäki ähli zat Onuňkydyr. Ondan bidin Onuň ýanynda kim şepagat edip biler? Ol bendeleriň edýän we etjek ähli işlerini bilýändir. (Ynsanlar) Onuň ylmyndan Özüniň islän zadyndan başga hiç zadyň (hakykatyna) doly düşünip bilmezler. Onuň kürsüsi asmanlary we ýeri (doly) gurşap alandyr. Ol ikisini (asmany we ýeri) gorap saklamak Oňa kyn däldir. Ol (Alla) Beýikdir, Belentdir."
+      }
     },
     {
       "id": "aft12",
@@ -105,8 +310,90 @@
       "reference_id": "ibnmajah",
       "reference_detail": "ابن ماجه 925 ومسلم 2721 (اللهم إني أسألك علماً نافعاً ورزقاً طيباً وعملاً متقبلاً)",
       "virtue": "كان يقولها إذا صلى الصبح حين يسلم (ابن ماجه 925).",
-      "translation": null,
-      "tags": []
+      "tags": [],
+      "translations": {
+        "ar": "((اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْماً نافِعاً، وَرِزْقاً طَيِّباً، وَعَمَلاً مُتَقَبَّلاً))",
+        "en": "O Allah, grant me beneficial knowledge, goodly provision, and accepted deeds.",
+        "fr": "Ô Allah, accorde-moi une science utile, une subsistance agréable et des œuvres acceptées.",
+        "de": "O Allah, gewähre mir nützliches Wissen, gute Versorgung und angenommene Taten.",
+        "es": "Oh Allah, concédeme conocimiento beneficioso, sustento bueno y obras aceptadas.",
+        "es_la": "Oh Allah, concédeme conocimiento beneficioso, sustento bueno y obras aceptadas.",
+        "it": "O Allah, concedimi conoscenza benefica, sostentamento buono e opere accettate.",
+        "ru": "О Аллах, даруй мне полезное знание, благой удел и принятые деяния.",
+        "tr": "Allah'ım! Faydalı ilim, temiz rızık ve kabul edilen amel dilerim.",
+        "hi": "ऐ अल्लाह! मैं तुझ से नाफ़े वाले इल्म, पाकीज़ा रिज़्क़ और क़ुबूल शुदा अमल का सवाल करता हूँ।",
+        "ur": "اے اللہ! میں تجھ سے نفع بخش علم، پاکیزہ رزق اور قبول شدہ عمل کا سوال کرتا ہوں۔",
+        "ps": "اې الله! زه له تا نه د نفع وړ علم، پاکه روزي او قبل شوي عمل غوښتونکی یم.",
+        "so": "Allahow, waxaan kaa baryayaa cilmi nacfi leh, risqi wanaagsan, iyo camal la aqbalay.",
+        "id": "Ya Allah, sesungguhnya aku memohon kepada-Mu ilmu yang bermanfaat, rezeki yang baik, dan amal yang diterima.",
+        "ms": "Ya Allah, aku memohon kepada-Mu ilmu yang bermanfaat, rezeki yang baik, dan amal yang diterima.",
+        "pa": "ਹੇ ਅੱਲਾਹ! ਮੈਂ ਤੈਨੂੰ ਨਾਫ਼ੇ ਵਾਲੇ ਇਲਮ, ਪਾਕ ਰਿਜ਼ਕ ਅਤੇ ਕਬੂਲ ਸ਼ੁਦਾ ਅਮਲ ਦਾ ਸਵਾਲ ਕਰਦਾ ਹਾਂ।",
+        "tk": "Allahym! Men Senden peýdaly ylym, arassa rysgal we kabul edilýän amal soraýaryn."
+      }
     }
-  ]
+  ],
+  "translation_meta": {
+    "legacy_source": "commit 9fbacb2: backend/translations/<lang>.json -> athkar.fajr",
+    "item_sources": {
+      "ap01": "legacy",
+      "ap02": "legacy",
+      "ap03": "legacy",
+      "ap04": "legacy",
+      "ap05": "legacy",
+      "ap06": "legacy",
+      "ap07": "legacy",
+      "ap08": "legacy",
+      "ap09": "hadeethenc:65102",
+      "aft10": "alquran.cloud:1:1+112+1:1+113+1:1+114",
+      "aft11": "alquran.cloud:2:255",
+      "aft12": "legacy"
+    },
+    "known_gaps": [
+      "ms/tk/tr: ap09 translation is authored and needs native review",
+      "ps/id: HadeethEnc explanatory gloss removed; confirm the edited wording with a native reviewer",
+      "ap02/tk: replacement still needs Turkmen review"
+    ],
+    "verification_status": "pilot: legacy translations + HadeethEnc + AlQuran Cloud; tk aft10/aft11 from the official Turkmen Directorate translation (also reproduced by Gurhan); no independent third Turkmen source for 2:255; not yet four-source verified for every item",
+    "reference_sources": [
+      "HadeethEnc (https://hadeethenc.com)",
+      "Sunnah.com (https://sunnah.com)",
+      "IslamHouse / Hisn al-Muslim (https://islamhouse.com)",
+      "Quran.com (https://quran.com)",
+      "Dorar.net (https://dorar.net)",
+      "Kurany Kerim. Türkmen dilinde (Türkmenistanyň Müftüsiniň Müdiriýeti): https://www.yslamnury.com/main/download-files/Kurany_Kerim_turkmen_dilinde_taze.pdf",
+      "Türkmençe Kuran (Gurhan), Wikimedia Commons: https://commons.wikimedia.org/wiki/File:Türkmençe_Kuran_(Gurhan).pdf"
+    ],
+    "needs_review": {
+      "ap02": [
+        "tk"
+      ],
+      "ap09": [
+        "ms",
+        "tk",
+        "tr",
+        "ps",
+        "id"
+      ]
+    },
+    "per_language_sources": {
+      "pa": {
+        "aft10": "quranenc:punjabi_arif",
+        "aft11": "quranenc:punjabi_arif"
+      },
+      "tk": {
+        "aft10": "Turkmen Directorate of Religious Affairs / Kurany Kerim (Türkmen dilinde); Gurhan PDF reproduces the same text",
+        "aft11": "Turkmen Directorate of Religious Affairs / Kurany Kerim (Türkmen dilinde); Gurhan PDF reproduces the same text"
+      }
+    },
+    "verification_notes": [
+      "aft10/tr: regenerated from one copy each of Al-Ikhlas (112), Al-Falaq (113), and An-Nas (114); AlQuran Cloud tr.diyanet repeats the full surah text in every ayah.",
+      "ap02/tk: replaced the legacy mistranslation \"paýhas\" (wisdom) with \"Salam/beýiklik/hormat\"; still needs Turkmen review.",
+      "ap09/ps,id: HadeethEnc renderings include an explanatory \"punishment\" gloss; it was removed from the displayed dhikr to match the Arabic.",
+      "ap04: added the \"Completion of the hundred\" phrase before the tahlil in all translations; review punctuation per language.",
+      "aft11/es,es_la: fixed \"El. el Viviente\" to \"Él, el Viviente\".",
+      "pa: removed quranenc footnote markers [1], [2], [51] from displayed text.",
+      "tk aft10/aft11: official Directorate PDF and Gurhan PDF carry the same text; no independent third Turkmen witness for 2:255.",
+      "es_la is a mirror of es, not an independent translation."
+    ]
+  }
 }

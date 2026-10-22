@@ -28,7 +28,7 @@ A Linux desktop prayer-times application with azan audio, structured adhkar, do-
 
 - **Prayer Times** — Accurate calculation (MWL, Umm Al-Qura, Egyptian, Tunisian + 22 more), per-prayer icons, live countdown, Hijri date
 - **Audio Azan** — Streaming MP3 playback with fade-in, volume control, multiple muezzins + per-prayer audio, takbeer mode
-- **Adhkar Library** — 23 structured categories (370 remembrances) with repetition counts and source references, Arabic-Indic numerals
+- **Adhkar Library** — 23 structured categories (361 remembrances) with repetition counts and source references, Arabic-Indic numerals
 - **Reminders** — User-defined reminders (text + time) with repeat days; checked every minute
 - **Hijri Events** — Islamic calendar events under the Hijri date (Ashura, White Days, Ramadan countdown, Laylat al-Qadr, Eids, Hajj days)
 - **Compact Widget** — Optional always-on-top prayer card in the app's theme: prayer icon + name, live countdown, segment progress bar, Hijri date, clock and the upcoming prayers; RTL-aware, draggable with saved position

@@ -51,7 +51,7 @@
     {
       "id": "أذكار_الآذان",
       "name_ar": "أذكار الآذان",
-      "name_en": "أذكار الآذان",
+      "name_en": "Adhan Adhkar",
       "asset": "assets/adhkar/أذكار_الآذان.json",
       "icon": "adhan",
       "order": 7
@@ -163,7 +163,7 @@
     {
       "id": "التسبيح،_التحميد،_التهليل،_التكبير",
       "name_ar": "التسبيح، التحميد، التهليل، التكبير",
-      "name_en": "التسبيح، التحميد، التهليل، التكبير",
+      "name_en": "Tasbih, Tahmid, Tahlil, Takbir",
       "asset": "assets/adhkar/التسبيح،_التحميد،_التهليل،_التكبير.json",
       "icon": "tasbih",
       "order": 21
@@ -171,7 +171,7 @@
     {
       "id": "أماكن_وأوقات_إجابة_الدعاء",
       "name_ar": "أماكن وأوقات إجابة الدعاء",
-      "name_en": "أماكن وأوقات إجابة الدعاء",
+      "name_en": "Places & Times of Accepted Du'a",
       "asset": "assets/adhkar/أماكن_وأوقات_إجابة_الدعاء.json",
       "icon": "dua",
       "order": 22
@@ -179,7 +179,7 @@
     {
       "id": "الاستغفار_و_التوبة",
       "name_ar": "الاستغفار و التوبة",
-      "name_en": "الاستغفار و التوبة",
+      "name_en": "Istighfar & Repentance",
       "asset": "assets/adhkar/الاستغفار_و_التوبة.json",
       "icon": "istighfar",
       "order": 23

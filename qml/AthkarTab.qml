@@ -27,7 +27,7 @@ Rectangle {
                      "waking", "home", "eating", "mosque", "travel", "dua",
                      "prayer", "adhan", "tahara", "libas", "sick", "hajj",
                      "distress", "ruqya", "protection", "manners", "nature",
-                     "tasbih", "istighfar"]
+                     "tasbih", "istighfar", "misc"]
         var k = icon || "dua"
         if (known.indexOf(k) < 0) k = "dua"
         return "../assets/adhkar_icons/" + k + ".png"
@@ -124,7 +124,7 @@ Rectangle {
                         }
 
                         Text {
-                            text: modelData ? modelData.name_ar : ""
+                            text: modelData ? tr(modelData.name_ar) : ""
                             font.pixelSize: 12
                             font.bold: true
                             horizontalAlignment: Text.AlignHCenter
@@ -176,7 +176,7 @@ Rectangle {
 
                 Label {
                     id: dlgTitle
-                    text: openCategoryName
+                    text: openCategoryName ? tr(openCategoryName) : ""
                     font.pixelSize: 17
                     font.bold: true
                     color: theme.textColor

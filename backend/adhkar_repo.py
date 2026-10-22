@@ -1,14 +1,15 @@
 """
-Structured adhkar library (23 JSON categories, 370 items).
+Structured adhkar library (23 JSON categories, 361 items).
 
 Source mix and conflict policy (documented, do not change silently):
 - Base: Dart sibling assets (curated, counts/references verified).
 - Extended with azkar-db (345 rows, open data): new texts appended;
   same texts skipped as duplicates.
 - On count conflicts between sources, OURS is kept (multiple legitimate
-  narrations exist, e.g. x3 vs x100 variants); DB texts without explicit
-  count default to 1 (chip hidden).
-- Empty reference_id allowed (UI hides the row); arabic text required.
+  narrations exist, e.g. x3 vs x100 variants).
+- Sanad policy: every item must carry reference_id (a supported primary
+  collection) and reference_detail (book/number plus grading notes).
+  count is required and must be a positive integer; the UI always shows it.
 """
 
 import json
@@ -23,6 +24,20 @@ BASE_DIR: str = os.path.join(os.path.dirname(__file__), "assets", "adhkar")
 INDEX_FILE: str = os.path.join(BASE_DIR, "index.json")
 
 _MAX_CACHE_SIZE = 20
+
+ALLOWED_REFERENCE_IDS = {
+    "bukhari",
+    "muslim",
+    "abudawud",
+    "tirmidhi",
+    "ibnmajah",
+    "quran",
+    "ahmad",
+    "nasai",
+    "hakim",
+    "bayhaqi",
+    "hisn",
+}
 
 
 class AdhkarValidationError(ValueError):
@@ -73,8 +88,31 @@ def validate_category(data: Any) -> None:
             continue
         if not item.get("arabic"):
             errors.append("%s: missing arabic" % item.get("id", "?"))
-        # reference_id is optional (many authentic adhkar circulate without
-        # a citable source); the UI hides the reference row when absent.
+        rid = item.get("reference_id")
+        if not rid:
+            errors.append("%s: missing reference_id" % item.get("id", "?"))
+        elif rid not in ALLOWED_REFERENCE_IDS:
+            errors.append("%s: unknown reference_id %s" % (item.get("id", "?"), rid))
+        if not item.get("reference_detail"):
+            errors.append("%s: missing reference_detail" % item.get("id", "?"))
+        if "count" not in item:
+            errors.append("%s: missing count" % item.get("id", "?"))
+        else:
+            count = item.get("count")
+            if isinstance(count, bool) or not isinstance(count, int) or count < 1:
+                errors.append("%s: invalid count" % item.get("id", "?"))
+        translations = item.get("translations")
+        if translations is not None:
+            if not isinstance(translations, dict):
+                errors.append("%s: translations must be a map" % item.get("id", "?"))
+            else:
+                for lang, text in translations.items():
+                    if not isinstance(lang, str) or not lang:
+                        errors.append("%s: invalid translation language" % item.get("id", "?"))
+                    if not isinstance(text, str) or not text.strip():
+                        errors.append(
+                            "%s: empty translation for %s" % (item.get("id", "?"), lang)
+                        )
     if errors:
         raise AdhkarValidationError("; ".join(errors))
 
@@ -137,6 +175,7 @@ class AdhkarRepository:
                     "reference_detail": it.get("reference_detail", ""),
                     "virtue": it.get("virtue"),
                     "translation": it.get("translation"),
+                    "translations": it.get("translations", {}),
                     "tags": it.get("tags", []),
                 }
                 for it in data["items"]

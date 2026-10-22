@@ -18,6 +18,9 @@ Rectangle {
     border.width: 1
 
     height: Math.max(110, 12 + headerRow.height + 8 + bodyText.height
+                        + (translationText.visible
+                           ? 8 + translationLabel.height + 8 + translationText.height
+                           : 0)
                         + (refRow.visible ? 8 + refRow.height : 0) + 12)
 
     function numeral(n) {
@@ -26,8 +29,10 @@ Rectangle {
     }
 
     function tr(key) {
-        if (typeof backendController === "undefined" || backendController === null)
+        if (typeof l10n === "undefined" || l10n === null
+                || typeof backendController === "undefined" || backendController === null)
             return key
+        var _ = l10n.currentLanguage
         return backendController.translate(key)
     }
 
@@ -36,7 +41,7 @@ Rectangle {
             "bukhari": "البخاري", "muslim": "مسلم", "abudawud": "أبو داود",
             "tirmidhi": "الترمذي", "ibnmajah": "ابن ماجه", "quran": "القرآن الكريم",
             "ahmad": "أحمد", "nasai": "النسائي", "hakim": "الحاكم",
-            "hisn": "حصن المسلم"
+            "bayhaqi": "البيهقي", "hisn": "حصن المسلم"
         }
         return m[id] ? tr(m[id]) : id
     }
@@ -81,7 +86,11 @@ Rectangle {
                 Text {
                     id: chipText
                     anchors.centerIn: parent
-                    text: "× " + numeral(itemData ? itemData.count : 1) + " " + tr("مرات")
+                    text: itemData
+                          ? (itemData.count > 1
+                             ? "× " + numeral(itemData.count) + " " + tr("مرات")
+                             : "× " + numeral(itemData.count))
+                          : ""
                     font.pixelSize: 11
                     font.bold: true
                     color: theme.accentColor
@@ -99,6 +108,37 @@ Rectangle {
             font.pixelSize: 17
             font.bold: true
             lineHeight: 1.9
+        }
+
+        Text {
+            id: translationLabel
+            Layout.fillWidth: true
+            visible: translationText.visible
+            text: tr("الترجمة")
+            color: theme.accentColor
+            font.pixelSize: 10
+            font.bold: true
+            horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl)
+                                 ? Text.AlignRight : Text.AlignLeft
+        }
+
+        Text {
+            id: translationText
+            Layout.fillWidth: true
+            visible: text !== ""
+            text: {
+                if (!itemData || !itemData.translations) return ""
+                var lang = (typeof l10n !== "undefined" && l10n)
+                           ? l10n.currentLanguage : "ar"
+                if (lang === "ar") return ""
+                return itemData.translations[lang] || ""
+            }
+            wrapMode: Text.WordWrap
+            horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl)
+                                 ? Text.AlignRight : Text.AlignLeft
+            color: theme.textMutedColor
+            font.pixelSize: 13
+            lineHeight: 1.6
         }
 
         RowLayout {
@@ -120,7 +160,9 @@ Rectangle {
                     if (!itemData) return ""
                     var ref = refName(itemData.reference_id || "")
                     var det = itemData.reference_detail || ""
-                    return det ? (ref ? ref + " " + det : det) : ref
+                    if (!det) return ref
+                    if (!ref) return det
+                    return det.indexOf(ref) === 0 ? det : ref + " " + det
                 }
                 wrapMode: Text.WordWrap
                 font.pixelSize: 11
