@@ -706,7 +706,8 @@
     "known_gaps": [
       "m02: the isti'adha preamble is present in Arabic but not included in the non-Arabic aft11 translations.",
       "Only the legacy-covered and Qur'an-batch items are translated; the remaining items still need sources and native review.",
-      "Hisn batch is partial: some non-Arabic languages are still pending."
+      "Hisn batch is partial: some non-Arabic languages are still pending.",
+    "Hisn batch gaps (see docs/dev/HISN-TRANSLATION-BATCH.md section 5) - de: m04, m05, mor17, mor18, mor21, mor22, mor25, mor26, mor27, mor29 | ur: m04, m05, mor17, mor18, mor21, mor22, mor25, mor26, mor27, mor29 | so: m05, m08, mor18, mor25, mor27 | pa: m04, m05, m08, mor17, mor18, mor19, mor20, mor21, mor22, mor25, mor26, mor27, mor29 | ps: m03, m04, m05, m08, mor17, mor18, mor19, mor20, mor21, mor22, mor25, mor26, mor27, mor29."
     ],
     "quran_batch": {
       "source": "after_prayer.json (aft10 = alquran.cloud:1:1+112+1:1+113+1:1+114; aft11 = alquran.cloud:2:255)",
