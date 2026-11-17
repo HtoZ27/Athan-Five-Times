@@ -110,9 +110,7 @@ def validate_category(data: Any) -> None:
                     if not isinstance(lang, str) or not lang:
                         errors.append("%s: invalid translation language" % item.get("id", "?"))
                     if not isinstance(text, str) or not text.strip():
-                        errors.append(
-                            "%s: empty translation for %s" % (item.get("id", "?"), lang)
-                        )
+                        errors.append("%s: empty translation for %s" % (item.get("id", "?"), lang))
     if errors:
         raise AdhkarValidationError("; ".join(errors))
 

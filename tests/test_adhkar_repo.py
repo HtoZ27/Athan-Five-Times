@@ -140,24 +140,16 @@ class TestValidation:
             with pytest.raises(AdhkarValidationError):
                 validate_category({"id": "x", "items": [item]})
         with pytest.raises(AdhkarValidationError):
-            validate_category(
-                {"id": "x", "items": [_valid_item(reference_id="unknown-book")]}
-            )
+            validate_category({"id": "x", "items": [_valid_item(reference_id="unknown-book")]})
         with pytest.raises(AdhkarValidationError):
             validate_category({"id": "x", "items": [_valid_item(count=0)]})
 
     def test_invalid_translations_rejected(self):
-        validate_category(
-            {"id": "x", "items": [_valid_item(translations={"en": "Dhikr"})]}
-        )
+        validate_category({"id": "x", "items": [_valid_item(translations={"en": "Dhikr"})]})
         with pytest.raises(AdhkarValidationError):
-            validate_category(
-                {"id": "x", "items": [_valid_item(translations=["Dhikr"])]}
-            )
+            validate_category({"id": "x", "items": [_valid_item(translations=["Dhikr"])]})
         with pytest.raises(AdhkarValidationError):
-            validate_category(
-                {"id": "x", "items": [_valid_item(translations={"en": "  "})]}
-            )
+            validate_category({"id": "x", "items": [_valid_item(translations={"en": "  "})]})
 
 
 class TestSanad:
@@ -175,9 +167,7 @@ class TestSanad:
         repo = AdhkarRepository()
         morning = {it["id"]: it for it in repo.load_category("morning")["items"]}
         evening = {it["id"]: it for it in repo.load_category("evening")["items"]}
-        sleep = {
-            it["id"]: it for it in repo.load_category("أذكار_النوم_والليل")["items"]
-        }
+        sleep = {it["id"]: it for it in repo.load_category("أذكار_النوم_والليل")["items"]}
         assert morning["m05"]["count"] == 1
         assert morning["m09"]["count"] == 10
         assert morning["mor20"]["count"] == 1
@@ -192,19 +182,14 @@ class TestSanad:
     def test_corrected_sources(self):
         repo = AdhkarRepository()
         morning = {it["id"]: it for it in repo.load_category("morning")["items"]}
-        sleep = {
-            it["id"]: it for it in repo.load_category("أذكار_النوم_والليل")["items"]
-        }
+        sleep = {it["id"]: it for it in repo.load_category("أذكار_النوم_والليل")["items"]}
         assert morning["m02"]["reference_detail"] == "البقرة: 255"
         assert morning["m06"]["reference_id"] == "tirmidhi"
         assert morning["mor22"]["reference_id"] == "abudawud"
         assert sleep["s02"]["count"] == 1
         assert "دون قوله" in sleep["s02"]["reference_detail"]
         assert sleep["sle14"]["reference_id"] == "tirmidhi"
-        prayer = {
-            it["id"]: it
-            for it in repo.load_category("أدعية_الصلاة")["items"]
-        }
+        prayer = {it["id"]: it for it in repo.load_category("أدعية_الصلاة")["items"]}
         assert "بِرِضَاكَ" in prayer["دعاء_السجود_07"]["arabic"]
 
     def test_restored_morning_evening_items(self):
@@ -285,11 +270,7 @@ class TestCategoryTranslations:
         import re
 
         arabic = re.compile(r"[\u0600-\u06FF]")
-        leaked = [
-            c["id"]
-            for c in AdhkarRepository().get_index()
-            if arabic.search(c["name_en"])
-        ]
+        leaked = [c["id"] for c in AdhkarRepository().get_index() if arabic.search(c["name_en"])]
         assert not leaked, f"Arabic name_en values: {leaked}"
 
     def test_athkar_tab_translates_category_names(self):
@@ -576,6 +557,7 @@ class TestAfterPrayerTranslations:
         assert "l10n.currentLanguage" in src
         assert "translationText" in src
 
+
 class TestMorningEveningLegacyCoverage:
     COVERED = {
         "morning": {"m06", "m07", "m09", "m10", "mor14", "mor15", "mor16", "mor23"},
@@ -659,7 +641,9 @@ class TestMorningEveningQuranBatch:
                         expected = ap_by[source]["translations"][lang]
                     else:
                         source_id, index = source
-                        expected = self._split_basmala(ap_by[source_id]["translations"][lang])[index]
+                        expected = self._split_basmala(ap_by[source_id]["translations"][lang])[
+                            index
+                        ]
                     assert translations[lang] == expected, f"{iid}/{lang}"
 
     def test_batch_segments_are_distinct(self):
@@ -670,8 +654,14 @@ class TestMorningEveningQuranBatch:
             cat = repo.load_category(cat_id)
             by_id = {it["id"]: it for it in cat["items"]}
             for lang in LANGS:
-                segments = [by_id[iid]["translations"][lang] for iid in mapping if iid.startswith(("mor1", "eve1"))]
-                assert len(segments) == len(set(segments)), f"{cat_id}/{lang}: duplicate surah segments"
+                segments = [
+                    by_id[iid]["translations"][lang]
+                    for iid in mapping
+                    if iid.startswith(("mor1", "eve1"))
+                ]
+                assert len(segments) == len(set(segments)), (
+                    f"{cat_id}/{lang}: duplicate surah segments"
+                )
 
     def test_batch_non_arabic_has_no_arabic_script(self):
         import re
@@ -701,8 +691,22 @@ class TestMorningEveningHisnBatch:
     """Hisn al-Muslim batch: all 16 non-Arabic locales now cover all 27 ids."""
 
     LANGUAGES = (
-        "de", "en", "es", "es_la", "fr", "hi", "id", "it", "ms",
-        "pa", "ps", "ru", "so", "tk", "tr", "ur",
+        "de",
+        "en",
+        "es",
+        "es_la",
+        "fr",
+        "hi",
+        "id",
+        "it",
+        "ms",
+        "pa",
+        "ps",
+        "ru",
+        "so",
+        "tk",
+        "tr",
+        "ur",
     )
 
     # No language is partial any more; the key must exist and be empty.
@@ -713,12 +717,35 @@ class TestMorningEveningHisnBatch:
 
     ITEMS = {
         "morning": {
-            "m03", "m04", "m05", "m08", "mor17", "mor18", "mor19",
-            "mor20", "mor21", "mor22", "mor25", "mor26", "mor27", "mor29",
+            "m03",
+            "m04",
+            "m05",
+            "m08",
+            "mor17",
+            "mor18",
+            "mor19",
+            "mor20",
+            "mor21",
+            "mor22",
+            "mor25",
+            "mor26",
+            "mor27",
+            "mor29",
         },
         "evening": {
-            "e03", "e07", "e08", "e09", "eve16", "eve17", "eve18",
-            "eve19", "eve20", "eve21", "eve24", "eve25", "eve26",
+            "e03",
+            "e07",
+            "e08",
+            "e09",
+            "eve16",
+            "eve17",
+            "eve18",
+            "eve19",
+            "eve20",
+            "eve21",
+            "eve24",
+            "eve25",
+            "eve26",
         },
     }
 
