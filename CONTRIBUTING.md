@@ -28,3 +28,21 @@ bash scripts/sync-appdir.sh && bash scripts/sync-appdir.sh --check-only
   `scripts/sync-appdir.sh`.
 - Do not commit binaries (`*.AppImage`, `*.deb`, `*.rpm`, `*.pkg.tar.*`);
   release artifacts are uploaded to GitHub Releases.
+
+## Translation review
+
+Native-speaker review is tracked in
+[`docs/dev/HISN-REVIEW-QUEUE.md`](docs/dev/HISN-REVIEW-QUEUE.md). The queue lists
+every string that was composed or adapted instead of copied from a published
+translation, with the Arabic, the current text, the source and the reason.
+
+- Review only what you are qualified to judge; partial reviews are welcome.
+- To sign off, remove the language from `translation_meta.needs_review[item]`
+  in `assets/adhkar/{morning,evening}.json` and from `NEEDS_REVIEW` in
+  `tests/test_adhkar_repo.py`.
+- Keep `pa` in Gurmukhi script, and do not change other locales in the same
+  pull request.
+- Run `python3 -m pytest tests/test_adhkar_repo.py -q` before opening the pull
+  request.
+
+If you would rather not use Git, comment on the pinned review issue instead.
