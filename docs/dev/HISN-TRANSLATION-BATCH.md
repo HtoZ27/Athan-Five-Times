@@ -414,6 +414,9 @@ locales (816 entries / 509 distinct texts). What remains is review, not retrieva
      morning wording with the book's own morning→evening substitutions.
    * `mor27` (so) — the published Somali covers the short istighfar; the repo uses the long
      form, which was expanded.
+   The ready-to-use queue (Arabic + current translation + source + sign-off steps) is
+   `docs/dev/HISN-REVIEW-QUEUE.md`; it is generated from `translation_meta.needs_review`
+   and lists all 17 entries.
 2. **`m02` / `e02` preamble (resolved 2026-11-17).** The Arabic used to prepend the
    isti'adha (*أعوذ بالله من الشيطان الرجيم*) while the aft11 translations start at the ayah.
    The preamble was removed from both the Arabic and `translations.ar`, so the item is now
