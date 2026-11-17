@@ -8,7 +8,8 @@ application minute by minute.
 
 The public API (``calculate`` / ``PrayerTimesResult``) is unchanged; the
 only additions are the optional ``city_name``, ``country_code`` and
-``altitude`` arguments used to apply the reference's official city tables.
+``altitude`` arguments used to apply the reference's official city tables
+and the generated city altitude map.
 """
 
 import functools
@@ -572,6 +573,18 @@ def _normalise_city(value: str | None) -> str:
     return re.sub(r"[^a-z0-9]", "", stripped.lower())
 
 
+def _city_altitude(country_code: str, city_key: str) -> float:
+    """Return the generated city altitude in metres, or zero when unknown."""
+    if not country_code or not city_key:
+        return 0.0
+    try:
+        from .city_altitudes import lookup
+    except ImportError:  # pragma: no cover - optional data module
+        return 0.0
+    value = lookup(country_code, city_key)
+    return float(value) if value is not None else 0.0
+
+
 @functools.lru_cache(maxsize=256)
 def _calculate_cached(
     lat_key: str,
@@ -583,7 +596,7 @@ def _calculate_cached(
     offsets_tuple: tuple,
     city_key: str = "",
     country_code: str = "",
-    altitude: float = 0.0,
+    altitude: float | None = None,
 ) -> Optional[PrayerTimesResult]:
     try:
         target_date = date.fromisoformat(target_date_iso)
@@ -602,7 +615,15 @@ def _calculate_cached(
 
         method_key = _get_method_key(method_name)
         if static is not None:
-            method_key, _deltas, altitude = static
+            method_key, _deltas, static_altitude = static
+            if altitude is None:
+                altitude = static_altitude
+        elif altitude is None:
+            # No explicit altitude and no official table: use the city map.
+            altitude = _city_altitude(country_code, city_key)
+        if altitude is None:
+            altitude = 0.0
+        altitude = float(altitude)
         if method_key is None:
             logger.warning("Unknown method '%s', falling back to أم القرى", method_name)
             method_key = "makkah"
@@ -672,7 +693,7 @@ def calculate(
     offsets: Optional[Dict[str, int]] = None,
     city_name: Optional[str] = None,
     country_code: Optional[str] = None,
-    altitude: float = 0.0,
+    altitude: Optional[float] = None,
 ) -> Optional[PrayerTimesResult]:
     lat_key = f"{latitude:.6f}"
     lon_key = f"{longitude:.6f}"
@@ -704,5 +725,5 @@ def calculate(
         offsets_tuple,
         _normalise_city(city_name),
         (country_code or "").upper(),
-        float(altitude or 0.0),
+        None if altitude is None else float(altitude),
     )
