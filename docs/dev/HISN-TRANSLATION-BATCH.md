@@ -29,15 +29,17 @@ separate item id, so one dhikr can appear as two ids). Coverage is therefore giv
 | `ru` | 51/51 | 33/33 | IslamHouse Russian DOCX |
 | `tk` | 51/51 | 33/33 | IslamHouse Turkmen DOCX |
 | `tr` | 51/51 | 33/33 | archive.org `tr_Hisnul_Muslim.pdf` (İsmail Yaşa) |
-| `de` | 33/51 | 21/33 | qabasi.com/de (**+9 ids** this stream) |
-| `ur` | 33/51 | 21/33 | qabasi.com/ur + HadeethEnc 6093/3008 (**+9**) |
-| `so` | 39/51 | 25/33 | hisnmuslim.com/i/so (**+15**) |
-| `pa` | 26/51 | 17/33 | HadeethEnc 6093 (**+2**) |
-| `ps` | 24/51 | 16/33 | pre-existing only (**+0**) |
+| `de` | 51/51 | 33/33 | IslamHouse German PDF (`de_Hisnul_ElMuslim.pdf`, book 247027) + HadeethEnc 6093 / qabasi.com/de for the legacy ids |
+| `ur` | 51/51 | 33/33 | qabasi.com/ur + HadeethEnc + islambook.com/ur/azkr/1,2 (12 unique texts / 18 ids) |
+| `so` | 51/51 | 33/33 | hisnmuslim.com/i/so + Somali book `so_Xisnul_Muslim.pdf` + hisnmuslim.com/i/so/1 (4 unique texts / 5 ids, evening forms adapted) |
+| `pa` | 51/51 | 33/33 | HadeethEnc 6093 + islambook.com/pa/azkr/1,2 (16 unique texts / 25 ids, Gurmukhi) |
+| `ps` | 51/51 | 33/33 | islambook.com/ps/azkr/1,2 (17 unique texts / 27 ids) |
 
-⇒ **716 translation entries** (444 distinct texts) across the 16 non-Arabic locales;
-**11 non-Arabic languages have full 33/33 coverage.** The 5 partial locales already had
-24 ids each from earlier i18n work; this stream added the `+N` ids shown above.
+⇒ **816 translation entries** (509 distinct texts) across the 16 non-Arabic locales;
+**all 16 non-Arabic languages now have full 33/33 coverage.** Urdu, Punjabi and Pashto
+were completed on 2026-11-17 from the islambook.com morning/evening pages; Somali gained
+its last 4 unique texts from hisnmuslim.com/i/so/1. The only remaining work is native
+review of the composed/adapted entries (`translation_meta.needs_review`).
 
 Note: `pa` = **Punjabi** (Gurmukhi, U+0A00 block) and `ps` = **Pashto** (Perso-Arabic);
 they are distinct locales — do not swap them.
@@ -53,26 +55,36 @@ they are distinct locales — do not swap them.
 **Where the state lives**
 
 - `assets/adhkar/{morning,evening}.json` → `translation_meta.hisn_batch`:
-  - `languages` — languages with **full** 27/27 coverage
-  - `partial_languages` — `{lang: [item ids]}` for partial coverage
-  - `missing_languages` — languages with **no** coverage
+  - `languages` — languages with **full** coverage of the batch ids (now 16/16)
+  - `partial_languages` — `{lang: [item ids]}` for partial coverage; **empty** now that
+    ur/pa/ps/so are complete (the key stays so readers can tell "none" from "not tracked")
+  - `missing_languages` — languages with **no** coverage; **empty**
   - `items`, `sources` (per language), `source`, `note`
-  - plus `translation_meta.partial_items`, `covered_items`, `verification_status`, `known_gaps`
-- `tests/test_adhkar_repo.py` → class `TestMorningEveningHisnPartialBatch`
-  - `LANGUAGES` = full-coverage languages
-  - `PARTIAL` = `{lang: {"morning": {...}, "evening": {...}}}` — mirrors the JSON metadata
+  - plus `translation_meta.partial_items`, `covered_items`, `verification_status`,
+    `known_gaps`, `needs_review`
+  - `partial_items` is **not** a coverage list: it marks membership in this batch (the
+    test asserts every batch id is listed there and none is in `covered_items`).
+  - `needs_review` — `{item id: [lang, …]}` for text composed/adapted by the assistant
+    rather than copied from a published translation. Keep it until a native speaker signs off.
+- `tests/test_adhkar_repo.py` → class `TestMorningEveningHisnBatch`
+  - `LANGUAGES` = the 16 full-coverage locales
+  - `PARTIAL = {}` — no per-item partial sets remain; the metadata key must stay empty
+  - `NEEDS_REVIEW` — mirrors `translation_meta.needs_review` (`test_needs_review_flags`)
   - `ARABIC_SCRIPT_LANGS = ("ur", "ps")` — skipped by the no-Arabic-script check
     (Urdu/Pashto legitimately use the Arabic script; same rule as
     `backend/translations/__init__.py:_ARABIC_SCRIPT_LANGS`)
+  - `test_full_batch_has_sources` — asserts empty `partial_languages`/`missing_languages`
+    and a `sources` entry for ur/pa/ps/so in both categories
 
 **Gates last run (all green)**
 
 ```
-python3 -m pytest tests/ -q          # 562 tests in tests/ (56 in test_adhkar_repo.py), 0 failures
+python3 -m pytest tests/ -q          # 564 tests in tests/ (58 in test_adhkar_repo.py), 0 failures
 python3 -m ruff check backend/ tests/ # clean (CI only lints these two dirs)
 python3 -m json.tool assets/adhkar/morning.json   # valid
 python3 -m json.tool assets/adhkar/evening.json   # valid
 QT_QPA_PLATFORM=offscreen python3 scripts/smoke-qml.py   # SMOKE OK: zero QML errors
+git diff --check                     # clean (no whitespace errors)
 ```
 
 **Working tree:** modified files, **not committed**. Split into thematic commits when
@@ -100,13 +112,21 @@ equals **page-1 block index + 75**.
 | `mor21` / `eve20` | 89 | `/i/<lang>/1` block 14 | evening form |
 | `mor22` / `eve21` | 85 | `/i/<lang>/1` block 10 | none |
 | `mor25` / `eve24` | 203 | `/i/<lang>/92` block 0 | Arabic is plural → adapt singular→plural |
-| `mor26` / `eve25` | 120 | `/i/<lang>/34` block 1 | none |
+| `mor26` / `eve25` | 121 | `/i/<lang>/34` block 1 | none |
 | `mor27` / `eve26` | 250 | `/i/<lang>/129` block 2 | dhikr quoted inside a narration |
 | `mor29` | 95 | `/i/<lang>/1` block 20 | none |
 | `e03` | 77 (evening) | `/i/<lang>/1` block 2 | evening form (source may be morning-only) |
 
 **Evening forms to adapt** (Arabic swaps morning→evening words):
 `e03` (أمسينا … هذه الليلة), `eve16` (أميت على الفطرة), `eve20` (أمسينا … هذه الليلة).
+
+**ur/pa/ps shortcut (2026-11-17):** the three locales do not need this map. The
+islambook.com morning/evening pages use the same `zekr-N` ids across languages and already
+contain the published translation for each block, so the mapping is
+`zekr-9→m03/e07`, `zekr-5→m04/e08`, `zekr-223→m05`, `zekr-13→m08/e09`, `zekr-11→mor17`,
+`zekr-14→mor18/eve17`, `zekr-15→mor19/eve18`, `zekr-16→mor20/eve19`, `zekr-17→mor21`,
+`zekr-18→mor22/eve21`, `zekr-21→mor25/eve24`, `zekr-22→mor26/eve25`, `zekr-23→mor27/eve26`,
+`zekr-313→mor29`, `zekr-30→e03`, `zekr-38→eve16`, `zekr-44→eve20`. See §3.8.
 
 ### 2.1 IMPORTANT METHOD NOTE — never copy text out of tool output
 
@@ -216,12 +236,140 @@ the anchor. Two shapes occur:
 Always strip punctuation **and** diacritics before comparing, then require a token-similarity
 ratio ≥ 0.85; without punctuation stripping the same comparison silently returns 0 matches
 (this bit us once), and with a low threshold a longer/different narration gets attached to
-the wrong item.ition of book 1566 (pages redirect to the home page).
-* archive.org search: no German / Pashto / Punjabi / Somali Hisn book.
+the wrong item.
+
+### 3.7 Local reference-file audit (`New Folder/`, 2026-11-17)
+
+The folder holds 20 PDFs = **16 unique files**; four are byte-identical duplicates present
+as `… (1).pdf` (`de_Hisnul_ElMuslim`, `ps-fortress`, `ko-hisn-almuslim-in-korean`,
+`risala_ur_hisnul_muslim`). Language was auto-detected from the text layer, not assumed from
+the file name.
+
+| File | Pages | Text layer | Detected language | Verdict for this batch |
+|---|---|---|---|---|
+| `de_Hisnul_ElMuslim.pdf` | 155 | ✔ 291 k chars | German | source of record; `de` already 51/51 |
+| `en-fortress-of-the-muslim.pdf` | 204 | ✔ English + partial Arabic | English | `en` already 51/51 |
+| `risala_fr_hisnulmuslim.pdf` | 197 | ✔ 310 k chars | French | `fr` already 51/51 |
+| `tr_Hisnul_Muslim.pdf` | 99 | ✔ 305 k chars | Turkish | `tr` already 51/51 |
+| `tr_Hisnul_Muslim_1436_1.pdf` | 121 | ✔ | Turkish | alternate edition, not needed |
+| `risala_tr-hisnul_muslim.pdf` | 159 | ✔ | Turkish | alternate edition, not needed |
+| `pt-fortificac-o-do-muculmano.pdf` | 202 | ✔ | Portuguese | **not an app language** |
+| `ko-hisn-almuslim-in-korean.pdf` | 148 | ✔ Hangul | Korean | **not an app language** |
+| `risala_bn_hisn_almuslim.pdf` | 147 | ✔ Bengali | Bengali | **not an app language** |
+| `risala_bn-hisnul_muslim.pdf` | 208 | ✔ Bengali | Bengali | alternate edition, same |
+| `so_Xisnul_Muslim.pdf` | 236 | ✔ 257 k chars | Somali | **used**; all 7 merged payloads reproduce at word coverage 1.000 |
+| `risala_ur_hisnul_muslim.pdf` | 155 | partial | Urdu | **not usable** (below) |
+| `ur_Hisnul_Muslim.pdf` | 128 | ✘ 2.5 k chars | Urdu | scanned/outlined |
+| `ur_Hisnul_Muslim_1436.pdf` | 172 | ✘ 0.9 k chars | Urdu | scanned |
+| `ps-fortress.pdf` | 152 | partial | Pashto | **not usable** (below) |
+
+**Why the Urdu and Pashto books cannot be harvested.** Both number 152 items (short edition,
+so no 203/250/256) and both expose a text layer, but that layer is **not the dhikr
+translations**:
+
+* no Hisn translation can avoid the word Allah, yet in the Pashto file `الله` occurs **0**
+  times in 156 k chars (its most frequent token is the scrambled form `اهلل`) and the
+  ordinary words `لمونځ` (prayer) and `دعا` are absent; in the Urdu file `اللہ` occurs 5
+  times (plus 146 visually reversed `هللا`) in 146 k chars;
+* the RTL glyphs are stored in visual order **and inconsistently** (reversing every line
+  turns 794 `کے` into 210 and drops `اللہ` to 0), so no single transform restores logical
+  order;
+* the content words of item 86 itself (`نام`, `زمین`, `آسمان`, `نقصان`) are absent from its
+  block, and across the 145 items shared by the two books the block lengths correlate
+  **negatively** (r = −0.22) where a correct alignment would be strongly positive.
+
+The translation bodies are set as images. The two `ur_Hisnul_Muslim*.pdf` scans have no text
+layer at all (`pdftotext` yields 2.5 kB over 128 pages and 0.9 kB over 172 pages). Do **not**
+extract these books by item number: the numbering is standard, but the text under each number
+is not a safely readable translation.
+
+**No Punjabi source exists in this folder**: none of the 20 files is Punjabi
+(`risala_bn*` is Bengali), and a workspace-wide `find` returns no other PDF.
+*(Superseded: the online islambook.com pages of §3.8 later supplied `pa` in full.)*
+
+Net effect at audit time: the new reference files add **no** extractable Hisn items; `ur`
+stayed at 33/51 and `ps` at 24/51. *(Superseded by §3.8 for both: ur 51/51, ps 51/51.)*
+
+**Online sources checked (2026-11-17):**
+
+* **Urdu — archive.org `HisnUlMuslimUrdu`** (Saeed bin Ali al-Qahtani, 79-page scan). It has
+  a real OCR text layer (251 kB, tesseract `urd`) and is genuine Urdu prose (`کے` 725, `سے`
+  678, `ہے` 324), but it is too corrupt for payloads: `زمین` and `نقصان` occur **0** times in
+  147 k chars, item 86's block lacks its content words, and the text around the Allah
+  formula is garbled. Three other Urdu OCR copies were measured and are equally partial or
+  garbled: `hisn-ul-muslim-sahih` (104 kB), `HisnUlMuslimTahqeeqOTakhreejZubairAliSb`
+  (142 kB) and `hisnullmuslim` (145 kB). Rejected.
+* **Pashto — archive.org `20260309_20260309_0532`** (Hisn al-Muslim in Pashto, 275 kB OCR,
+  tesseract `pus`). It is readable and really does contain the dhikr translations — item 86
+  reads `د هغه الله په نوم چې … په ځمکه او آسمان کې ضرر نه رسوي …` — but it is a **commentary
+  edition**: Arabic transliteration, hadith footnotes and explanatory prose are interleaved
+  with the translations, and its 106 `#` and 33 `ترجمه` separators also occur inside
+  footnotes and Qur'an quotations. OCR noise is present (e.g. a bare `ه` where `هغه` is
+  meant). Not merged automatically; this is the best candidate for a native Pashto reviewer.
+* **IslamHouse alternate editions (2026-11-17)**: book 1566 has no Urdu/Pashto file, but
+  other ids do. `ur/books/1584` serves `ur_Hisnul_Muslim.pdf` (129 pp) and
+  `ur_Hisnul_Muslim_1436.pdf` (173 pp) — both **scans** (`pdftotext` yields 2.6 kB / 0.9 kB);
+  its `ur-fortress.pdf` (174 pp) has 409 k chars, but the layer is fragmented RTL (16 468
+  `U+202C`, 9 933 `U+202B`, 4 862 `U+202A`; words are split and character-reversed
+  inconsistently: `کے` 203 raw → 846 after line reversal, while `اللہ`, `زمین` and `نقصان`
+  stay at 0 under every transform). `ur/books/2846918` is the same
+  `risala_ur_hisnul_muslim.pdf` already audited. `ps/books/727736` serves
+  `ps_hisn_almuslim.pdf` (302 pp) with **no text layer** (302 chars). No `.docx`/`.doc`
+  endpoint exists for any of them (all 404).
+* **Pashto structural pilot (archive.org OCR)**: the OCR alternates Arabic lines (no
+  Pashto-specific letters) with Pashto translation lines, so line classification itself is
+  reliable. Anchoring the 20 testable batch ids (11 unique) by their Arabic text gave only
+  **one** complete translation (`m03`/`e07`); 8/20 best matches scored r = 0.37–0.66 and came
+  from hadith footnotes/commentary, and even the clean item contains the systematic OCR
+  substitution `هغه` → `څه`. Not merged; this OCR is only usable by a native reviewer.
+* **Punjabi**: no Hisn book found on archive.org or GitHub (`hisn punjabi`, `hisn pashto`
+  repository searches return 0) ⇒ `pa` stays blocked.
+
+**Sources checked and rejected:**
+
+* IslamHouse: no edition of book 1566 for the remaining languages (pages redirect to the
+  home page).
 * hisnmuslim.com: no `fr/de/tr/pa/ur/ps/ms` language slug.
 * Search engines: DuckDuckGo HTML works (`https://html.duckduckgo.com/html/?q=…`) but
   rate-limits; Mojeek returns a captcha; the `websearch` tool may be blocked by a
   hidden-unicode filter.
+
+### 3.8 islambook.com — published Urdu / Punjabi / Pashto morning & evening (found 2026-11-17)
+
+This is the source that closed `ur`, `pa` and `ps`. Rejected alternatives failed because
+they had no standalone dhikr text; islambook has one translated block per dhikr, for all
+17 batch texts, in all three languages.
+
+* **Pages:** `https://www.islambook.com/{ur,pa,ps}/azkr/1` (morning) and `/azkr/2`
+  (evening). The pages are static HTML; `curl` gets **403**, a real browser loads them.
+* **Anchors:** every dhikr is `<section id="zekr-N" class="azkar-entry">`, and `N` is
+  **identical across the three languages**, so one item mapping serves all of them.
+* **Text:** inside the section,
+  `div.azkar-text[lang="ar"]` = Arabic, `div.azkar-translation[lang="ur|pa|ps"]` = the
+  published translation. (`div.azkar-transliteration[lang=…]` holds transliterations for
+  ~30 languages and is not used; the `[lang]` attribute is the reliable selector, not the
+  element class.)
+* **Punjabi script:** islambook's `pa` blocks are **Gurmukhi** (U+0A00–U+0A7F), which is
+  what the app's `pa` locale requires. Assert this before merging: Gurmukhi present, no
+  Arabic-script and no Latin characters in the payload.
+* **Extraction:** run the pages in the browser, evaluate one JS snippet that walks the
+  `zekr-N` ids and reads `innerText` of both divs, then `POST` the result to a local
+  receiver (`127.0.0.1:8765`) that merges it into `ingested.json`. This keeps the text out
+  of tool output entirely (see §2.1).
+* **Verification:** for each mapping, assert that the app's normalized Arabic (harakat and
+  punctuation stripped) is contained in the source `azkar-text[lang=ar]`. Three exception
+  cases are handled explicitly, not silently:
+  * `zekr-5` (`m04/e08`) orders *Allah–Islam–Muhammad* and says **نبيا** where the repo
+    Arabic says **رسولًا** — the published translations were adapted to *Messenger* and to
+    the repo's word order, then flagged `needs_review`.
+  * `zekr-223` (`m05`) contains only the first half (**سبحان الله وبحمده**); the second
+    half (**سبحان الله العظيم**) was appended by analogy and flagged.
+  * `zekr-22` (`mor26/eve25`) has two typos in its source Arabic (around **ضلع** and
+    **غلبة**); the published translations nevertheless render the repo's
+    *غلبة الدين وقهر الرجال* correctly, so the check uses keyword tokens instead of the
+    full string.
+* **Numbers:** ur 17 texts / 18 ids, pa 17 / 25, ps 17 / 27 (some ids share a text, e.g.
+  `m03`/`e07`). Only `m05` (all three) and `m04`/`e08` (all three) needed adaptation.
 
 ---
 
@@ -253,28 +401,37 @@ Verify: `pytest tests/test_adhkar_repo.py -q`, `ruff check backend/ tests/`,
 
 ## 5. Remaining punchlist
 
-1. **`ps`** — 24/51 ids pre-existing, **0 new**. HadeethEnc `6093`/`6272` exist but the
-   Pashto edition gives only narration + transliteration (no standalone dhikr translation),
-   so nothing can be harvested. Needs a Pashto Hisn book.
-2. **`de` / `ur`** — 33/51 each (21/33 unique); 18 ids / 12 unique missing:
-   `m04 m05 mor17 mor18 mor21 mor22 mor25 mor26 mor27 mor29 e08 eve16 eve17 eve20 eve21
-   eve24 eve25 eve26`. qabasi's six sections are exhausted (5 unique dhikkar), HadeethEnc has
-   no standalone translations for these ⇒ needs a full German/Urdu Hisn book.
-3. **`so`** — 39/51 (25/33); 12 ids / 8 unique missing: `m05 m08 mor18 mor25 mor27 e03 e09
-   eve16 eve17 eve20 eve24 eve26`. hisnmuslim's Somali edition (pages 1–135) has **no Arabic
-   script** and no Somali text for `m05/m08/mor18/mor25/mor27`. Do not fabricate the evening
-   wording of `e03`/`eve16`/`eve20`.
-4. **`pa`** — 26/51 (17/33); 25 ids / 16 unique missing. HadeethEnc `6093` was the last usable
-   source; `3008` is 404 in the Punjabi edition.
-5. **Metadata note (fixed):** `hisn_batch.note` now spells out the Messenger terms
-   (`en` Messenger, `es` **Mensajero**, `fr` Messager, `id` rasul, `tk` resul, `ru`
-   посланник; `it` alone uses *Profeta*). The earlier claim that `es` used *Profeta* was
-   wrong.
-6. **`es_la` note:** `after_prayer.json` says *"es_la is a mirror of es"*. True for the
+The coverage work is **done**: all 51 Hisn ids have a translation in all 16 non-Arabic
+locales (816 entries / 509 distinct texts). What remains is review, not retrieval.
+
+1. **Native review (the only real blocker).** `translation_meta.needs_review` lists every
+   entry that was composed or adapted rather than copied from a published translation:
+   * `m04` / `e08` in `ur`, `pa`, `ps`, `so` — published text says *نبي* and orders
+     Allah–Islam–Muhammad; adapted to the repo's *رسولًا* and Allah–Muhammad–Islam.
+   * `m05` in `ur`, `pa`, `ps`, `so` — islambook/hisnmuslim publish only the first half;
+     the second half (*سبحان الله العظيم*) was appended.
+   * Somali evening forms `e03`, `eve16`, `eve20`, `eve26` — derived from the published
+     morning wording with the book's own morning→evening substitutions.
+   * `mor27` (so) — the published Somali covers the short istighfar; the repo uses the long
+     form, which was expanded.
+2. **`m02` / `e02` preamble (resolved 2026-11-17).** The Arabic used to prepend the
+   isti'adha (*أعوذ بالله من الشيطان الرجيم*) while the aft11 translations start at the ayah.
+   The preamble was removed from both the Arabic and `translations.ar`, so the item is now
+   exactly Ayat al-Kursi and matches all 16 translations; `reference_detail` is
+   *البقرة: 255* and `test_kursi_has_no_istiadha_preamble` locks this in. If the isti'adha
+   is wanted back, it must be added together with a translated form in every locale
+   (option B: isti'adha + basmala + ayah).
+3. **Verification already in place.** `tests/test_adhkar_repo.py::TestMorningEveningHisnBatch`
+   asserts: full 16-language coverage of every batch id, empty `partial_languages` /
+   `missing_languages`, a `sources` entry for ur/pa/ps/so, no Arabic script in `pa`/`so`,
+   and exact agreement between `needs_review` and `NEEDS_REVIEW`. `git diff` shows the only
+   changed translation values are the fills plus one Somali word (`nabinimo` →
+   `rasuulnimo`).
+4. **`es_la` note:** `after_prayer.json` says *"es_la is a mirror of es"*. True for the
    adhkar content (63/63 items identical) but **not** for the UI: 10 of the 264 `ui` keys
    differ between `es.json` and `es_la.json`. Wording should be narrowed.
-7. **Native review** — the adapted evening forms (`e03`, `eve16`, `eve20`), the
-   singular→plural adaptation of `mor25`/`eve24`, and the Malay/Urdu/Somali OCR-derived
-   texts were written by the assistant, not by native speakers. Flag them in
-   `needs_review`.
-8. **Scope decision** — 298 items in 19 categories have no non-Arabic translation.
+5. **Scope decision (out of this stream).** 298 items in 19 categories have no non-Arabic
+   translation at all; only the morning/evening Hisn batch was in scope here.
+6. **Commit split (when asked):** (1) adhkar JSON translations + `translation_meta`,
+   (2) tests, (3) this document, (4) pre-existing session edits
+   (`backend/translations` + `backend/adhkar_repo.py` + `qml/*` + `scripts/e2e-features.py`).

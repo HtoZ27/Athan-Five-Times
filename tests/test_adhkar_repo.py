@@ -195,7 +195,7 @@ class TestSanad:
         sleep = {
             it["id"]: it for it in repo.load_category("أذكار_النوم_والليل")["items"]
         }
-        assert "النحل: 98" in morning["m02"]["reference_detail"]
+        assert morning["m02"]["reference_detail"] == "البقرة: 255"
         assert morning["m06"]["reference_id"] == "tirmidhi"
         assert morning["mor22"]["reference_id"] == "abudawud"
         assert sleep["s02"]["count"] == 1
@@ -351,14 +351,16 @@ class TestTextIntegrity:
             it = next(i for i in cat["items"] if i["id"] == iid)
             assert "وهو العلي العظيم" in _bare_arabic(it["arabic"]), (cid, iid)
 
-    def test_istiadha_merged_with_kursi(self):
+    def test_kursi_has_no_istiadha_preamble(self):
         repo = AdhkarRepository()
         for cid, iid in [("morning", "m02"), ("evening", "e02")]:
             cat = repo.load_category(cid)
             it = next(i for i in cat["items"] if i["id"] == iid)
             bare = _bare_arabic(it["arabic"])
-            assert "اعوذ بالله من الشيطان الرجيم" in bare, (cid, iid)
-            assert "النحل: 98" in it["reference_detail"], (cid, iid)
+            assert "اعوذ بالله من الشيطان الرجيم" not in bare, (cid, iid)
+            assert bare.startswith("الله لا اله الا هو الحي القيوم"), (cid, iid, bare[:60])
+            assert it["reference_detail"] == "البقرة: 255", (cid, iid)
+            assert it["translations"]["ar"] == it["arabic"], (cid, iid)
 
     def test_istighfar_items_complete(self):
         repo = AdhkarRepository()
@@ -695,32 +697,16 @@ class TestMorningEveningQuranBatch:
             assert set(mapping) <= set(meta["covered_items"])
 
 
-class TestMorningEveningHisnPartialBatch:
-    """Hisn al-Muslim batch: full-coverage languages plus per-item partial ones."""
+class TestMorningEveningHisnBatch:
+    """Hisn al-Muslim batch: all 16 non-Arabic locales now cover all 27 ids."""
 
-    LANGUAGES = ("en", "es", "es_la", "fr", "hi", "id", "it", "ms", "ru", "tk", "tr")
+    LANGUAGES = (
+        "de", "en", "es", "es_la", "fr", "hi", "id", "it", "ms",
+        "pa", "ps", "ru", "so", "tk", "tr", "ur",
+    )
 
-    # Languages whose source only covers part of the batch; the id sets mirror
-    # translation_meta.hisn_batch.partial_languages in the JSON files.
-    PARTIAL = {
-        "de": {
-            "morning": {"m03", "m08", "mor19", "mor20"},
-            "evening": {"e03", "e07", "e09", "eve18", "eve19"},
-        },
-        "ur": {
-            "morning": {"m03", "m08", "mor19", "mor20"},
-            "evening": {"e03", "e07", "e09", "eve18", "eve19"},
-        },
-        "so": {
-            "morning": {"m03", "m04", "mor17", "mor19", "mor20", "mor21",
-                        "mor22", "mor26", "mor29"},
-            "evening": {"e07", "e08", "eve18", "eve19", "eve21", "eve25"},
-        },
-        "pa": {
-            "morning": {"m03"},
-            "evening": {"e07"},
-        },
-    }
+    # No language is partial any more; the key must exist and be empty.
+    PARTIAL = {}
 
     # ur/ps write in the Arabic script, so the no-Arabic-script check skips them.
     ARABIC_SCRIPT_LANGS = ("ur", "ps")
@@ -786,3 +772,40 @@ class TestMorningEveningHisnPartialBatch:
                 assert set(partial[lang]) == set(per_cat.get(cat_id, set())), lang
                 assert not (set(partial[lang]) & set(batch["languages"])), lang
                 assert lang not in batch["missing_languages"], lang
+
+    # Composed/adapted entries that still need a native speaker; mirrors
+    # translation_meta.needs_review in the JSON files.
+    NEEDS_REVIEW = {
+        "morning": {
+            "m04": {"pa", "ps", "so", "ur"},
+            "m05": {"pa", "ps", "so", "ur"},
+            "mor27": {"so"},
+        },
+        "evening": {
+            "e03": {"so"},
+            "e08": {"pa", "ps", "so", "ur"},
+            "eve16": {"so"},
+            "eve20": {"so"},
+            "eve26": {"so"},
+        },
+    }
+
+    def test_needs_review_flags(self):
+        for cat_id, expected in self.NEEDS_REVIEW.items():
+            path = os.path.join(ASSETS, f"{cat_id}.json")
+            with open(path, encoding="utf-8") as f:
+                data = json.load(f)
+            review = data["translation_meta"].get("needs_review", {})
+            assert {k: set(v) for k, v in review.items()} == expected
+            assert set(review) <= self.ITEMS[cat_id]
+
+    def test_full_batch_has_sources(self):
+        for cat_id, ids in self.ITEMS.items():
+            path = os.path.join(ASSETS, f"{cat_id}.json")
+            with open(path, encoding="utf-8") as f:
+                batch = json.load(f)["translation_meta"]["hisn_batch"]
+            assert batch["partial_languages"] == {}
+            assert batch["missing_languages"] == []
+            for lang in ("ur", "pa", "ps", "so"):
+                assert lang in batch["sources"], (cat_id, lang)
+                assert batch["languages"].count(lang) == 1
