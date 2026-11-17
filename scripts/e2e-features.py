@@ -127,11 +127,23 @@ def main() -> int:
         st.setProperty("currentIndex", 0)
         app.processEvents()
 
-    for lang in ("en", "fr", "ar"):
+    # Every shipped language, through the same path the settings dialog uses.
+    from backend._constants import LANGS
+    _rtl_langs = {"ar", "ur", "ps", "pa"}
+    for lang in LANGS:
         lo.setLanguage(lang)
+        pe.updateSetting("language", lang)
+        pe.commitSettings()
         app.processEvents()
         nm = pe.getNextPrayerName()
-        check(f"lang-{lang}", bool(nm), nm)
+        rows = pe.getPrayerTimes()
+        row_name = rows[0]["name"] if rows else ""
+        check(f"lang-{lang}", bool(nm) and bool(row_name), f"{nm}/{row_name}")
+        check(f"lang-rtl-{lang}", pe.isRtl() is (lang in _rtl_langs))
+    lo.setLanguage("ar")
+    pe.updateSetting("language", "ar")
+    pe.commitSettings()
+    app.processEvents()
 
     for th in ("light", "dark", "ottoman_gold", "catppuccin_mocha",
                "catppuccin_latte", "auto"):
@@ -253,6 +265,66 @@ def main() -> int:
     pe.recalculate()
     app.processEvents()
 
+    # --- Calculation matrix: every method, madhab, offset and timezone ---
+    from datetime import date as _matrix_date
+    from datetime import timedelta as _timedelta
+
+    _methods = pe.getCalcMethods()
+    _matrix_bad = []
+    for _m in _methods:
+        _r = _calc(36.8065, 10.1815, target_date=_matrix_date(2026, 6, 21),
+                   method_name=_m["key"], tz_name="Africa/Tunis",
+                   city_name="Tunis", country_code="TN")
+        if _r is None:
+            _matrix_bad.append(_m["key"])
+            continue
+        _vals = list(_r.as_dict().values())
+        if not all(a < b for a, b in zip(_vals, _vals[1:])):
+            _matrix_bad.append(_m["key"])
+    check("methods-36-matrix", len(_methods) == 36 and not _matrix_bad,
+          f"bad={_matrix_bad[:4]}")
+
+    # The same methods at a high-latitude summer date exercise the clamps.
+    _high_bad = []
+    for _m in _methods:
+        _r = _calc(51.5074, -0.1278, target_date=_matrix_date(2026, 6, 21),
+                   method_name=_m["key"], tz_name="Europe/London")
+        if _r is None:
+            _high_bad.append(_m["key"])
+            continue
+        _vals = list(_r.as_dict().values())
+        if not all(a < b for a, b in zip(_vals, _vals[1:])):
+            _high_bad.append(_m["key"])
+    check("methods-36-high-lat", not _high_bad, f"bad={_high_bad[:4]}")
+
+    _shafi = _calc(36.8065, 10.1815, target_date=_matrix_date(2026, 6, 21),
+                   method_name=_methods[0]["key"], madhab="shafi",
+                   tz_name="Africa/Tunis").as_dict()
+    _hanafi = _calc(36.8065, 10.1815, target_date=_matrix_date(2026, 6, 21),
+                    method_name=_methods[0]["key"], madhab="hanafi",
+                    tz_name="Africa/Tunis").as_dict()
+    check("madhab-asr", _shafi["asr"] < _hanafi["asr"],
+          f"{_shafi['asr']} vs {_hanafi['asr']}")
+    check("madhab-other-prayers", all(_shafi[k] == _hanafi[k]
+                                      for k in ("fajr", "sunrise", "dhuhr", "maghrib", "isha")))
+
+    _base = _calc(36.8065, 10.1815, target_date=_matrix_date(2026, 6, 21),
+                  method_name=_methods[0]["key"], tz_name="Africa/Tunis").as_dict()
+    _offset_map = {"fajr": 5, "sunrise": -3, "dhuhr": 2, "asr": -4, "maghrib": 6, "isha": -7}
+    _shifted = _calc(36.8065, 10.1815, target_date=_matrix_date(2026, 6, 21),
+                     method_name=_methods[0]["key"], tz_name="Africa/Tunis",
+                     offsets=_offset_map).as_dict()
+    check("offsets-matrix", all((_shifted[k] - _base[k]).total_seconds() == _offset_map[k] * 60
+                                for k in _offset_map))
+
+    _utc = _calc(36.8065, 10.1815, target_date=_matrix_date(2026, 6, 21),
+                 method_name=_methods[0]["key"], tz_name="UTC").as_dict()
+    check("timezone-matrix", all((_utc[k] - _base[k]) == _timedelta(hours=-1)
+                                 for k in _base))
+    check("target-date", _calc(36.8065, 10.1815, target_date=_matrix_date(2026, 6, 21),
+                               method_name=_methods[0]["key"],
+                               tz_name="Africa/Tunis").calc_date == _matrix_date(2026, 6, 21))
+
     prov = pe.getAthkarProvider()
     check("adhkar-items-morning", len(prov.getCategoryItems("morning")) == 26)
     it = prov.getCategoryItems("morning")[0]
@@ -262,6 +334,296 @@ def main() -> int:
 
     pe._athkar_provider.setPrayerAthkar("fajr", "t")
     check("popup-text", len(pe._athkar_provider.getPrayerAthkarText()) > 100)
+
+    # --- Every user-facing option, through the controller ---
+    def _settle(seconds=0.3):
+        end = _time.time() + seconds
+        while _time.time() < end:
+            app.processEvents()
+            _time.sleep(0.01)
+
+    _baseline = pe._result.as_dict()
+    _all_keys = ("fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha")
+    for _key in _all_keys:
+        pe.setOffset(_key, 7)
+        check(f"offset-controller-{_key}",
+              pe.getOffset(_key) == 7
+              and (pe._result.as_dict()[_key] - _baseline[_key]).total_seconds() == 420)
+        pe.setOffset(_key, 0)
+    check("offset-controller-reset", all(pe.getOffset(k) == 0 for k in _all_keys))
+
+    for _entry in pe.getAzanEnabledList():
+        _key = _entry["key"]
+        pe.setAzanEnabled(_key, False)
+        _state = {e["key"]: e["enabled"] for e in pe.getAzanEnabledList()}
+        check(f"azan-toggle-{_key}", _state[_key] is False)
+        pe.setAzanEnabled(_key, True)
+    check("azan-toggle-reset", all(e["enabled"] for e in pe.getAzanEnabledList()))
+
+    _option_values = {
+        "dnd_enabled": False,
+        "dnd_from": 21,
+        "dnd_to": 5,
+        "dnd_duration": 15,
+        "fade_in": False,
+        "fade_in_duration": 7,
+        "takbeer_only": True,
+        "sleep_mode": False,
+        "show_tray": False,
+        "athkar_popup_enabled": False,
+        "athkar_popup_duration": 120,
+        "athkar_popup_delay": 30,
+        "athkarCount": 99,
+        "athkarMethod": "specific_time",
+        "background_enabled": False,
+        "render_backend": "software",
+        "render_loop": "basic",
+        "window_geometry": [10, 20, 300, 200],
+    }
+    for _key, _value in _option_values.items():
+        pe.updateSetting(_key, _value)
+        check(f"option-{_key}", pe.getSetting(_key) == _value)
+    pe.commitSettings()
+    _settle()
+    with open(SETTINGS_FILE, encoding="utf-8") as _f:
+        _saved = json.load(_f)
+    check("option-persisted", all(_saved.get(k) == v for k, v in _option_values.items()))
+
+    check("timer-awake", pe._clock_timer.interval() == 1000
+          and pe._prayer_timer.interval() == 60000)
+    pe.setBackgroundMode(True)
+    check("timer-background", pe._clock_timer.interval() == 30000
+          and pe._prayer_timer.interval() == 300000)
+    pe.setBackgroundMode(False)
+    check("timer-foreground", pe._clock_timer.interval() == 1000
+          and pe._prayer_timer.interval() == 60000)
+
+    _option_defaults = {
+        "dnd_enabled": True,
+        "dnd_from": 22,
+        "dnd_to": 6,
+        "dnd_duration": 20,
+        "fade_in": True,
+        "fade_in_duration": 3,
+        "takbeer_only": False,
+        "sleep_mode": True,
+        "show_tray": True,
+        "athkar_popup_enabled": True,
+        "athkar_popup_duration": 300,
+        "athkar_popup_delay": 60,
+        "athkarCount": 33,
+        "athkarMethod": "after_prayer",
+        "background_enabled": True,
+        "render_backend": "auto",
+        "render_loop": "auto",
+        "window_geometry": [100, 100, 800, 600],
+    }
+    for _key, _value in _option_defaults.items():
+        pe.updateSetting(_key, _value)
+    pe.commitSettings()
+    _settle()
+    check("timer-sleep", pe._prayer_timer.interval() == 300000)
+
+    # Pre-azan alert uses the real notification path with a fabricated next time.
+    pe.updateSetting("pre_azan_minutes", 10)
+    pe.updateSetting("pre_azan_enabled", True)
+    pe.updateSetting("silent_mode", False)
+    _real_next = pe._cached_next
+    pe._cached_next = ("fajr", pe._now() + _timedelta(minutes=5))
+    pe._pre_notified.clear()
+    pe._check_pre_azan(pe._now())
+    _alert = pe.getPreAlert()
+    check("pre-alert-text", bool(_alert) and "10" in _alert, _alert)
+    pe.updateSetting("silent_mode", True)
+    pe._check_pre_azan(pe._now())
+    check("pre-alert-silent", pe.getPreAlert() == "")
+    pe.updateSetting("silent_mode", False)
+    pe.updateSetting("pre_azan_enabled", False)
+    pe._check_pre_azan(pe._now())
+    check("pre-alert-disabled", pe.getPreAlert() == "")
+    pe.updateSetting("pre_azan_enabled", True)
+    pe._cached_next = _real_next
+    pe._pre_notified.clear()
+
+    for _fmt, _marker in (("12h", "AM"), ("24h", "")):
+        pe.updateSetting("time_format", _fmt)
+        app.processEvents()
+        _rows = pe.getPrayerTimes()
+        if _marker:
+            _ok = all(r["time"].endswith(("AM", "PM")) for r in _rows)
+        else:
+            _ok = all("AM" not in r["time"] and "PM" not in r["time"] for r in _rows)
+        check(f"time-format-{_fmt}", bool(_rows) and _ok,
+              _rows[0]["time"] if _rows else "")
+    pe.updateSetting("time_format", "24h")
+    _settle()
+
+    pe.updateSetting("hijri_day_offset", 0)
+    _settle()
+    _h0 = pe.getHijriDate()
+    pe.updateSetting("hijri_day_offset", 1)
+    _settle()
+    _h1 = pe.getHijriDate()
+    pe.updateSetting("hijri_day_offset", -1)
+    _settle()
+    _hm = pe.getHijriDate()
+    pe.updateSetting("hijri_day_offset", 0)
+    _settle()
+    check("hijri-offset", _h0 != _h1 and _h0 != _hm and _h1 != _hm
+          and pe.getHijriDate() == _h0, f"{_h0} / {_h1} / {_hm}")
+
+    _tunis_reference = pe._result.as_dict()
+    pe.updateSetting("custom_coords", True)
+    pe.updateSetting("latitude", 48.8566)
+    pe.updateSetting("longitude", 2.3522)
+    pe.updateSetting("timezone", "Europe/Paris")
+    _settle()
+    _paris = pe._result.as_dict()
+    check("custom-coords-applied", pe.getSetting("custom_coords") is True
+          and abs(pe.getSetting("latitude") - 48.8566) < 1e-6
+          and abs(pe.getSetting("longitude") - 2.3522) < 1e-6
+          and abs((_paris["fajr"] - _tunis_reference["fajr"]).total_seconds()) > 1800)
+    # Unchecking custom coordinates in the UI runs auto-location; emulate its
+    # apply step with the known Tunis coordinates.
+    _auto_ok = pe._apply_auto_coords("TN", "Tunis", 36.8065, 10.1815, "Africa/Tunis")
+    _settle()
+    check("custom-coords-restored", _auto_ok is True
+          and pe.getSetting("custom_coords") is False
+          and pe._result.as_dict() == _tunis_reference)
+
+    pe.updateSetting("timezone", "UTC")
+    _settle()
+    _utc_times = pe._result.as_dict()
+    check("timezone-controller",
+          all((_utc_times[k] - _tunis_reference[k]).total_seconds() == -3600
+              for k in _all_keys))
+    pe.updateSetting("timezone", "Africa/Tunis")
+    _settle()
+
+    pe.updateSetting("volume", 0.42)
+    pe.commitSettings()
+    _settle()
+    _export = pe.exportSettings()
+    check("export-settings", bool(_export) and _export.startswith(TMP)
+          and os.path.isfile(_export), _export)
+    with open(_export, encoding="utf-8") as _f:
+        _export_json = json.load(_f)
+    check("export-content", _export_json.get("volume") == 0.42
+          and _export_json.get("country") == "TN")
+
+    pe.updateSetting("volume", 0.11)
+    pe.updateSetting("country", "IQ")
+    pe.updateSetting("city", "Baghdad")
+    pe.updateSetting("timezone", "Asia/Baghdad")
+    _settle()
+    pe.importSettings(_export)
+    _settle()
+    check("import-settings", pe.getSetting("volume") == 0.42
+          and pe.getSetting("country") == "TN"
+          and pe.getSetting("city") == "Tunis"
+          and pe.getSetting("timezone") == "Africa/Tunis")
+
+    _bad_file = os.path.join(TMP, "bad-settings.json")
+    with open(_bad_file, "w", encoding="utf-8") as _f:
+        json.dump({"volume": 0.5, "evil_key": 1}, _f)
+    pe.importSettings(_bad_file)
+    _settle()
+    check("import-reject-unknown", pe.getSetting("volume") == 0.42
+          and pe.getSetting("country") == "TN")
+    with open(_bad_file, "w", encoding="utf-8") as _f:
+        json.dump([], _f)
+    pe.importSettings(_bad_file)
+    _settle()
+    check("import-reject-nondict", pe.getSetting("volume") == 0.42)
+
+    pe.updateSetting("volume", 0.05)
+    pe.commitSettings()
+    _settle()
+    pe.storeSettingsSnapshot()
+    pe.updateSetting("volume", 0.77)
+    pe.updateSetting("method", pe.getCalcMethods()[2]["key"])
+    pe.commitSettings()
+    _settle()
+    pe.restoreSettingsSnapshot()
+    _settle()
+    check("snapshot-restore", pe.getSetting("volume") == 0.05
+          and pe.getSetting("method") == pe.getCalcMethods()[0]["key"])
+
+    pe.saveTheme("ottoman_gold")
+    _settle()
+    with open(SETTINGS_FILE, encoding="utf-8") as _f:
+        _saved = json.load(_f)
+    check("theme-save", _saved.get("theme") == "ottoman_gold")
+    pe.saveTheme("dark")
+    _settle()
+
+    _prev_country = pe.getSetting("country")
+    _auto_ok = pe._apply_auto_coords("FR", "Paris", 48.8566, 2.3522, "Europe/Paris")
+    _settle()
+    check("auto-coords-apply", _auto_ok is True
+          and pe.getSetting("country") == "FR"
+          and pe.getSetting("city") == "Paris"
+          and pe.getSetting("custom_coords") is False)
+    _auto_bad = pe._apply_auto_coords("ZZ", "Nowhere", 0.0, 0.0, None)
+    check("auto-coords-reject",
+          _auto_bad is False and pe.getSetting("country") == "FR")
+    pe.updateSetting("country", "TN")
+    pe.updateSetting("city", "Tunis")
+    pe.updateSetting("timezone", "Africa/Tunis")
+    _settle()
+    check("auto-coords-restored", pe.getSetting("country") == _prev_country)
+
+    _page = pe.searchCitiesPaginated("TN", "tunis", 0, 2)
+    check("search-query", _page["total"] == 1
+          and _page["items"][0]["engName"] == "Tunis", str(_page["total"]))
+    _page_all = pe.searchCitiesPaginated("TN", "", 0, 5)
+    _page_next = pe.searchCitiesPaginated("TN", "", 5, 5)
+    check("search-paging", len(_page_all["items"]) == 5
+          and _page_all["total"] > 5
+          and bool(_page_next["items"])
+          and _page_next["items"][0] != _page_all["items"][0])
+    _coords = pe.getCityCoords("TN", "Tunis")
+    check("city-coords", abs(_coords["lat"] - 36.8065) < 0.01
+          and abs(_coords["lon"] - 10.1815) < 0.01)
+    check("default-method",
+          pe.getDefaultMethod("TN") in {m["key"] for m in pe.getCalcMethods()})
+    check("offset-keys", pe.getOffsetKeys() == ["fajr", "dhuhr", "asr", "maghrib", "isha"])
+    _tn_cities = pe.getCitiesForCountry("TN")
+    check("cities-shape", len(_tn_cities) > 5
+          and all({"name", "engName", "lat", "lon", "countryCode"} <= set(c)
+                  for c in _tn_cities[:5]))
+    check("nested-setting", pe.getNestedSetting("offsets.fajr") == 0)
+    _all_settings = pe.getSettings()
+    check("settings-shape",
+          {"country", "city", "method", "offsets", "azan_enabled", "audio"} <= set(_all_settings))
+
+    _tray = pe.getTrayInfo()
+    check("tray-info", bool(_tray.get("next")) and isinstance(_tray.get("remaining"), str),
+          str(_tray))
+    check("progress", 0.0 <= pe.getProgressToNext() <= 1.0)
+    _following = pe.getFollowingPrayers()
+    check("following", 1 <= len(_following) <= 3
+          and all("name" in f and "time" in f for f in _following),
+          str(_following))
+    check("credits", bool(pe.getCreditsTitle()) and len(pe.getCreditsHtml()) > 500)
+    check("location-text", bool(pe.getLocationText()), pe.getLocationText())
+    check("date-texts", bool(pe.getClockText()) and bool(pe.getGregorianDate())
+          and bool(pe.getHijriDate()))
+    check("translate", bool(pe.translate("app_name")) and bool(pe.translatePrayer("fajr")))
+
+    from backend.countries_data import COUNTRY_CITIES
+    _rows = 0
+    _bad_data = []
+    for _code, _cities in COUNTRY_CITIES.items():
+        if not _cities:
+            _bad_data.append(_code)
+            continue
+        for _name, _lat, _lon in _cities:
+            _rows += 1
+            if not (-90 <= _lat <= 90 and -180 <= _lon <= 180):
+                _bad_data.append(f"{_code}/{_name}")
+    check("city-data-complete", _rows == 9681 and not _bad_data,
+          f"rows={_rows} bad={_bad_data[:3]}")
 
     import glob
     src = sorted(glob.glob(os.path.join(ROOT, "assets", "muezzins", "*.mp3")))[0]
@@ -281,6 +643,11 @@ def main() -> int:
     time.sleep(0.5)
     check("audio-preview", playing is True, f"playing={playing}")
     check("audio-stop", pe.isAzanPlaying() is False)
+
+    pe.setPrayerAudio("fajr", tmp_mp3)
+    check("audio-prayer-assign", pe.getPrayerAudio("fajr") == tmp_mp3)
+    pe.setDefaultMuezzin(tmp_mp3)
+    check("audio-default-assign", pe.getPrayerAudio("isha") == tmp_mp3)
 
     from backend.settings import set_autostart
     set_autostart(True)
@@ -393,6 +760,16 @@ def main() -> int:
         app.processEvents()
         wob.deleteLater()
         app.processEvents()
+
+    # --- Full reset returns the app to first-run defaults ---
+    pe.resetAllSettings()
+    _settle()
+    check("reset-defaults", pe.getSetting("country") == "SA"
+          and pe.getSetting("city") == "Mecca"
+          and pe.getSetting("volume") == 1.0
+          and pe.getSetting("theme") == "dark"
+          and all(v == 0 for v in pe.getSetting("offsets").values()))
+    check("reset-recalculates", len(pe.getPrayerTimes()) == 6)
 
     import glob as _g
     check("prayer-icons-14",
