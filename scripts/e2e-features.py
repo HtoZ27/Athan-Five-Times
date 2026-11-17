@@ -43,12 +43,20 @@ qml_errors: list = []
 def _handler(mode, context, message):
     if mode in (QtMsgType.QtWarningMsg, QtMsgType.QtCriticalMsg, QtMsgType.QtFatalMsg):
         text = str(message)
-        if (
-            "TypeError" in text
-            or "ReferenceError" in text
-            or "Binding loop" in text
-            or "Failed" in text
-        ):
+        markers = (
+            "TypeError",
+            "ReferenceError",
+            "Binding loop",
+            "Failed",
+            "is not defined",
+            "Cannot read property",
+            "Cannot call method",
+            "Cannot assign",
+            "Unable to assign",
+            "Cannot anchor",
+            "Non-existent",
+        )
+        if any(marker in text for marker in markers):
             qml_errors.append(f"{context.file}:{context.line}: {text}")
 
 
@@ -1163,6 +1171,28 @@ def main() -> int:
                 and empty.isVisible(),
                 f"count={city_list.property('count')} h={popup.property('height'):.0f}",
             )
+
+            # A broad query returns more than one page: the load-more label
+            # must fit inside its button instead of being clipped to 32px.
+            field.forceActiveFocus()
+            _pump(8)
+            QMetaObject.invokeMethod(field, "selectAll")
+            _type_text("a", field)
+            _pump(140)
+            more_btn = next(
+                (o for o in _walk_all(popup) if _prop(o, "objectName") == "cityLoadMore"),
+                None,
+            )
+            more_width = float(_prop(more_btn, "width") or 0) if more_btn is not None else 0
+            more_needed = 0.0
+            if more_btn is not None:
+                more_content = _prop(more_btn, "contentItem")
+                more_needed = float(_prop(more_content, "implicitWidth") or 0)
+            check(
+                "ui-city-load-more-fits",
+                more_btn is not None and more_width + 1 >= more_needed and more_width >= 60,
+                f"w={more_width:.0f} needed={more_needed:.0f}",
+            )
             QMetaObject.invokeMethod(popup, "close")
             _pump(25)
 
@@ -1217,6 +1247,88 @@ def main() -> int:
             )
             lo.setLanguage("ar")
             _pump(60)
+
+        # --- timezone: nearest zone per city, independent of the UI language ---
+        def _set_city(code, city):
+            pe.updateSetting("country", code)
+            pe.updateSetting("city", city)
+            _pump(55)
+            return pe.getSettings()
+
+        for country, city, expected in (
+            ("US", "Los Angeles", "America/Los_Angeles"),
+            ("RU", "Vladivostok", "Asia/Vladivostok"),
+            ("AU", "Perth", "Australia/Perth"),
+            ("CA", "Vancouver", "America/Vancouver"),
+            ("BR", "Manaus", "America/Manaus"),
+        ):
+            tz = _set_city(country, city).get("timezone")
+            check(f"ui-tz-nearest-{country}", tz == expected, f"{tz} != {expected}")
+
+        for lang in ("fr", "de", "ru", "es", "tr", "ms"):
+            lo.setLanguage(lang)
+            _pump(35)
+            tz = _set_city("SA", "Mecca").get("timezone")
+            check(f"ui-tz-lang-{lang}", tz == "Asia/Riyadh", f"{tz} != Asia/Riyadh")
+
+        # A resolved zone outside the short common list must be visible in the
+        # settings combo instead of silently showing the first entry (Tunis).
+        _set_city("AU", "Perth")
+        # The timezone combo lives in the General tab (index 7); the location
+        # change must have refreshed it without reopening the dialog.
+        dlg.setProperty("currentTabIndex", 7)
+        _pump(45)
+        tz_combo = _find_ui("timezoneCombo")
+        tz_idx = int(_prop(tz_combo, "currentIndex") or -1)
+        tz_model = _prop(tz_combo, "model") or []
+        tz_code = tz_model[tz_idx].get("code") if 0 <= tz_idx < len(tz_model) else None
+        check("ui-tz-combo-perth", tz_code == "Australia/Perth", str(tz_code))
+
+        # --- real checkbox: unchecking restores the city and recalculates ---
+        lo.setLanguage("ar")
+        _set_city("TN", "Tunis")
+        pe.updateSetting("timezone", "Africa/Tunis")
+        pe.recalculate()
+        _pump(30)
+        tunis_fajr = pe._result.as_dict()["fajr"]
+
+        pe.updateSetting("custom_coords", True)
+        pe.updateSetting("latitude", -33.86)
+        pe.updateSetting("longitude", 151.21)
+        pe.updateSetting("timezone", "Australia/Sydney")
+        pe.recalculate()
+        _pump(40)
+        sydney_fajr = pe._result.as_dict()["fajr"]
+
+        dlg.setProperty("currentTabIndex", 0)
+        _pump(45)
+        coords_check = _find_ui("customCoordsCheck")
+        check(
+            "ui-custom-coords-checked",
+            coords_check is not None and bool(_prop(coords_check, "checked")),
+            str(_prop(coords_check, "checked")),
+        )
+        if coords_check is not None:
+            coords_check.setProperty("checked", False)
+            _pump(140)
+        st = pe.getSettings()
+        check(
+            "ui-custom-coords-uncheck-restores",
+            st.get("custom_coords") is False
+            and abs(st.get("latitude", 0) - 36.8065) < 0.01
+            and abs(st.get("longitude", 0) - 10.1815) < 0.01
+            and st.get("timezone") == "Africa/Tunis",
+            f"{st.get('custom_coords')}/{st.get('latitude')}/{st.get('timezone')}",
+        )
+        check(
+            "ui-custom-coords-uncheck-recalc",
+            abs((sydney_fajr - tunis_fajr).total_seconds()) > 3600
+            and pe._result.as_dict()["fajr"] == tunis_fajr,
+            f"{pe._result.as_dict()['fajr']} vs {tunis_fajr}",
+        )
+        _set_city("TN", "Tunis")
+        pe.updateSetting("timezone", "Africa/Tunis")
+        _pump(45)
 
         # --- every shipped language, every tab, narrowest window ---
         from backend._constants import LANGS as _UI_LANGS

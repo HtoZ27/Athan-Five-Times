@@ -1060,9 +1060,8 @@ class PrayerEngine(QObject):
         updates["longitude"] = lon
         from .location import _tz_for_country
 
-        tz = _tz_for_country(country_name(country), country)
-        if tz:
-            updates["timezone"] = tz
+        tz = _tz_for_country(country_name(country), country, lat, lon)
+        updates["timezone"] = tz or "UTC"
         self._settings = self._update_settings_batch(updates)
 
     def _apply_auto_coords(
@@ -1338,11 +1337,20 @@ class PrayerEngine(QObject):
                     value,
                     cities[0][0],
                 )
+                current_city = cities[0][0]
+            # Multi-zone countries need the city coordinates to pick the
+            # nearest zone; the stored city is valid for the new country.
+            city_lat = city_lon = None
+            for eng, clat, clon in cities:
+                if eng == current_city:
+                    city_lat, city_lon = clat, clon
+                    break
+            if city_lat is None and cities:
+                city_lat, city_lon = cities[0][1], cities[0][2]
             from .location import _tz_for_country
 
-            tz = _tz_for_country(country_name(value), value)
-            if tz:
-                updates["timezone"] = tz
+            tz = _tz_for_country(country_name(value), value, city_lat, city_lon)
+            updates["timezone"] = tz or "UTC"
         elif key == "custom_coords" and not value:
             # Unchecking custom coordinates restores the selected city's
             # coordinates locally (no IP lookup, works offline).
@@ -1360,9 +1368,8 @@ class PrayerEngine(QObject):
                 updates["longitude"] = lon
                 from .location import _tz_for_country
 
-                tz = _tz_for_country(country_name(country), country)
-                if tz:
-                    updates["timezone"] = tz
+                tz = _tz_for_country(country_name(country), country, lat, lon)
+                updates["timezone"] = tz or "UTC"
         if key == "latitude":
             try:
                 value = float(value)
@@ -1388,6 +1395,10 @@ class PrayerEngine(QObject):
             clear_location_cache()
             self._auto_update_coordinates()
         if key in ("country", "city", "latitude", "longitude", "timezone"):
+            self._schedule_recalc(location_changed=True)
+        elif key == "custom_coords":
+            # Unchecking restores the city coordinates above; refresh the
+            # preview immediately instead of waiting for Save/Cancel.
             self._schedule_recalc(location_changed=True)
         elif key in ("method", "madhab", "hijri_day_offset"):
             self._schedule_recalc()
@@ -1769,6 +1780,24 @@ class PrayerEngine(QObject):
                 {"code": code, "name": timezone_name(code, name)} for code, name in common
             ]
         return _TIMEZONES_CACHE
+
+    @Slot(str, result="QVariant")
+    def getTimezoneEntry(self, code: str):
+        """Return a display entry for a zone missing from the short common list."""
+        zone = (code or "").strip()
+        if not zone:
+            return {}
+        if zone.startswith("Etc/GMT"):
+            # IANA signs are inverted: Etc/GMT-1 is UTC+1.
+            suffix = zone[len("Etc/GMT") :]
+            if suffix:
+                sign = "-" if suffix.startswith("+") else "+"
+                label = f"UTC{sign}{suffix.lstrip('+-')}"
+            else:
+                label = "UTC"
+        else:
+            label = zone.rsplit("/", 1)[-1].replace("_", " ")
+        return {"code": zone, "name": timezone_name(zone, label)}
 
     @Slot()
     def resetAllSettings(self):

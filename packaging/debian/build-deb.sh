@@ -61,7 +61,7 @@ Section: utils
 Priority: optional
 Architecture: all
 Maintainer: H.Z.Tun <htoz27@users.noreply.github.com>
-Depends: python3 (>= 3.10), python3-pyside6.qtcore, python3-pyside6.qtgui, python3-pyside6.qtwidgets, python3-pyside6.qtqml, python3-pyside6.qtquick, python3-pyside6.qtquickcontrols2, python3-pyside6.qtsvg
+Depends: python3 (>= 3.10), python3-pyside6.qtcore, python3-pyside6.qtgui, python3-pyside6.qtwidgets, python3-pyside6.qtqml, python3-pyside6.qtquick, python3-pyside6.qtquickcontrols2, python3-pyside6.qtsvg, tzdata
 Recommends: libnotify-bin
 Description: Islamic prayer times with azan audio and adhkar
  Desktop prayer-times application with streaming azan audio, a structured

@@ -10,8 +10,10 @@ Button {
     ThemeColors { id: theme }
 
     implicitHeight: compact ? 32 : 34
+    // Even compact buttons (close, load-more) must fit their label instead of
+    // eliding it: "عرض المزيد (26)" needs ~90px, not 32.
     implicitWidth: compact
-        ? 32
+        ? Math.max(32, contentItem.implicitWidth + 12)
         : Math.max(84, contentItem.implicitWidth + 24)
     font.pixelSize: 13
     hoverEnabled: true

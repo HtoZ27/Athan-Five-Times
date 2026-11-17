@@ -6,7 +6,7 @@
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
 [![Qt 6 QML](https://img.shields.io/badge/Qt-6_QML-green?logo=qt&logoColor=white)](https://www.qt.io/)
 
-> **Beta (0.3.17b)** — This is a beta release: not yet bug-free, not yet
+> **Beta (0.3.18b)** — This is a beta release: not yet bug-free, not yet
 > tested on all Linux environments, and translations are still unreviewed.
 > Bug reports are welcome via GitHub Issues.
 
@@ -45,6 +45,7 @@ A Linux desktop prayer-times application with azan audio, structured adhkar, do-
 
 - Python 3.10+
 - PySide6 (Qt6), adhan, miniaudio
+- `tzdata` (the IANA timezone tables the city picker resolves against)
 - Linux with PulseAudio/PipeWire for audio; `notify-send` optional (tray fallback built in)
 
 ## Installation
@@ -59,19 +60,20 @@ chmod +x Athan-Five-Times-x86_64.AppImage
 > The AppImage runs on the host Python: it needs PySide6 + adhan +
 > miniaudio installed on your system (it tells you exactly what is
 > missing instead of crashing). Install Qt via your distro, then
-> `pip install --break-system-packages adhan miniaudio`.
+> `pip install --break-system-packages adhan miniaudio`. Keep the host
+> `tzdata` package installed so city timezones resolve correctly.
 
 Or install a native package (also on the releases page):
 
 ```bash
 # Debian / Ubuntu (Qt wheels exist on Debian 13 / Ubuntu 25.04+)
-sudo dpkg -i athan-five-times_0.3.17b_all.deb
+sudo dpkg -i athan-five-times_0.3.18b_all.deb
 sudo apt-get install -f   # pulls python3-pyside6* if missing
 pip install --break-system-packages adhan miniaudio
 athan-five-times
 
 # Fedora / openSUSE (from spec)
-sudo dnf install athan-five-times-0.3.17b-1.noarch.rpm
+sudo dnf install athan-five-times-0.3.18b-1.noarch.rpm
 
 # Arch Linux (from PKGBUILD)
 makepkg -si   # inside packaging/arch, or use the AUR
@@ -88,9 +90,9 @@ pip install -r requirements-lock.txt
 
 ```bash
 pip install -e ".[dev]"
-python -m pytest tests/          # 449 tests
+python -m pytest tests/          # 660 tests
 python3 scripts/smoke-qml.py     # QML zero-error gate
-python3 scripts/e2e-features.py  # isolated end-to-end (65 checks)
+python3 scripts/e2e-features.py  # isolated end-to-end (254 checks)
 ```
 
 `AppDir/` is derived build staging — regenerate with `bash scripts/sync-appdir.sh`

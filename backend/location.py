@@ -5,7 +5,9 @@ Uses ip-api.com (plain HTTP: the free tier rejects HTTPS), retry, and fallback.
 
 import json
 import logging
+import math
 import os
+import re
 import threading
 import time
 
@@ -129,36 +131,40 @@ COUNTRY_TZ = {
 }
 
 
-def _tz_for_country_code(code: str) -> str:
-    """Resolve an IANA timezone from an ISO country code.
+def _parse_zone_coord(token: str) -> tuple[float, float] | None:
+    """Parse a ``zone.tab`` coordinate (``+DDMM[SS]+DDDMM[SS]``)."""
+    match = re.fullmatch(
+        r"([+-])(\d{2})(\d{2})(\d{2})?([+-])(\d{3})(\d{2})(\d{2})?",
+        token.strip(),
+    )
+    if not match:
+        return None
+    lat_sign, lat_d, lat_m, lat_s, lon_sign, lon_d, lon_m, lon_s = match.groups()
+    latitude = int(lat_d) + int(lat_m) / 60 + (int(lat_s) / 3600 if lat_s else 0)
+    longitude = int(lon_d) + int(lon_m) / 60 + (int(lon_s) / 3600 if lon_s else 0)
+    if lat_sign == "-":
+        latitude = -latitude
+    if lon_sign == "-":
+        longitude = -longitude
+    return latitude, longitude
 
-    Preference order: pytz's complete country map (when installed), then the
-    system zoneinfo tables (``zone1970.tab``/``zone.tab``) so location changes
-    still get a correct timezone on systems without pytz.
+
+_ZONE_TAB_CACHE: dict[str, list[tuple[str, float | None, float | None]]] | None = None
+
+
+def _zone_rows() -> dict[str, list[tuple[str, float | None, float | None]]]:
+    """Parse the system zone tables into ``{country_code: [(zone, lat, lon)]}``.
+
+    Both ``zone.tab`` and ``zone1970.tab`` are merged, and every row's
+    comma-separated country list is split: a row such as ``SA,AQ,KW,YE``
+    belongs to all four countries, not to a literal ``"SA,AQ,KW,YE"`` key.
     """
-    if not code:
-        return ""
-    if _PYTZ_AVAILABLE:
-        try:
-            zones = pytz.country_timezones.get(code.upper(), [])
-            if zones:
-                return zones[0]
-        except Exception:
-            pass
-    zones = _zones_by_country().get(code.upper(), [])
-    return zones[0] if zones else ""
-
-
-_ZONE_TAB_CACHE: dict | None = None
-
-
-def _zones_by_country() -> dict:
-    """Parse the system zone tables into ``{country_code: [zones]}``."""
     global _ZONE_TAB_CACHE
     if _ZONE_TAB_CACHE is not None:
         return _ZONE_TAB_CACHE
-    table: dict[str, list[str]] = {}
-    for filename in ("zone1970.tab", "zone.tab"):
+    table: dict[str, list[tuple[str, float | None, float | None]]] = {}
+    seen: set[tuple[str, str]] = set()
+    for filename in ("zone.tab", "zone1970.tab"):
         path = Path("/usr/share/zoneinfo") / filename
         try:
             with path.open(encoding="utf-8") as f:
@@ -168,21 +174,124 @@ def _zones_by_country() -> dict:
                     parts = line.rstrip("\n").split("\t")
                     if len(parts) < 3:
                         continue
-                    table.setdefault(parts[0].upper(), []).append(parts[2])
+                    zone = parts[2].strip()
+                    if not zone:
+                        continue
+                    point = _parse_zone_coord(parts[1]) if len(parts) > 1 else None
+                    lat, lon = point if point else (None, None)
+                    for raw in parts[0].split(","):
+                        code = raw.strip().upper()
+                        if not code or (code, zone) in seen:
+                            continue
+                        seen.add((code, zone))
+                        table.setdefault(code, []).append((zone, lat, lon))
         except OSError:
             continue
-        if table:
-            break
     _ZONE_TAB_CACHE = table
     return table
 
 
-def _tz_for_country(name: str, code: str = "") -> str:
-    """Resolve timezone: prefer ISO code (pytz), then name-based COUNTRY_TZ, then ''."""
-    tz = _tz_for_country_code(code)
+def _zones_by_country() -> dict[str, list[str]]:
+    """Return ``{country_code: [zone names]}`` from the system tables."""
+    return {code: [row[0] for row in rows] for code, rows in _zone_rows().items()}
+
+
+def _zone_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Squared equirectangular distance — enough to pick a country zone."""
+    dlat = lat1 - lat2
+    dlon = (lon1 - lon2) * math.cos(math.radians((lat1 + lat2) / 2))
+    return dlat * dlat + dlon * dlon
+
+
+def _nearest_zone(
+    rows: list[tuple[str, float | None, float | None]],
+    latitude=None,
+    longitude=None,
+) -> str:
+    """Pick the zone nearest the given coordinates (else the first row)."""
+    if not rows:
+        return ""
+    if len(rows) == 1:
+        return rows[0][0]
+    try:
+        lat = float(latitude)
+        lon = float(longitude)
+    except (TypeError, ValueError):
+        return rows[0][0]
+    if not (-90 <= lat <= 90) or not (-180 <= lon <= 180):
+        return rows[0][0]
+    # The app treats (0, 0) as "no fix" (see _apply_auto_coords); keep the
+    # table's representative zone instead of matching a far-off capital.
+    if lat == 0.0 and lon == 0.0:
+        return rows[0][0]
+    best: tuple[float, str] | None = None
+    for zone, zlat, zlon in rows:
+        if zlat is None or zlon is None:
+            continue
+        distance = _zone_distance(lat, lon, zlat, zlon)
+        if best is None or distance < best[0]:
+            best = (distance, zone)
+    return best[1] if best else rows[0][0]
+
+
+def _longitude_zone(longitude) -> str:
+    """Best-effort fixed-offset zone for coordinates without a country zone."""
+    try:
+        lon = float(longitude)
+    except (TypeError, ValueError):
+        return "UTC"
+    if not -180 <= lon <= 180:
+        return "UTC"
+    hours = max(-12, min(14, round(lon / 15)))
+    if hours == 0:
+        return "UTC"
+    # IANA's Etc/GMT signs are inverted: Etc/GMT-3 == UTC+3.
+    return f"Etc/GMT{'-' if hours > 0 else '+'}{abs(hours)}"
+
+
+def _tz_for_country_code(code: str, latitude=None, longitude=None) -> str:
+    """Resolve an IANA timezone from an ISO country code.
+
+    Preference order: pytz's country map (when installed, single zone) and the
+    system zone tables.  When the country spans several zones and coordinates
+    are supplied, the nearest zone wins instead of the first table row.
+    """
+    if not code:
+        return ""
+    code = code.upper()
+    if _PYTZ_AVAILABLE:
+        try:
+            zones = list(pytz.country_timezones.get(code, []))
+        except Exception:
+            zones = []
+        if zones:
+            table = _zone_rows().get(code)
+            if table:
+                return _nearest_zone(table, latitude, longitude)
+            return _nearest_zone([(zone, None, None) for zone in zones], latitude, longitude)
+    return _nearest_zone(_zone_rows().get(code, []), latitude, longitude)
+
+
+def _tz_for_country(name: str, code: str = "", latitude=None, longitude=None) -> str:
+    """Resolve a timezone from an ISO code, then a country name.
+
+    With coordinates the result is never empty: an unknown country falls back
+    to its longitude-derived offset, so callers can always replace a stale
+    foreign timezone instead of keeping it.
+    """
+    tz = _tz_for_country_code(code, latitude, longitude)
     if tz:
         return tz
-    return COUNTRY_TZ.get(name, "")
+    if not code and name:
+        derived = _country_code(name)
+        if derived:
+            tz = _tz_for_country_code(derived, latitude, longitude)
+            if tz:
+                return tz
+        tz = COUNTRY_TZ.get(name, "")
+        if tz:
+            return tz
+    return _longitude_zone(longitude) if longitude is not None else ""
 
 
 _COUNTRY_REV: dict | None = None
@@ -241,7 +350,7 @@ def _try_ip_api(retries: int) -> dict | None:
     for attempt in range(retries + 1):
         try:
             req = Request(
-                "http://ip-api.com/json/", headers={"User-Agent": "AthanFiveTimes/0.3.17b"}
+                "http://ip-api.com/json/", headers={"User-Agent": "AthanFiveTimes/0.3.18b"}
             )
             with urlopen(req, timeout=10) as resp:
                 data = json.loads(resp.read().decode())
@@ -249,9 +358,9 @@ def _try_ip_api(retries: int) -> dict | None:
                 city = data.get("city", "")
                 country = data.get("country", "")
                 code = (data.get("countryCode") or "").upper()
-                tz = data.get("timezone", "") or _tz_for_country(country, code)
                 lat = data.get("lat", 0.0)
                 lon = data.get("lon", 0.0)
+                tz = data.get("timezone", "") or _tz_for_country(country, code, lat, lon)
                 if lat == 0.0 and lon == 0.0:
                     logger.warning("Invalid coordinates from IP API")
                     if attempt < retries:
@@ -276,7 +385,7 @@ def _try_ip_api(retries: int) -> dict | None:
 def _try_fallback() -> dict | None:
     """Fallback using ipapi.co (HTTPS)."""
     try:
-        req = Request("https://ipapi.co/json/", headers={"User-Agent": "AthanFiveTimes/0.3.17b"})
+        req = Request("https://ipapi.co/json/", headers={"User-Agent": "AthanFiveTimes/0.3.18b"})
         with urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode())
         if data.get("error"):
@@ -306,7 +415,7 @@ def _try_ipinfo() -> dict | None:
     try:
         req = Request(
             "https://ipinfo.io/json",
-            headers={"User-Agent": "AthanFiveTimes/0.3.17b"},
+            headers={"User-Agent": "AthanFiveTimes/0.3.18b"},
         )
         with urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode())
@@ -336,7 +445,7 @@ def _try_ipwho() -> dict | None:
     try:
         req = Request(
             "https://ipwho.is/",
-            headers={"User-Agent": "AthanFiveTimes/0.3.17b"},
+            headers={"User-Agent": "AthanFiveTimes/0.3.18b"},
         )
         with urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode())
@@ -354,7 +463,7 @@ def _try_ipwho() -> dict | None:
             tz = tz.get("id", "")
         code = (data.get("country_code") or "").upper()
         if not tz:
-            tz = _tz_for_country(country, code)
+            tz = _tz_for_country(country, code, lat, lon)
         return {
             "city": data.get("city", ""),
             "country": country,
@@ -373,7 +482,7 @@ def _try_geojs() -> dict | None:
     try:
         req = Request(
             "https://get.geojs.io/v1/ip/geo.json",
-            headers={"User-Agent": "AthanFiveTimes/0.3.17b"},
+            headers={"User-Agent": "AthanFiveTimes/0.3.18b"},
         )
         with urlopen(req, timeout=10) as resp:
             data = json.loads(resp.read().decode())
@@ -386,7 +495,7 @@ def _try_geojs() -> dict | None:
             return None
         if (lat == 0.0 and lon == 0.0) or not (-90 <= lat <= 90) or not (-180 <= lon <= 180):
             return None
-        tz = data.get("timezone", "") or _tz_for_country(data.get("country", ""), code)
+        tz = data.get("timezone", "") or _tz_for_country(data.get("country", ""), code, lat, lon)
         return {
             "city": data.get("city", ""),
             "country": data.get("country", ""),

@@ -314,6 +314,7 @@ Item {
                     height: 36
                     color: "transparent"
                     ThemedButton {
+                        objectName: "cityLoadMore"
                         anchors.centerIn: parent
                         text: tr("عرض المزيد") + " (" + (_searchTotal - _searchOffset) + ")"
                         compact: true

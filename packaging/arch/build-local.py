@@ -59,7 +59,7 @@ def build_tree(dest):
             "builddate = 0\npackager = H.Z.Tun\nsize = 0\narch = any\n"
             "license = MIT\n"
             "depend = python\ndepend = pyside6\ndepend = libnotify\n"
-            "depend = hicolor-icon-theme\n"
+            "depend = hicolor-icon-theme\ndepend = tzdata\n"
         )
 
     entries = [".PKGINFO"]

@@ -27,6 +27,9 @@ Dialog {
         target: backendController
         function onLocationChanged() {
             locationTab.populate()
+            // The timezone lives in the General tab; keep it in step with the
+            // city even when that tab was loaded earlier in this session.
+            if (_tabLoaded[7]) generalTab.syncTimezone()
         }
         function onAutoLocationStatus(status) {
             detectingLocation = (status === "detecting")
@@ -502,6 +505,7 @@ Dialog {
 
                                         Layout.fillWidth: true
                                         id: customCoordsCheck
+                                        objectName: "customCoordsCheck"
                                         text: tr("استخدام إحداثيات مخصصة")
                                         checked: useCustomCoords
                                         onCheckedChanged: {
@@ -1359,15 +1363,7 @@ Dialog {
                                         }
                                     }
                                     themeCombo.currentIndex = themeIdx >= 0 ? themeIdx : 0
-                                    timezoneCombo.model = backendController.getTimezones()
-                                    var tzIdx = -1
-                                    for (var i = 0; i < timezoneCombo.model.length; i++) {
-                                        if (timezoneCombo.model[i].code === s.timezone) {
-                                            tzIdx = i
-                                            break
-                                        }
-                                    }
-                                    timezoneCombo.currentIndex = tzIdx >= 0 ? tzIdx : 0
+                                    generalTab.syncTimezone()
                                     var rbCodes = ["auto", "opengl", "software"]
                                     var rbIdx = rbCodes.indexOf(s.render_backend)
                                     renderBackendCb.currentIndex = rbIdx >= 0 ? rbIdx : 0
@@ -1383,6 +1379,42 @@ Dialog {
                                     _populating = false
                                 }
                             }
+
+                        function syncTimezone() {
+                            // Programmatic index changes must not write the
+                            // setting back (it would trigger another recalc).
+                            var wasPopulating = _populating
+                            _populating = true
+                            try {
+                                var s = backendController.getSettings()
+                                timezoneCombo.model = backendController.getTimezones()
+                                var tzIdx = -1
+                                for (var i = 0; i < timezoneCombo.model.length; i++) {
+                                    if (timezoneCombo.model[i].code === s.timezone) {
+                                        tzIdx = i
+                                        break
+                                    }
+                                }
+                                // The common list is short; when the city's
+                                // resolved zone is not in it (Perth,
+                                // Vladivostok, Vancouver…), show that zone
+                                // instead of silently selecting Tunis.
+                                if (tzIdx < 0 && s.timezone) {
+                                    var tzEntry = backendController.getTimezoneEntry(s.timezone)
+                                    if (tzEntry && tzEntry.code) {
+                                        var tzModel = []
+                                        for (var j = 0; j < timezoneCombo.model.length; j++)
+                                            tzModel.push(timezoneCombo.model[j])
+                                        tzModel.push(tzEntry)
+                                        timezoneCombo.model = tzModel
+                                        tzIdx = tzModel.length - 1
+                                    }
+                                }
+                                timezoneCombo.currentIndex = tzIdx >= 0 ? tzIdx : 0
+                            } finally {
+                                _populating = wasPopulating
+                            }
+                        }
 
                         function resetAllSettings() {
                             resetConfirmDlg.open()
@@ -1534,7 +1566,7 @@ Dialog {
                                 label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("المنطقة الزمنية"); color: theme.textColor; font.bold: true; ToolTip.text: tr("اختيار المنطقة الزمنية لحساب مواقيت الصلاة") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
-                                    ThemedComboBox { id: timezoneCombo; Layout.fillWidth: true
+                                    ThemedComboBox { id: timezoneCombo; objectName: "timezoneCombo"; Layout.fillWidth: true
                                         model: backendController ? backendController.getTimezones() : []
                                         textRole: "name"
                                         valueRole: "code"
