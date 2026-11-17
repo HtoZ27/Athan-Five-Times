@@ -267,7 +267,9 @@
     "التسبيح، التحميد، التهليل، التكبير": "Tesbih, tahmid, tehlil, tekbir",
     "الرقية الشرعية": "Rukye",
     "البيهقي": "Beyhakî",
-    "الترجمة": "Çeviri"
+    "الترجمة": "Çeviri",
+    "إغلاق": "Kapat",
+    "لا توجد مدن مطابقة": "Eşleşen şehir yok"
   },
   "prayer_names": {
     "fajr": "İmsak",

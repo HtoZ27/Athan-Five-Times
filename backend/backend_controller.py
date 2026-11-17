@@ -1042,20 +1042,28 @@ class PrayerEngine(QObject):
         s = self._settings
         country = s.get("country")
         city = s.get("city")
-        if country and country != "none" and city:
-            _methods, _cntrs, _city_db = _ensure_country_data()
-            cities = _city_db.get(country, [])
-            city_map = {eng_name: (lat, lon) for eng_name, lat, lon in cities}
-            if city in city_map:
-                lat, lon = city_map[city]
-                self._settings = self._update_settings_batch({"latitude": lat, "longitude": lon})
-                return
-            if cities:
-                logger.warning("City %r not in database, using first city of %s", city, country)
-                self._settings = self._update_settings_batch(
-                    {"latitude": cities[0][1], "longitude": cities[0][2]}
-                )
-                return
+        if not country or country == "none":
+            return
+        _methods, _cntrs, _city_db = _ensure_country_data()
+        cities = _city_db.get(country, [])
+        if not cities:
+            return
+        city_map = {eng_name: (lat, lon) for eng_name, lat, lon in cities}
+        updates: dict = {}
+        if city in city_map:
+            lat, lon = city_map[city]
+        else:
+            logger.warning("City %r not in database, using first city of %s", city, country)
+            updates["city"] = cities[0][0]
+            lat, lon = cities[0][1], cities[0][2]
+        updates["latitude"] = lat
+        updates["longitude"] = lon
+        from .location import _tz_for_country
+
+        tz = _tz_for_country(country_name(country), country)
+        if tz:
+            updates["timezone"] = tz
+        self._settings = self._update_settings_batch(updates)
 
     def _apply_auto_coords(
         self,
@@ -1315,6 +1323,46 @@ class PrayerEngine(QObject):
             self.settingChanged.emit(key)
             return
         updates = {key: value}
+        if key == "country":
+            # Keep the stored city valid for the new country and move the
+            # timezone with it, even when the user has custom coordinates.
+            _methods, _cntrs, _db = _ensure_country_data()
+            cities = _db.get(value, [])
+            known = {eng for eng, _, _ in cities}
+            current_city = self._settings.get("city", "")
+            if known and current_city not in known:
+                updates["city"] = cities[0][0]
+                logger.info(
+                    "City %r invalid for %s, switching to %r",
+                    current_city,
+                    value,
+                    cities[0][0],
+                )
+            from .location import _tz_for_country
+
+            tz = _tz_for_country(country_name(value), value)
+            if tz:
+                updates["timezone"] = tz
+        elif key == "custom_coords" and not value:
+            # Unchecking custom coordinates restores the selected city's
+            # coordinates locally (no IP lookup, works offline).
+            country = self._settings.get("country", "")
+            city = self._settings.get("city", "")
+            _methods, _cntrs, _db = _ensure_country_data()
+            cities = _db.get(country, [])
+            if cities:
+                city_map = {eng: (lat, lon) for eng, lat, lon in cities}
+                if city not in city_map:
+                    city = cities[0][0]
+                    updates["city"] = city
+                lat, lon = city_map[city]
+                updates["latitude"] = lat
+                updates["longitude"] = lon
+                from .location import _tz_for_country
+
+                tz = _tz_for_country(country_name(country), country)
+                if tz:
+                    updates["timezone"] = tz
         if key == "latitude":
             try:
                 value = float(value)

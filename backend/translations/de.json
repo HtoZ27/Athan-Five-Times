@@ -267,7 +267,9 @@
     "التسبيح، التحميد، التهليل، التكبير": "Tasbih, Tahmid, Tahlil, Takbir",
     "الرقية الشرعية": "Ruqya",
     "البيهقي": "Al-Bayhaqi",
-    "الترجمة": "Übersetzung"
+    "الترجمة": "Übersetzung",
+    "إغلاق": "Schließen",
+    "لا توجد مدن مطابقة": "Keine passenden Städte"
   },
   "prayer_names": {
     "fajr": "Fadschr",

@@ -267,7 +267,9 @@
     "التسبيح، التحميد، التهليل، التكبير": "Tasbih, tahmid, tahlil, takbir",
     "الرقية الشرعية": "Ruqyah",
     "البيهقي": "Al-Baihaqi",
-    "الترجمة": "Terjemahan"
+    "الترجمة": "Terjemahan",
+    "إغلاق": "Tutup",
+    "لا توجد مدن مطابقة": "Tiada bandar yang sepadan"
   },
   "prayer_names": {
     "fajr": "Subuh",

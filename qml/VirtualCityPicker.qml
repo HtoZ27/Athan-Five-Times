@@ -6,6 +6,8 @@ import Theme 1.0
 Item {
     id: root
 
+    objectName: "cityPicker"
+
     property string countryCode: ""
     property string selectedEngName: ""
     property string selectedDisplayName: ""
@@ -35,6 +37,19 @@ Item {
     // Arrow side follows LayoutMirroring; padding must follow it too
     // (Qt mirrors anchors but not padding).
     property bool isRtl: l10n ? l10n.isRtl : true
+    property string languageCode: l10n ? l10n.currentLanguage : ""
+
+    onLanguageCodeChanged: reloadCities()
+
+    function reloadCities() {
+        if (!countryCode || countryCode === "none")
+            return
+        if (typeof backendController === "undefined" || backendController === null)
+            return
+        _allCities = backendController.getCityNamesForCountry(countryCode)
+        _applyFilter("")
+        setCity(selectedEngName)
+    }
 
     implicitHeight: 40
     Layout.fillWidth: true
@@ -114,6 +129,8 @@ Item {
             for (var i = 0; i < _allCities.length; i++)
                 listViewModel.append(_allCities[i])
             _hasMore = false
+            if (popup.opened)
+                listView.currentIndex = listViewModel.count > 0 ? 0 : -1
             return
         }
         _pendingQuery = text
@@ -122,26 +139,19 @@ Item {
 
     ListModel { id: listViewModel }
 
-    TextField {
+    ThemedTextField {
         id: searchField
+        objectName: "citySearchField"
         anchors.fill: parent
-        color: theme.textColor
-        placeholderTextColor: theme.textMutedColor
+        font.pixelSize: 13
         rightPadding: isRtl ? 10 : 30
         leftPadding: isRtl ? 30 : 10
-        font.pixelSize: 13
-        verticalAlignment: Text.AlignVCenter
-
-        background: Rectangle {
-            color: theme.bgColor
-            radius: 6
-            border.color: theme.borderColor
-            border.width: 1
-        }
 
         Keys.onDownPressed: {
-            if (!popup.opened && countryCode) popup.open()
-            else if (popup.opened && _hasMore && listView.currentIndex >= listViewModel.count - 3) {
+            if (!popup.opened && countryCode) {
+                popup.open()
+                listView.currentIndex = listViewModel.count > 0 ? 0 : -1
+            } else if (popup.opened && _hasMore && listView.currentIndex >= listViewModel.count - 3) {
                 _loadMore()
             } else if (popup.opened) {
                 listView.incrementCurrentIndex()
@@ -151,9 +161,11 @@ Item {
             if (popup.opened) listView.decrementCurrentIndex()
         }
         Keys.onReturnPressed: {
-            if (popup.opened && listView.currentIndex >= 0 && listView.currentIndex < listViewModel.count) {
-                var sel = listViewModel.get(listView.currentIndex)
-                _selectCity(sel.engName, sel.name)
+            if (popup.opened && listViewModel.count > 0) {
+                var idx = listView.currentIndex < 0 ? 0 : listView.currentIndex
+                var sel = listViewModel.get(idx)
+                if (sel)
+                    _selectCity(sel.engName, sel.name)
             } else if (text) {
                 var q = text.toLowerCase()
                 var hit = null
@@ -218,11 +230,24 @@ Item {
 
     Popup {
         id: popup
-        y: parent.height + 4
+        objectName: "cityPopup"
+        // Flip above the field when the space below cannot fit a short list.
+        y: {
+            var win = root.Window.window
+            if (!win)
+                return root.height + 4
+            var top = root.mapToItem(null, 0, 0).y
+            var below = win.height - (top + root.height) - 8
+            return below >= Math.min(height, 120) ? root.height + 4
+                                                    : -height - 4
+        }
         width: parent.width
-        height: Math.min(300, listView.contentHeight + 12)
+        // Never collapse to a 12px strip: empty state still needs a row.
+        height: Math.max(56, Math.min(300, listView.contentHeight + 12))
         padding: 6
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+        onOpened: listView.currentIndex = listViewModel.count > 0 ? 0 : -1
 
         background: Rectangle {
             color: theme.cardColor
@@ -233,9 +258,11 @@ Item {
 
         ListView {
             id: listView
+            objectName: "cityListView"
             anchors.fill: parent
             clip: true
             spacing: 2
+            model: listViewModel
             currentIndex: -1
             ScrollIndicator.vertical: ScrollIndicator { }
             boundsBehavior: Flickable.StopAtBounds
@@ -286,15 +313,24 @@ Item {
                     width: listView.width
                     height: 36
                     color: "transparent"
-                    Button {
+                    ThemedButton {
                         anchors.centerIn: parent
                         text: tr("عرض المزيد") + " (" + (_searchTotal - _searchOffset) + ")"
-                        flat: true
+                        compact: true
                         onClicked: _loadMore()
                         font.pixelSize: 12
                     }
                 }
             }
+        }
+
+        Label {
+            objectName: "cityEmptyLabel"
+            anchors.centerIn: parent
+            visible: listViewModel.count === 0
+            text: tr("لا توجد مدن مطابقة")
+            color: theme.textMutedColor
+            font.pixelSize: 13
         }
 
         onClosed: {

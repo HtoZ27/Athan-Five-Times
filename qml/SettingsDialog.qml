@@ -8,12 +8,18 @@ Dialog {
     id: root
 
     title: tr("إعدادات التطبيق")
-    width: Math.min(parent ? parent.width : 800, 800)
-    height: Math.min(parent ? parent.height : 720, 720)
-    x: (parent.width - width) / 2
-    y: (parent.height - height) / 2
+    // Keep the dialog inset from the window edge so the rounded frame
+    // never touches the window border at the minimum size.
+    width: Math.min(parent ? parent.width - 24 : 800, 800)
+    height: Math.min(parent ? parent.height - 24 : 720, 720)
+    x: (parent ? parent.width - width : 0) / 2
+    y: (parent ? parent.height - height : 0) / 2
     modal: true
     closePolicy: Dialog.CloseOnEscape
+
+    Overlay.modal: Rectangle {
+        color: "#99000000"
+    }
 
     ThemeColors { id: theme }
 
@@ -128,6 +134,10 @@ Dialog {
     }
 
     function retranslate() {
+        // Language-dependent data caches (country/city/method/theme names)
+        // must be dropped before the tabs refill their models.
+        if (typeof backendController !== "undefined" && backendController)
+            backendController.clearCaches()
         root.title = tr("إعدادات التطبيق")
         _tabNames = [
             tr("الموقع"),
@@ -206,12 +216,33 @@ Dialog {
             }
         }
 
-        Label {
-            anchors.centerIn: parent
-            text: root.title
-            color: theme.textColor
-            font.pixelSize: 16
-            font.bold: true
+        RowLayout {
+            anchors.fill: parent
+            anchors.leftMargin: 8
+            anchors.rightMargin: 8
+            spacing: 4
+
+            ThemedButton {
+                objectName: "settingsCloseButton"
+                compact: true
+                text: "✕"
+                ToolTip.text: tr("إغلاق")
+                Layout.preferredWidth: 32
+                Layout.preferredHeight: 32
+                onClicked: root.close()
+            }
+
+            Item { Layout.fillWidth: true }
+
+            Label {
+                text: root.title
+                color: theme.textColor
+                font.pixelSize: 16
+                font.bold: true
+            }
+
+            Item { Layout.fillWidth: true }
+            Item { Layout.preferredWidth: 32; Layout.preferredHeight: 1 }
         }
 
         Rectangle {
@@ -231,13 +262,14 @@ Dialog {
             anchors.margins: 8
             spacing: 6
 
-            RowLayout {
+            GridLayout {
                 id: tabBar
+                objectName: "settingsTabBar"
                 Layout.fillWidth: true
-                Layout.preferredHeight: 36
-                spacing: 2
-
-                Item { Layout.fillWidth: true }
+                Layout.preferredHeight: columns === 4 ? 76 : 116
+                columns: root.width >= 620 ? 4 : 3
+                columnSpacing: 4
+                rowSpacing: 4
 
                 Repeater {
                     id: tabRepeater
@@ -247,18 +279,29 @@ Dialog {
                         id: tabRect
                         required property var modelData
                         required property int index
-                        implicitWidth: tabLabel.implicitWidth + 20
+                        objectName: "settingsTab" + index
+                        Layout.fillWidth: true
+                        Layout.preferredWidth: 80
+                        Layout.minimumWidth: 40
+                        Layout.preferredHeight: 36
                         implicitHeight: 36
                         color: currentTabIndex === index ? theme.accentColor : Qt.rgba(theme.cardColor.r, theme.cardColor.g, theme.cardColor.b, 0.55)
                         radius: 6
+                        border.color: currentTabIndex === index ? theme.accentColor : theme.borderColor
+                        border.width: 1
 
                         Label {
                             id: tabLabel
-                            anchors.centerIn: parent
+                            anchors.fill: parent
+                            anchors.leftMargin: 6
+                            anchors.rightMargin: 6
                             text: modelData
                             color: currentTabIndex === index ? "#fff" : theme.textColor
                             font.pixelSize: 12
                             font.bold: currentTabIndex === index
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment: Text.AlignVCenter
+                            elide: Text.ElideRight
                         }
 
                         MouseArea {
@@ -269,8 +312,6 @@ Dialog {
                         }
                     }
                 }
-
-                Item { Layout.fillWidth: true }
             }
 
             StackLayout {
@@ -286,7 +327,7 @@ Dialog {
                             try {
                                 var s = backendController.getSettings()
                                 useCustomCoords = s.custom_coords || false
-                                _setCountryCombo(s.country)
+                                locationTab._setCountryCombo(s.country)
                                 _setCityCombo(s.country, s.city)
                                 if (s.latitude) latField.text = String(s.latitude)
                                 if (s.longitude) lonField.text = String(s.longitude)
@@ -321,6 +362,10 @@ Dialog {
                             for (var i = 0; i < countryCombo.model.length; i++) {
                                 if (countryCombo.model[i].code === code) {
                                     countryCombo.currentIndex = i
+                                    // Editable combos keep the old editText
+                                    // when the model is replaced (language
+                                    // switch); refresh it explicitly.
+                                    countryCombo.editText = countryCombo.model[i].name
                                     return
                                 }
                             }
@@ -358,10 +403,10 @@ Dialog {
 
                                 GroupBox {
                                     Layout.fillWidth: true
-                                    label: Label { text: tr("تحديد الموقع تلقائياً"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تحديد موقعك الحالي عبر الإنترنت") }
+                                    label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("تحديد الموقع تلقائياً"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تحديد موقعك الحالي عبر الإنترنت") }
                                     background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                     ColumnLayout { width: parent.width; spacing: 6
-                                        Button {
+                                        ThemedButton {
                                             Layout.fillWidth: true
                                             Layout.preferredHeight: 40
                                             text: tr("تحديد موقعي تلقائياً عبر الإنترنت")
@@ -386,7 +431,7 @@ Dialog {
 
                                 GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("الموقع"); color: theme.textColor; font.bold: true }
+                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("الموقع"); color: theme.textColor; font.bold: true }
 
                                 background: Rectangle {
                                     color: theme.cardColor
@@ -399,8 +444,9 @@ Dialog {
                                     width: parent.width
                                     spacing: 6
 
-                                    ComboBox {
+                                    ThemedComboBox {
                                         id: countryCombo
+                                        objectName: "countryCombo"
                                         Layout.fillWidth: true
                                         editable: true
                                         textRole: "name"
@@ -412,7 +458,7 @@ Dialog {
                                             backendController.updateSetting("country", item.code)
                                             var defaultMethod = backendController.getDefaultMethod(item.code)
                                             if (defaultMethod) {
-                                                methodCombo.currentIndex = _findMethodIndex(defaultMethod)
+                                                methodCombo.currentIndex = locationTab._findMethodIndex(defaultMethod)
                                             }
                                         }
                                         onAccepted: {
@@ -430,7 +476,7 @@ Dialog {
                                                 if (hit >= 0) {
                                                     currentIndex = hit
                                                 } else {
-                                                    _setCountryCombo(backendController.getSetting("country"))
+                                                    locationTab._setCountryCombo(backendController.getSetting("country"))
                                                 }
                                             }
                                         }
@@ -452,7 +498,9 @@ Dialog {
                                         }
                                     }
 
-                                    CheckBox {
+                                    ThemedCheckBox {
+
+                                        Layout.fillWidth: true
                                         id: customCoordsCheck
                                         text: tr("استخدام إحداثيات مخصصة")
                                         checked: useCustomCoords
@@ -461,10 +509,11 @@ Dialog {
                                             useCustomCoords = checked
                                             backendController.updateSetting("custom_coords", checked)
                                             if (!checked) {
-                                                backendController.resetToAutoCoordinates()
+                                                // Restore the selected city's own
+                                                // coordinates offline; no IP lookup.
                                                 var s = backendController.getSettings()
                                                 _currentCountryCode = s.country
-                                                _setCountryCombo(s.country)
+                                                locationTab._setCountryCombo(s.country)
                                                 cityPicker.setCity(s.city)
                                                 if (s.latitude) latField.text = String(s.latitude)
                                                 if (s.longitude) lonField.text = String(s.longitude)
@@ -476,7 +525,7 @@ Dialog {
                                         Layout.fillWidth: true
                                         visible: customCoordsCheck.checked
 
-                                        TextField {
+                                        ThemedTextField {
                                             id: latField
                                             Layout.fillWidth: true
                                             placeholderText: tr("العرض (Latitude)")
@@ -495,7 +544,7 @@ Dialog {
                                                 }
                                             }
                                         }
-                                        TextField {
+                                        ThemedTextField {
                                             id: lonField
                                             Layout.fillWidth: true
                                             placeholderText: tr("الطول (Longitude)")
@@ -520,15 +569,16 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("طريقة الحساب"); color: theme.textColor; font.bold: true }
+                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("طريقة الحساب"); color: theme.textColor; font.bold: true }
                                 background: Rectangle {
                                     color: theme.cardColor; radius: 8
                                     border.color: theme.borderColor; border.width: 1
                                 }
                                 ColumnLayout {
                                     width: parent.width
-                                    ComboBox {
+                                    ThemedComboBox {
                                         id: methodCombo
+                                        objectName: "methodCombo"
                                         Layout.fillWidth: true
                                         textRole: "display"
                                         onCurrentIndexChanged: {
@@ -541,15 +591,16 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("المذهب"); color: theme.textColor; font.bold: true }
+                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("المذهب"); color: theme.textColor; font.bold: true }
                                 background: Rectangle {
                                     color: theme.cardColor; radius: 8
                                     border.color: theme.borderColor; border.width: 1
                                 }
                                 ColumnLayout {
                                     width: parent.width
-                                    ComboBox {
+                                    ThemedComboBox {
                                         id: madhabCombo
+                                        objectName: "madhabCombo"
                                         Layout.fillWidth: true
                                         textRole: "display"
                                         onCurrentIndexChanged: {
@@ -598,40 +649,40 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("إزاحة أوقات الصلاة (دقائق)"); color: theme.textColor }
+                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("إزاحة أوقات الصلاة (دقائق)"); color: theme.textColor }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 4
                                     RowLayout { Layout.fillWidth: true
                                         Label { text: tr("الفجر"); color: theme.textColor; Layout.fillWidth: true }
-                                        SpinBox { id: fajrSp; from: -60; to: 60
+                                        ThemedSpinBox { id: fajrSp; from: -60; to: 60
                                             onValueChanged: { if (_populating) return; _pendingOffsets["fajr"] = value; _offsetDebounce.restart() } }
                                     }
                                     RowLayout { Layout.fillWidth: true
                                         Label { text: tr("الشروق"); color: theme.textColor; Layout.fillWidth: true }
-                                        SpinBox { id: sunriseSp; from: -60; to: 60
+                                        ThemedSpinBox { id: sunriseSp; from: -60; to: 60
                                             onValueChanged: { if (_populating) return; _pendingOffsets["sunrise"] = value; _offsetDebounce.restart() } }
                                     }
                                     RowLayout { Layout.fillWidth: true
                                         Label { text: tr("الظهر"); color: theme.textColor; Layout.fillWidth: true }
-                                        SpinBox { id: dhuhrSp; from: -60; to: 60
+                                        ThemedSpinBox { id: dhuhrSp; from: -60; to: 60
                                             onValueChanged: { if (_populating) return; _pendingOffsets["dhuhr"] = value; _offsetDebounce.restart() } }
                                     }
                                     RowLayout { Layout.fillWidth: true
                                         Label { text: tr("العصر"); color: theme.textColor; Layout.fillWidth: true }
-                                        SpinBox { id: asrSp; from: -60; to: 60
+                                        ThemedSpinBox { id: asrSp; from: -60; to: 60
                                             onValueChanged: { if (_populating) return; _pendingOffsets["asr"] = value; _offsetDebounce.restart() } }
                                     }
                                     RowLayout { Layout.fillWidth: true
                                         Label { text: tr("المغرب"); color: theme.textColor; Layout.fillWidth: true }
-                                        SpinBox { id: maghribSp; from: -60; to: 60
+                                        ThemedSpinBox { id: maghribSp; from: -60; to: 60
                                             onValueChanged: { if (_populating) return; _pendingOffsets["maghrib"] = value; _offsetDebounce.restart() } }
                                     }
                                     RowLayout { Layout.fillWidth: true
                                         Label { text: tr("العشاء"); color: theme.textColor; Layout.fillWidth: true }
-                                        SpinBox { id: ishaSp; from: -60; to: 60
+                                        ThemedSpinBox { id: ishaSp; from: -60; to: 60
                                             onValueChanged: { if (_populating) return; _pendingOffsets["isha"] = value; _offsetDebounce.restart() } }
                                     }
-                                    Button {
+                                    ThemedButton {
                                         Layout.fillWidth: true; Layout.preferredHeight: 36; Layout.topMargin: 4
                                         text: tr("إعادة تعيين جميع الإزاحات")
                                         onClicked: resetOffsets()
@@ -641,10 +692,10 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("إزاحة التاريخ الهجري"); color: theme.textColor }
+                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("إزاحة التاريخ الهجري"); color: theme.textColor }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
-                                    SpinBox {
+                                    ThemedSpinBox {
                                         id: hijriSp; Layout.fillWidth: true; from: -5; to: 5
                                         onValueChanged: { if (_populating) return; backendController.updateSetting("hijri_day_offset", value) }
                                     }
@@ -730,22 +781,26 @@ Dialog {
                                              RowLayout {
                                                  anchors.fill: parent; anchors.margins: 8; spacing: 6
                                                  ColumnLayout {
-                                                     Layout.fillWidth: true; Layout.fillHeight: true; spacing: 2
-                                                     Label { text: modelData.name; color: theme.textColor; font.bold: true }
+                                                     Layout.fillWidth: true; Layout.fillHeight: true
+                                                     Layout.minimumWidth: 0; spacing: 2
+                                                     Label { text: modelData.name; color: theme.textColor; font.bold: true
+                                                         Layout.fillWidth: true; Layout.minimumWidth: 0
+                                                         elide: Text.ElideRight }
                                                      Label { text: modelData.path; color: theme.textMutedColor; font.pixelSize: 11
-                                                         elide: Text.ElideMiddle; Layout.fillWidth: true }
+                                                         Layout.fillWidth: true; Layout.minimumWidth: 0
+                                                         elide: Text.ElideMiddle }
                                                  }
-                                                  Button {
+                                                  ThemedButton {
                                                       text: tr("🔊"); implicitWidth: 36; implicitHeight: 36
                                                        enabled: modelData && modelData.path !== ""
                                                       onClicked: muezzinsTab.previewMuezzin(index)
                                                   }
-                                                 Button {
+                                                 ThemedButton {
                                                      text: tr("⏹"); implicitWidth: 36; implicitHeight: 36
                                                      ToolTip.text: tr("إيقاف المعاينة")
                                                      onClicked: backendController.stopPreview()
                                                  }
-                                                  Button {
+                                                  ThemedButton {
                                                        text: modelData.path === muezzinsTab.defaultPath ? "⭐" : "☆"
                                                        implicitWidth: 36; implicitHeight: 36
                                                        ToolTip.text: modelData.path === muezzinsTab.defaultPath ? tr("المؤذن الافتراضي") : tr("تعيين كافتراضي")
@@ -756,16 +811,16 @@ Dialog {
                                                            }
                                                        }
                                                    }
-                                                  Button {
+                                                  ThemedButton {
                                                       text: tr("📋"); implicitWidth: 36; implicitHeight: 36
                                                       ToolTip.text: tr("نسخ المؤذن")
                                                       onClicked: muezzinsTab.duplicateMuezzin(index)
                                                   }
-                                                  Button {
+                                                  ThemedButton {
                                                       text: tr("📁"); implicitWidth: 36; implicitHeight: 36
                                                       onClicked: browseMuezzinAudio(index)
                                                   }
-                                                  Button {
+                                                  ThemedButton {
                                                       text: tr("❌"); implicitWidth: 36; implicitHeight: 36
                                                       onClicked: removeMuezzin(index)
                                                   }
@@ -773,7 +828,7 @@ Dialog {
                                         }
                                     }
 
-                            Button {
+                            ThemedButton {
                                 Layout.fillWidth: true; Layout.preferredHeight: 40
                                 text: tr("إضافة مؤذن")
                                 onClicked: browseMuezzinAudio(-1)
@@ -812,7 +867,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("ملفات الصوت لكل صلاة"); color: theme.textColor; font.bold: true }
+                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("ملفات الصوت لكل صلاة"); color: theme.textColor; font.bold: true }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 4
                                     Repeater {
@@ -824,33 +879,36 @@ Dialog {
                                             Label { 
                                                 text: modelData && modelData.prayer ? trPrayer(modelData.prayer) : ""
                                                 color: theme.textColor
-                                                Layout.preferredWidth: 60
+                                                Layout.preferredWidth: Math.max(60, Math.min(120, implicitWidth))
+                                                Layout.maximumWidth: 120
+                                                elide: Text.ElideRight
                                                 font.bold: true
                                             }
                                             Label {
                                                 text: modelData && modelData.path ? modelData.path : tr("(غير محدد)")
                                                 color: modelData && modelData.path ? theme.textColor : theme.textMutedColor
                                                 elide: Text.ElideMiddle; Layout.fillWidth: true
+                                                Layout.minimumWidth: 0
                                                 font.pixelSize: 12
                                             }
-                                            Button {
+                                            ThemedButton {
                                                 text: tr("🔊"); implicitWidth: 36; implicitHeight: 36
                                                 enabled: modelData && modelData.path !== ""
                                                 onClicked: backendController.previewAudio(modelData.path)
                                             }
-                                            Button {
+                                            ThemedButton {
                                                 text: tr("⏹"); implicitWidth: 36; implicitHeight: 36
                                                 ToolTip.text: tr("إيقاف المعاينة")
                                                 onClicked: backendController.stopPreview()
                                             }
-                                            Button {
+                                            ThemedButton {
                                                 text: tr("📁"); implicitWidth: 36; implicitHeight: 36
                                                 onClicked: browsePrayerAudio(modelData.prayer)
                                             }
                                         }
                                     }
 
-                                    Button {
+                                    ThemedButton {
                                         Layout.fillWidth: true; Layout.preferredHeight: 36; Layout.topMargin: 4
                                         text: tr("اختبار الأذان الافتراضي")
                                         onClicked: {
@@ -864,21 +922,23 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("الصوت العام"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات الصوت العامة للأذان") }
+                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("الصوت العام"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات الصوت العامة للأذان") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 6
 
                                     RowLayout {
                                         Layout.fillWidth: true
                                         Label { text: tr("مستوى الصوت:"); color: theme.textColor; ToolTip.text: tr("ضبط مستوى صوت الأذان (0-100%)") }
-                                        Slider {
+                                        ThemedSlider {
                                             id: volumeSp; Layout.fillWidth: true; from: 0; to: 1; stepSize: 0.05
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("volume", value) }
                                         }
                                         Label { text: Math.round(volumeSp.value * 100) + "%"; color: theme.textColor; Layout.preferredWidth: 50 }
                                     }
 
-                                    CheckBox {
+                                    ThemedCheckBox {
+
+                                        Layout.fillWidth: true
                                         id: fadeInCb; text: tr("تلاشي الدخول (Fade In)")
                                         ToolTip.text: tr("يبدأ الأذان بصوت منخفض ويزداد تدريجياً")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("fade_in", checked) }
@@ -887,11 +947,13 @@ Dialog {
                                     RowLayout {
                                         Layout.fillWidth: true; visible: fadeInCb.checked
                                         Label { text: tr("مدة التلاشي (ثوانٍ):"); color: theme.textColor; Layout.fillWidth: true; ToolTip.text: tr("مدة الزيادة التدريجية للصوت عند بداية الأذان") }
-                                        SpinBox { id: fadeDurSp; from: 1; to: 10
+                                        ThemedSpinBox { id: fadeDurSp; from: 1; to: 10
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("fade_in_duration", value) } }
                                     }
 
-                                    CheckBox {
+                                    ThemedCheckBox {
+
+                                        Layout.fillWidth: true
                                         id: takbeerCb; text: tr("تكبير فقط (بدون أذان كامل)")
                                         ToolTip.text: tr("يشغل التكبير فقط بدلاً من الأذان الكامل")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("takbeer_only", checked) }
@@ -907,13 +969,14 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("تفعيل الأذان لكل صلاة"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تفعيل/إيقاف الأذان لكل صلاة على حدة") }
+                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("تفعيل الأذان لكل صلاة"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تفعيل/إيقاف الأذان لكل صلاة على حدة") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 4
 
                                     Repeater {
                                         model: ["fajr", "dhuhr", "asr", "maghrib", "isha"]
-                                        delegate: CheckBox {
+                                        delegate: ThemedCheckBox {
+                                            Layout.fillWidth: true
                                             text: trPrayer(modelData)
                                             checked: backendController ? backendController.getNestedSetting("azan_enabled." + modelData) !== false : true
                                             ToolTip.text: tr("تفعيل الأذان لصلاة ") + trPrayer(modelData)
@@ -952,16 +1015,18 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("الأذان المبكر"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات التنبيه المبكر قبل الأذان") }
+                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("الأذان المبكر"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات التنبيه المبكر قبل الأذان") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 4
-                                    CheckBox { id: preAzanCb; text: tr("تفعيل التنبيه المبكر")
+                                    ThemedCheckBox {
+                                        Layout.fillWidth: true
+                                        id: preAzanCb; text: tr("تفعيل التنبيه المبكر")
                                         ToolTip.text: tr("تفعيل التنبيه المبكر قبل الأذان بالدقائق المحددة")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("pre_azan_enabled", checked) } }
                                     RowLayout {
                                         Layout.leftMargin: 20; visible: preAzanCb.checked
                                         Label { text: tr("دقائق قبل الأذان:"); color: theme.textColor; ToolTip.text: tr("عدد الدقائق قبل الأذان للتنبيه المبكر") }
-                                        SpinBox { id: preAzanSp; from: 1; to: 60
+                                        ThemedSpinBox { id: preAzanSp; from: 1; to: 60
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("pre_azan_minutes", value) } }
                                     }
                                 }
@@ -969,25 +1034,27 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("عدم الإزعاج (DND)"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إيقاف الإشعارات النظامية في أوقات محددة") }
+                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("عدم الإزعاج (DND)"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إيقاف الإشعارات النظامية في أوقات محددة") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 4
-                                    CheckBox { id: dndCb; text: tr("تفعيل DND")
+                                    ThemedCheckBox {
+                                        Layout.fillWidth: true
+                                        id: dndCb; text: tr("تفعيل DND")
                                         ToolTip.text: tr("إيقاف إشعارات النظام خلال فترة DND")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("dnd_enabled", checked) } }
                                     RowLayout {
                                         Layout.leftMargin: 20; visible: dndCb.checked
                                         Label { text: tr("من الساعة:"); color: theme.textColor; ToolTip.text: tr("ساعة بداية فترة DND") }
-                                        SpinBox { id: dndFromSp; from: 0; to: 23
+                                        ThemedSpinBox { id: dndFromSp; from: 0; to: 23
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("dnd_from", value) } }
                                         Label { text: tr("إلى الساعة:"); color: theme.textColor; ToolTip.text: tr("ساعة نهاية فترة DND") }
-                                        SpinBox { id: dndToSp; from: 0; to: 23
+                                        ThemedSpinBox { id: dndToSp; from: 0; to: 23
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("dnd_to", value) } }
                                     }
                                     RowLayout {
                                         Layout.leftMargin: 20; visible: dndCb.checked
                                         Label { text: tr("مدة بعد الصلاة (دقيقة):"); color: theme.textColor; ToolTip.text: tr("مدة تفعيل DND بعد كل صلاة") }
-                                        SpinBox { id: dndDurSp; from: 5; to: 120
+                                        ThemedSpinBox { id: dndDurSp; from: 5; to: 120
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("dnd_duration", value) } }
                                     }
                                 }
@@ -995,10 +1062,12 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("الوضع الصامت"); color: theme.textColor; font.bold: true; ToolTip.text: tr("كتم جميع الأصوات والتنبيهات") }
+                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("الوضع الصامت"); color: theme.textColor; font.bold: true; ToolTip.text: tr("كتم جميع الأصوات والتنبيهات") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
-                                    CheckBox { id: silentCb; text: tr("الوضع الصامت")
+                                    ThemedCheckBox {
+                                        Layout.fillWidth: true
+                                        id: silentCb; text: tr("الوضع الصامت")
                                         ToolTip.text: tr("كتم جميع أصوات الأذان والإشعارات")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("silent_mode", checked) } }
                                 }
@@ -1006,10 +1075,12 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("شريط النظام"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات أيقونة شريط النظام") }
+                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("شريط النظام"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات أيقونة شريط النظام") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
-                                    CheckBox { id: showTrayCb; text: tr("إظهار أيقونة شريط النظام")
+                                    ThemedCheckBox {
+                                        Layout.fillWidth: true
+                                        id: showTrayCb; text: tr("إظهار أيقونة شريط النظام")
                                         ToolTip.text: tr("إظهار أو إخفاء أيقونة التطبيق في شريط النظام")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("show_tray", checked) } }
                                 }
@@ -1045,19 +1116,19 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("الأذكار"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات الأذكار بعد الصلاة") }
+                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("الأذكار"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات الأذكار بعد الصلاة") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 6
                                     RowLayout {
                                         Layout.fillWidth: true
                                         Label { text: tr("عدد مرات التكرار:"); color: theme.textColor; ToolTip.text: tr("عدد مرات تكرار كل ذكر") }
-                                        SpinBox { id: athkarCountSp; from: 1; to: 99
+                                        ThemedSpinBox { id: athkarCountSp; from: 1; to: 99
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("athkarCount", value) } }
                                     }
                                     RowLayout {
                                         Layout.fillWidth: true
                                         Label { text: tr("طريقة العرض:"); color: theme.textColor; ToolTip.text: tr("متى تظهر الأذكار: بعد كل صلاة، في وقت محدد، أو كلاهما") }
-                                        ComboBox {
+                                        ThemedComboBox {
                                             id: athkarMethodCb; Layout.fillWidth: true
                                             model: [tr("بعد الصلاة"), tr("وقت محدد"), tr("كلاهما")]
                                             onCurrentIndexChanged: {
@@ -1072,25 +1143,27 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("النافذة المنبثقة للأذكار"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات النافذة المنبثقة التي تظهر الأذكار") }
+                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("النافذة المنبثقة للأذكار"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات النافذة المنبثقة التي تظهر الأذكار") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 6
-                                    CheckBox { id: popupEnabledCb; text: tr("تفعيل النافذة المنبثقة")
+                                    ThemedCheckBox {
+                                        Layout.fillWidth: true
+                                        id: popupEnabledCb; text: tr("تفعيل النافذة المنبثقة")
                                         ToolTip.text: tr("عرض نافذة منبثقة بالأذكار بعد كل صلاة")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("athkar_popup_enabled", checked) } }
                                     RowLayout {
                                         Layout.fillWidth: true; visible: popupEnabledCb.checked
                                         Label { text: tr("مدة العرض (ثوانٍ):"); color: theme.textColor; ToolTip.text: tr("مدة بقاء النافذة المنبثقة ظاهرة قبل الإغلاق التلقائي") }
-                                        SpinBox { id: popupDurSp; from: 5; to: 600
+                                        ThemedSpinBox { id: popupDurSp; from: 5; to: 600
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("athkar_popup_duration", value) } }
                                     }
                                     RowLayout {
                                         Layout.fillWidth: true; visible: popupEnabledCb.checked
                                         Label { text: tr("تأخير الظهور (ثوانٍ):"); color: theme.textColor; ToolTip.text: tr("تأخير ظهور النافذة بعد انتهاء الصلاة") }
-                                        SpinBox { id: popupDelaySp; from: 0; to: 300
+                                        ThemedSpinBox { id: popupDelaySp; from: 0; to: 300
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("athkar_popup_delay", value) } }
                                     }
-                                    Button {
+                                    ThemedButton {
                                         Layout.fillWidth: true; Layout.preferredHeight: 36; Layout.topMargin: 4; visible: popupEnabledCb.checked
                                         text: tr("اختبار النافذة المنبثقة")
                                         onClicked: {
@@ -1141,10 +1214,10 @@ Dialog {
 
                                 GroupBox {
                                     Layout.fillWidth: true
-                                    label: Label { text: tr("إضافة تذكير"); color: theme.textColor; font.bold: true }
+                                    label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("إضافة تذكير"); color: theme.textColor; font.bold: true }
                                     background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                     ColumnLayout { width: parent.width; spacing: 6
-                                        TextField {
+                                        ThemedTextField {
                                             id: remText; Layout.fillWidth: true
                                             placeholderText: tr("نص التذكير")
                                             color: theme.textColor; placeholderTextColor: theme.textMutedColor
@@ -1153,13 +1226,13 @@ Dialog {
                                         RowLayout {
                                             Layout.fillWidth: true
                                             Label { text: tr("الوقت (HH:MM):"); color: theme.textColor }
-                                            TextField {
+                                            ThemedTextField {
                                                 id: remTime; Layout.preferredWidth: 90
                                                 placeholderText: "07:00"; text: "07:00"
                                                 color: theme.textColor; placeholderTextColor: theme.textMutedColor
                                                 background: Rectangle { color: theme.bgColor; radius: 6; border.color: theme.borderColor; border.width: 1 }
                                             }
-                                            Button {
+                                            ThemedButton {
                                                 text: _editingReminderId === "" ? tr("إضافة") : tr("حفظ")
                                                 onClicked: {
                                                     if (remText.text.trim() === "") return
@@ -1172,7 +1245,7 @@ Dialog {
                                                     remindersTab.populate()
                                                 }
                                             }
-                                            Button {
+                                            ThemedButton {
                                                 visible: _editingReminderId !== ""
                                                 text: tr("إلغاء")
                                                 onClicked: remindersTab._resetForm()
@@ -1189,7 +1262,8 @@ Dialog {
                                             Repeater {
                                                 id: remDayRepeater
                                                 model: remindersTab.dayNames
-                                                delegate: CheckBox {
+                                                delegate: ThemedCheckBox {
+                                                    Layout.fillWidth: true
                                                     id: dayCb
                                                     property int dayIndex: index
                                                     text: modelData
@@ -1222,7 +1296,8 @@ Dialog {
                                         border.color: theme.borderColor; border.width: 1
                                         RowLayout {
                                             anchors.fill: parent; anchors.margins: 8; spacing: 8
-                                            CheckBox {
+                                            ThemedCheckBox {
+                                                Layout.fillWidth: true
                                                 checked: modelData.enabled
                                                 onToggled: {
                                                     backendController.toggleReminder(modelData.id, checked)
@@ -1234,7 +1309,7 @@ Dialog {
                                                 color: theme.textColor; Layout.fillWidth: true
                                                 elide: Text.ElideRight
                                             }
-                                            Button {
+                                            ThemedButton {
                                                 text: "✎"
                                                 onClicked: {
                                                     _editingReminderId = modelData.id
@@ -1243,7 +1318,7 @@ Dialog {
                                                     remTime.text = modelData.time
                                                 }
                                             }
-                                            Button {
+                                            ThemedButton {
                                                 text: "✕"
                                                 onClicked: {
                                                     backendController.removeReminder(modelData.id)
@@ -1334,10 +1409,10 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("اللغة"); color: theme.textColor; font.bold: true; ToolTip.text: tr("اختيار لغة واجهة التطبيق") }
+                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("اللغة"); color: theme.textColor; font.bold: true; ToolTip.text: tr("اختيار لغة واجهة التطبيق") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
-                    ComboBox { id: langCombo; Layout.fillWidth: true
+                    ThemedComboBox { id: langCombo; objectName: "languageCombo"; Layout.fillWidth: true
                         model: l10n ? l10n.languages : []
                         textRole: "name"
                         onCurrentIndexChanged: {
@@ -1354,10 +1429,10 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("المظهر"); color: theme.textColor; font.bold: true; ToolTip.text: tr("اختيار سمة ألوان التطبيق") }
+                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("المظهر"); color: theme.textColor; font.bold: true; ToolTip.text: tr("اختيار سمة ألوان التطبيق") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
-                                    ComboBox { id: themeCombo; Layout.fillWidth: true
+                                    ThemedComboBox { id: themeCombo; objectName: "themeCombo"; Layout.fillWidth: true
                                         model: backendController ? backendController.getThemes() : []
                                         textRole: "name"
                                         onActivated: {
@@ -1372,11 +1447,11 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("العرض"); color: theme.textColor; font.bold: true; ToolTip.text: tr("اختيار محرك العرض") }
+                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("العرض"); color: theme.textColor; font.bold: true; ToolTip.text: tr("اختيار محرك العرض") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 4
                                     Label { text: tr("محرك العرض:"); color: theme.textColor }
-                                    ComboBox { id: renderBackendCb; Layout.fillWidth: true
+                                    ThemedComboBox { id: renderBackendCb; Layout.fillWidth: true
                                         model: [tr("تلقائي"), "OpenGL", tr("برمجي")]
                                         onActivated: {
                                             var codes = ["auto", "opengl", "software"]
@@ -1385,7 +1460,7 @@ Dialog {
                                         }
                                     }
                                     Label { text: tr("حلقة العرض:"); color: theme.textColor }
-                                    ComboBox { id: renderLoopCb; Layout.fillWidth: true
+                                    ThemedComboBox { id: renderLoopCb; Layout.fillWidth: true
                                         model: [tr("تلقائي"), "threaded", "basic"]
                                         onActivated: {
                                             var codes = ["auto", "threaded", "basic"]
@@ -1404,10 +1479,12 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("بدء التشغيل التلقائي"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تشغيل التطبيق تلقائياً عند بدء تشغيل النظام") }
+                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("بدء التشغيل التلقائي"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تشغيل التطبيق تلقائياً عند بدء تشغيل النظام") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
-                                    CheckBox { id: autostartCb; text: tr("تشغيل التطبيق تلقائياً عند بدء النظام")
+                                    ThemedCheckBox {
+                                        Layout.fillWidth: true
+                                        id: autostartCb; text: tr("تشغيل التطبيق تلقائياً عند بدء النظام")
                                         ToolTip.text: tr("إضافة التطبيق لبرامج بدء التشغيل")
                                         onCheckedChanged: { if (_populating) return; backendController.setAutostart(checked) } }
                                 }
@@ -1415,10 +1492,12 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("وضع النوم"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تقليل نشاط التطبيق في الخلفية") }
+                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("وضع النوم"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تقليل نشاط التطبيق في الخلفية") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
-                                    CheckBox { id: sleepModeCbGeneral; text: tr("وضع السكون (فحص أقل في الخلفية)")
+                                    ThemedCheckBox {
+                                        Layout.fillWidth: true
+                                        id: sleepModeCbGeneral; text: tr("وضع السكون (فحص أقل في الخلفية)")
                                         ToolTip.text: tr("تقليل تكرار فحص الأوقات لتوفير البطارية والمعالج")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("sleep_mode", checked) } }
                                 }
@@ -1426,10 +1505,12 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("صورة الخلفية"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تفعيل أو تعطيل صورة الخلفية في الواجهة الرئيسية") }
+                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("صورة الخلفية"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تفعيل أو تعطيل صورة الخلفية في الواجهة الرئيسية") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
-                                    CheckBox { id: backgroundEnabledCb; text: tr("إظهار صورة الخلفية")
+                                    ThemedCheckBox {
+                                        Layout.fillWidth: true
+                                        id: backgroundEnabledCb; text: tr("إظهار صورة الخلفية")
                                         ToolTip.text: tr("تفعيل/تعطيل صورة المسجد النبوي في الخلفية")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("background_enabled", checked) } }
                                 }
@@ -1437,10 +1518,12 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("الودجة المصغرة"); color: theme.textColor; font.bold: true; ToolTip.text: tr("نافذة صغيرة تعرض الصلاة القادمة والعد التنازلي") }
+                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("الودجة المصغرة"); color: theme.textColor; font.bold: true; ToolTip.text: tr("نافذة صغيرة تعرض الصلاة القادمة والعد التنازلي") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
-                                    CheckBox { id: widgetCb; text: tr("إظهار الودجة المصغرة على سطح المكتب")
+                                    ThemedCheckBox {
+                                        Layout.fillWidth: true
+                                        id: widgetCb; text: tr("إظهار الودجة المصغرة على سطح المكتب")
                                         ToolTip.text: tr("نافذة صغيرة دائمة العرض تعرض الصلاة القادمة والعد التنازلي")
                                         onCheckedChanged: { if (_populating) return; backendController.setWidgetVisible(checked) } }
                                 }
@@ -1448,10 +1531,10 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("المنطقة الزمنية"); color: theme.textColor; font.bold: true; ToolTip.text: tr("اختيار المنطقة الزمنية لحساب مواقيت الصلاة") }
+                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("المنطقة الزمنية"); color: theme.textColor; font.bold: true; ToolTip.text: tr("اختيار المنطقة الزمنية لحساب مواقيت الصلاة") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
-                                    ComboBox { id: timezoneCombo; Layout.fillWidth: true
+                                    ThemedComboBox { id: timezoneCombo; Layout.fillWidth: true
                                         model: backendController ? backendController.getTimezones() : []
                                         textRole: "name"
                                         valueRole: "code"
@@ -1467,20 +1550,20 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { text: tr("إدارة الإعدادات"); color: theme.textColor; font.bold: true; ToolTip.text: tr("استيراد/تصدير/إعادة تعيين الإعدادات") }
+                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("إدارة الإعدادات"); color: theme.textColor; font.bold: true; ToolTip.text: tr("استيراد/تصدير/إعادة تعيين الإعدادات") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 6
-                                    Button {
+                                    ThemedButton {
                                         Layout.fillWidth: true; Layout.preferredHeight: 36
                                         text: tr("تصدير الإعدادات")
                                         onClicked: exportSettings()
                                     }
-                                    Button {
+                                    ThemedButton {
                                         Layout.fillWidth: true; Layout.preferredHeight: 36
                                         text: tr("استيراد الإعدادات")
                                         onClicked: importSettings()
                                     }
-                                    Button {
+                                    ThemedButton {
                                         Layout.fillWidth: true; Layout.preferredHeight: 36
                                         text: tr("إعادة تعيين للإعدادات الافتراضية")
                                         onClicked: resetAllSettings()
@@ -1500,6 +1583,14 @@ Dialog {
         color: theme.cardColor
         radius: 12
 
+        Rectangle {
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 1
+            color: theme.borderColor
+        }
+
         RowLayout {
             anchors.fill: parent
             anchors.margins: 8
@@ -1507,10 +1598,13 @@ Dialog {
 
             Item { Layout.fillWidth: true }
 
-            Button {
+            ThemedButton {
                 id: saveBtn
+                objectName: "settingsSaveButton"
+                primary: true
                 text: tr("حفظ")
                 Layout.preferredHeight: 36
+                Layout.preferredWidth: 96
                 onClicked: {
                     _saving = true
                     backendController.commitSettings()
@@ -1518,10 +1612,12 @@ Dialog {
                 }
             }
 
-            Button {
+            ThemedButton {
                 id: cancelBtn
+                objectName: "settingsCancelButton"
                 text: tr("إلغاء")
                 Layout.preferredHeight: 36
+                Layout.preferredWidth: 96
                 onClicked: root.close()
             }
         }

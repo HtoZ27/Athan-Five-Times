@@ -267,7 +267,9 @@
     "التسبيح، التحميد، التهليل، التكبير": "Tasbiix, tahmiid, tahliil, takbiir",
     "الرقية الشرعية": "Ruqyah",
     "البيهقي": "Al-Bayhaqi",
-    "الترجمة": "Turjumaad"
+    "الترجمة": "Turjumaad",
+    "إغلاق": "Xir",
+    "لا توجد مدن مطابقة": "Ma jiraan magaalooyin u dhigma"
   },
   "prayer_names": {
     "fajr": "Subax",

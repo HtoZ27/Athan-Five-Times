@@ -267,7 +267,9 @@
     "التسبيح، التحميد، التهليل، التكبير": "Tesbih, tahmid, tehlil, tekbir",
     "الرقية الشرعية": "Rukýa",
     "البيهقي": "Al-Beýhaky",
-    "الترجمة": "Terjime"
+    "الترجمة": "Terjime",
+    "إغلاق": "Ýap",
+    "لا توجد مدن مطابقة": "Gabat gelýän şäher ýok"
   },
   "prayer_names": {
     "fajr": "Ertir",

@@ -130,14 +130,51 @@ COUNTRY_TZ = {
 
 
 def _tz_for_country_code(code: str) -> str:
-    """Resolve an IANA timezone from an ISO country code via pytz (247 countries)."""
-    if not code or not _PYTZ_AVAILABLE:
+    """Resolve an IANA timezone from an ISO country code.
+
+    Preference order: pytz's complete country map (when installed), then the
+    system zoneinfo tables (``zone1970.tab``/``zone.tab``) so location changes
+    still get a correct timezone on systems without pytz.
+    """
+    if not code:
         return ""
-    try:
-        zones = pytz.country_timezones.get(code.upper(), [])
-        return zones[0] if zones else ""
-    except Exception:
-        return ""
+    if _PYTZ_AVAILABLE:
+        try:
+            zones = pytz.country_timezones.get(code.upper(), [])
+            if zones:
+                return zones[0]
+        except Exception:
+            pass
+    zones = _zones_by_country().get(code.upper(), [])
+    return zones[0] if zones else ""
+
+
+_ZONE_TAB_CACHE: dict | None = None
+
+
+def _zones_by_country() -> dict:
+    """Parse the system zone tables into ``{country_code: [zones]}``."""
+    global _ZONE_TAB_CACHE
+    if _ZONE_TAB_CACHE is not None:
+        return _ZONE_TAB_CACHE
+    table: dict[str, list[str]] = {}
+    for filename in ("zone1970.tab", "zone.tab"):
+        path = Path("/usr/share/zoneinfo") / filename
+        try:
+            with path.open(encoding="utf-8") as f:
+                for line in f:
+                    if not line or line.startswith("#"):
+                        continue
+                    parts = line.rstrip("\n").split("\t")
+                    if len(parts) < 3:
+                        continue
+                    table.setdefault(parts[0].upper(), []).append(parts[2])
+        except OSError:
+            continue
+        if table:
+            break
+    _ZONE_TAB_CACHE = table
+    return table
 
 
 def _tz_for_country(name: str, code: str = "") -> str:
