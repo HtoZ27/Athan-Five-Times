@@ -81,7 +81,7 @@ class TestVolumeWiring:
 class TestIshaInterval:
     def test_uae_official_oct9(self):
         # Awqaf Abu Dhabi official 2026-10-09: Fajr 05:01, Isha 19:18
-        # (angle-derived 18.0/18.0 — verified, NOT a fixed interval).
+        # (from the official city table, not a fixed interval).
         from backend.prayer_calc import calculate
 
         r = calculate(
@@ -90,6 +90,8 @@ class TestIshaInterval:
             target_date=date(2026, 10, 9),
             method_name="الهيئة العامة للشؤون الإسلامية (الإمارات)",
             tz_name="Asia/Dubai",
+            city_name="Abu Dhabi",
+            country_code="AE",
         )
         d = r.as_dict()
         assert d["fajr"].strftime("%H:%M") == "05:01", d

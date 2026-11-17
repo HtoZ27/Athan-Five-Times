@@ -162,7 +162,7 @@ def main() -> int:
         check("settings-dialog-open", True)
         check("countries-241", len(pe.getCountryList()) == 241)
         check("cities-tunis", len(pe.getCityNamesForCountry("TN")) > 5)
-        check("methods-26", len(pe.getCalcMethods()) == 26)
+        check("methods-36", len(pe.getCalcMethods()) == 36)
         check("madhabs-2-ar", all("شافعي" in m["display"] or "حنفي" in m["display"]
                                   for m in pe.getMadhabs()))
         check("themes-6-ar", len(pe.getThemes()) == 6 and

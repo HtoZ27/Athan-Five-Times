@@ -122,7 +122,7 @@ class TestUnverifiedMethodRemoved:
         from backend.prayer_calc import CALCULATION_METHODS
 
         assert "طريقة فاروقي (باكستان/شمال الهند)" not in CALCULATION_METHODS
-        assert len(CALCULATION_METHODS) == 26
+        assert len(CALCULATION_METHODS) == 36
 
 
 class TestTimezoneAliases:

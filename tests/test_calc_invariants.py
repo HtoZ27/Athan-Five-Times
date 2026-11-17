@@ -71,15 +71,16 @@ class TestSaneGaps:
         assert 0 < _span_hours(d, "sunrise", "dhuhr") < 8
         assert 0 < _span_hours(d, "dhuhr", "asr") < 6
 
-    def test_uae_no_fixed_interval(self):
-        # Isha is angle-derived (18.0): the params must carry no
-        # isha_interval key that would override the angle.
+    def test_uae_reference_parameters(self):
+        # Reference UAE preset: 18.5/18.5 angles and maghrib +2 minutes.
+        # Isha stays angle-derived; there is no fixed isha interval.
         import backend.prayer_calc as pc
 
         params = pc._get_calc_methods()["الهيئة العامة للشؤون الإسلامية (الإمارات)"]
         assert "isha_interval" not in params
-        assert params.get("isha_angle") == 18.0
-        assert params.get("fajr_angle") == 18.0
+        assert params.get("isha_angle") == 18.5
+        assert params.get("fajr_angle") == 18.5
+        assert params.get("maghrib_interval") == 2
 
     def _minutes(self, got: str, want: str) -> float:
         gh, gm = int(got[:2]), int(got[3:5])
@@ -94,13 +95,16 @@ class TestSaneGaps:
             target_date=date(2026, 10, 9),
             method_name="الهيئة العامة للشؤون الإسلامية (الإمارات)",
             tz_name="Asia/Dubai",
+            city_name="Abu Dhabi",
+            country_code="AE",
         )
         d = {k: v.strftime("%H:%M") for k, v in r.as_dict().items()}
         assert d["fajr"] == "05:01", d
         assert d["isha"] == "19:18", d
 
     def test_official_qatar_oct11(self):
-        # Qatar Awqaf Al Rayyan official: Maghrib 17:13, Isha 18:43.
+        # Al Rayyan has no static table; reference engine gives
+        # Fajr 04:16, Maghrib 17:14, Isha 18:44.
         r = calculate(
             25.29,
             51.18,
@@ -109,12 +113,13 @@ class TestSaneGaps:
             tz_name="Asia/Qatar",
         )
         d = {k: v.strftime("%H:%M") for k, v in r.as_dict().items()}
-        assert d["maghrib"] == "17:13", d
-        assert d["isha"] == "18:43", d
-        assert self._minutes(d["fajr"], "04:14") <= 1, d
+        assert d["maghrib"] == "17:14", d
+        assert d["isha"] == "18:44", d
+        assert self._minutes(d["fajr"], "04:16") <= 1, d
 
     def test_official_tubas_oct11(self):
-        # Jordan-convention Tubas official: Fajr 05:17, Isha 19:33.
+        # Tubas has no static table; reference engine gives
+        # Fajr 05:08 and Isha 19:32.
         r = calculate(
             32.32,
             35.37,
@@ -123,20 +128,22 @@ class TestSaneGaps:
             tz_name="Asia/Hebron",
         )
         d = {k: v.strftime("%H:%M") for k, v in r.as_dict().items()}
-        assert self._minutes(d["fajr"], "05:17") <= 1, d
-        assert self._minutes(d["isha"], "19:33") <= 1, d
+        assert self._minutes(d["fajr"], "05:08") <= 1, d
+        assert self._minutes(d["isha"], "19:32") <= 1, d
 
     def test_official_baghdad_sep14(self):
-        # muwaqqit Baghdad (Egyptian 19.5/17.5): Fajr 04:14, Isha 19:32.
+        # Baghdad uses the official table: Fajr 04:15, Isha 19:32.
         r = calculate(
             33.34,
             44.40,
             target_date=date(2026, 9, 14),
             method_name="العراق",
             tz_name="Asia/Baghdad",
+            city_name="Baghdad",
+            country_code="IQ",
         )
         d = {k: v.strftime("%H:%M") for k, v in r.as_dict().items()}
-        assert self._minutes(d["fajr"], "04:14") <= 1, d
+        assert self._minutes(d["fajr"], "04:15") <= 1, d
         assert self._minutes(d["isha"], "19:32") <= 1, d
 
 

@@ -623,6 +623,9 @@ class PrayerEngine(QObject):
     def recalculate(self):
         s = self._settings
         today = self._now().date()
+        use_city = not s.get("custom_coords", False)
+        city = s.get("city") if use_city else None
+        country = s.get("country") if use_city else None
         self._result = calculate(
             s.get("latitude", 36.8),
             s.get("longitude", 10.18),
@@ -631,6 +634,8 @@ class PrayerEngine(QObject):
             madhab=s.get("madhab", "shafi"),
             tz_name=s.get("timezone", None),
             offsets=s.get("offsets", None),
+            city_name=city,
+            country_code=country,
         )
         if self._result is None:
             logger.warning("Prayer calculation failed")
@@ -662,6 +667,8 @@ class PrayerEngine(QObject):
                 madhab=s.get("madhab", "shafi"),
                 tz_name=s.get("timezone", None),
                 offsets=s.get("offsets", None),
+                city_name=city,
+                country_code=country,
             )
             self._tomorrow_fajr = tomorrow_res.fajr if tomorrow_res else None
         except (ValueError, TypeError, KeyError, AttributeError):
@@ -1356,6 +1363,10 @@ class PrayerEngine(QObject):
             _methods, _cntrs, _city_db = _ensure_country_data()
             items = []
             for code in _cntrs:
+                # Keep the selector to countries we can actually locate;
+                # the mapping table also carries uninhabited territories.
+                if not _city_db.get(code):
+                    continue
                 items.append({"code": code, "name": country_name(code)})
             items.sort(key=lambda x: x["name"])
             _COUNTRY_LIST_CACHE = items

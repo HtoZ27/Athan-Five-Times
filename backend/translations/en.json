@@ -591,7 +591,17 @@
     "وزارة الأوقاف القطرية": "Qatar Ministry of Endowments",
     "وزارة الأوقاف الكويتية": "Kuwait Ministry of Endowments",
     "اليمن": "Yemen",
-    "مخصص": "Custom"
+    "مخصص": "Custom",
+    "الأردن (وزارة الأوقاف)": "Jordan (Ministry of Awqaf)",
+    "كازاخستان": "Kazakhstan",
+    "سلطنة عمان": "Oman",
+    "جزر المالديف": "Maldives",
+    "بلجيكا": "Belgium",
+    "سويسرا": "Switzerland",
+    "التشيك": "Czechia",
+    "كوريا الجنوبية": "South Korea",
+    "لوكسمبورغ": "Luxembourg",
+    "جنوب شرق آسيا (JAKIM)": "Southeast Asia (JAKIM)"
   },
   "madhab": {
     "shafi": "Shafi'i",
