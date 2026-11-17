@@ -192,6 +192,67 @@ def main() -> int:
     pe.updateSetting("city", "NoSuchCity123")
     check("reject-city", pe.getSetting("city") == "Tunis")
 
+    # City altitude map through the real controller, still isolated.
+    from backend.prayer_calc import calculate as _calc
+
+    def _calc_with_altitude(country, city, method, tz, altitude):
+        return _calc(
+            pe.getSetting("latitude"),
+            pe.getSetting("longitude"),
+            target_date=pe._result.calc_date,
+            method_name=method,
+            tz_name=tz,
+            city_name=city,
+            country_code=country,
+            altitude=altitude,
+        )
+
+    def _engine_matches_altitude(country, city, method, tz, altitude):
+        expected = _calc_with_altitude(country, city, method, tz, altitude)
+        return expected is not None and pe._result.sunrise == expected.sunrise
+
+    pe.updateSetting("country", "MA")
+    pe.updateSetting("city", "Marrakesh")
+    pe.updateSetting("method", "Morocco")
+    pe.updateSetting("timezone", "Africa/Casablanca")
+    pe.updateSetting("custom_coords", False)
+    pe.commitSettings()
+    pe.recalculate()
+    app.processEvents()
+    check("altitude-map-marrakesh",
+          _engine_matches_altitude("MA", "Marrakesh", "Morocco",
+                                   "Africa/Casablanca", 457.0))
+    sea_level = _calc_with_altitude("MA", "Marrakesh", "Morocco",
+                                    "Africa/Casablanca", 0.0)
+    check("altitude-map-differs-sea-level",
+          sea_level is not None and pe._result.sunrise != sea_level.sunrise,
+          f"{pe._result.sunrise} vs {sea_level.sunrise if sea_level else None}")
+
+    pe.updateSetting("country", "IQ")
+    pe.updateSetting("city", "Dahuk")
+    pe.updateSetting("method", "Iraq")
+    pe.updateSetting("timezone", "Asia/Baghdad")
+    pe.updateSetting("custom_coords", False)
+    pe.commitSettings()
+    pe.recalculate()
+    app.processEvents()
+    check("altitude-static-dahuk",
+          _engine_matches_altitude("IQ", "Dahuk", "Iraq", "Asia/Baghdad", 0.0))
+    dahuk_map = _calc_with_altitude("IQ", "Dahuk", "Iraq", "Asia/Baghdad", 570.0)
+    check("altitude-static-not-map",
+          dahuk_map is not None and pe._result.sunrise != dahuk_map.sunrise,
+          f"{pe._result.sunrise} vs {dahuk_map.sunrise if dahuk_map else None}")
+
+    # Restore the shared default for the remaining feature checks.
+    pe.updateSetting("country", "TN")
+    pe.updateSetting("city", "Tunis")
+    pe.updateSetting("method", pe.getCalcMethods()[0]["key"])
+    pe.updateSetting("timezone", "Africa/Tunis")
+    pe.updateSetting("custom_coords", False)
+    pe.commitSettings()
+    pe.recalculate()
+    app.processEvents()
+
     prov = pe.getAthkarProvider()
     check("adhkar-items-morning", len(prov.getCategoryItems("morning")) == 26)
     it = prov.getCategoryItems("morning")[0]
