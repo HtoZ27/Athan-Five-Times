@@ -293,3 +293,43 @@ if tz:                                                    # يفشل => يبقى
 - e2e معزول: **254/254** فحصًا و0 أخطاء QML، منها أقرب منطقة لـUS/RU/AU/CA/BR، وست لغات مع السعودية، وعنصر بيرث في القائمة، وعرض زر «عرض المزيد»، وإلغاء حقيقي لمربع الإحداثيات مع إعادة الحساب.
 
 **الحزم**: أُضيفت تبعية `tzdata` إلى deb/rpm/Arch، لأن التطبيق المبني لا يستخدم `pytz` ويعتمد على جداول `/usr/share/zoneinfo`.
+
+---
+
+## تجاوز التخطيط الهندي/البنجابي + ثبات CI (2026-11-18)
+
+**الملفات**: `qml/SettingsDialog.qml`, `.github/workflows/ci.yml`, `packaging/rpm/athan-five-times.spec`
+
+**المشكلة**: في نافذة الإعدادات بعرض 460×680 كانت تبويبات الصوت/الإشعارات تخرج عن الإطار في اللغتين الهندية `hi` والبنجابية `pa` (نصوص أطول من العربية)، فسجّل e2e في CI:
+
+| اللغة | الفحص | القياس من CI |
+|---|---|---|
+| `pa` | tab4 | `QQuickRowLayout w=433` مقابل `tabW=408`، و`ThemedSpinBox w=104` |
+| `hi` | tab3 | `Label w=456` مقابل `tabW=408` |
+| `hi` | tab4 | `QQuickRowLayout w=409` مقابل `tabW=408` |
+
+**السبب**: عناوين `GroupBox` كانت بحجم نصها الكامل دون قص أو التفاف، وصفوف «مدة التلاشي» و«التنبيه المبكر» و«DND» كانت تضع التسمية و`ThemedSpinBox` في صف واحد دون السماح للتسمية بالتقلّص، وسطرا «من الساعة/إلى الساعة» كانا في صف واحد فيتجاوزان العرض.
+
+**قبل** (`SettingsDialog.qml`):
+```qml
+label: Label { z: 2; text: tr("الصوت العام"); ... }          // بلا width ولا wrap
+Label { text: tr("مدة التلاشي (ثوانٍ):"); Layout.fillWidth: true }  // تُقصّ لا تلتف
+RowLayout { Label { text: tr("من الساعة:") } ThemedSpinBox{} Label { text: tr("إلى الساعة:") } ThemedSpinBox{} }
+```
+
+**بعد**:
+```qml
+label: Label { width: parent ? Math.max(120, parent.width - 28) : implicitWidth
+               wrapMode: Text.WordWrap; ... }                 // كل العناوين الـ25
+Label { Layout.fillWidth: true; Layout.minimumWidth: 0; wrapMode: Text.WordWrap }
+RowLayout { Layout.fillWidth: true; ... }                     // «من/إلى» في صفّين مستقلّين
+```
+
+**الأدلة**:
+- e2e معزول على **PySide6 6.12.0** (نفس نسخة CI): **254/254** فحصًا، **0** أخطاء QML، ومنها `ui-lang-pa` و`ui-lang-hi`.
+- مسح تخطيط لكل اللغات الـ17 × 8 تبويبات عند كثافات خط 96/102/108/114: **17/17 نظيفة** في كل كثافة.
+- `pytest`: **660** اختبارًا ناجحًا، و`ruff check`/`format` نظيفان على `backend/` و`tests/`.
+
+**CI**: كان فشل `test (3.10)` مركّبًا من مشكلتين: تجاوز التخطيط أعلاه، ثم انهيار `Fatal Python error: none_dealloc: deallocating None`. أُعيد إنتاجه محليًا على Python 3.10.22 و3.11.18 مع PySide6 6.12.0 (نفس الشيفرة تنجح على 3.12.3)، فالخلل في shiboken 6.12.0: يخفض عدّاد `None` مرة إضافية، ولا يكون قاتلًا إلا قبل Python 3.12 حيث `None` خالد. لذلك:
+- e2e الواجهة يُشغَّل مرة واحدة على **3.12** (اختبار سلوك تطبيق لا اختبار مفسّر)، و`pytest` يبقى على 3.10/3.11/3.12، و`smoke-qml` يغطي QML على 3.11.
+- `fail-fast: false` حتى لا يُلغي فشل 3.10 مهمة 3.12 قبل انتهائها.

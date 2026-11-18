@@ -1,5 +1,5 @@
 Name:           athan-five-times
-Version:        0.3.18b
+Version:        0.3.19b
 Release:        1%{?dist}
 Summary:        Islamic prayer times with azan audio and adhkar
 License:        MIT
@@ -43,6 +43,9 @@ install -Dm644 LICENSE %{buildroot}%{_docdir}/%{name}/LICENSE
 %{_docdir}/%{name}/LICENSE
 
 %changelog
+* Wed Nov 18 2026 H.Z.Tun <htoz27@users.noreply.github.com> - 0.3.19b-1
+- Keep long GroupBox titles and setting rows inside the settings dialog
+  (Hindi/Punjabi audio and notifications tabs overflowed).
 * Tue Nov 17 2026 H.Z.Tun <htoz27@users.noreply.github.com> - 0.3.18b-1
 - Fix city timezone resolution (multi-zone countries, language independent)
   and refresh the settings timezone combo; require tzdata.
