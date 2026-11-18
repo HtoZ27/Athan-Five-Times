@@ -73,7 +73,7 @@ pip install --break-system-packages adhan miniaudio
 athan-five-times
 
 # Fedora / openSUSE (from spec)
-sudo dnf install athan-five-times-0.3.19b-1.noarch.rpm
+sudo dnf install athan-five-times-0.3.19b-1.*.noarch.rpm
 
 # Arch Linux (from PKGBUILD)
 makepkg -si   # inside packaging/arch, or use the AUR
