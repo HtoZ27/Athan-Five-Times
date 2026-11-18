@@ -1261,16 +1261,19 @@ Dialog {
                                         RowLayout {
                                             Layout.fillWidth: true; spacing: 4
                                             Label { text: tr("أيام التكرار:"); color: theme.textColor }
-                                            Label { text: tr("(اتركها فارغة لكل يوم)"); color: theme.textMutedColor; font.pixelSize: 11 }
-                                            Item { Layout.fillWidth: true }
+                                            Label {
+                                                text: tr("(اتركها فارغة لكل يوم)"); color: theme.textMutedColor
+                                                font.pixelSize: 11
+                                                Layout.fillWidth: true; Layout.minimumWidth: 0
+                                                wrapMode: Text.WordWrap
+                                            }
                                         }
                                         Flow {
-                                            Layout.fillWidth: true; spacing: 2
+                                            Layout.fillWidth: true; Layout.minimumWidth: 0; spacing: 2
                                             Repeater {
                                                 id: remDayRepeater
                                                 model: remindersTab.dayNames
                                                 delegate: ThemedCheckBox {
-                                                    Layout.fillWidth: true
                                                     id: dayCb
                                                     property int dayIndex: index
                                                     text: modelData
@@ -1304,7 +1307,7 @@ Dialog {
                                         RowLayout {
                                             anchors.fill: parent; anchors.margins: 8; spacing: 8
                                             ThemedCheckBox {
-                                                Layout.fillWidth: true
+                                                Layout.fillWidth: true; Layout.minimumWidth: 0
                                                 checked: modelData.enabled
                                                 onToggled: {
                                                     backendController.toggleReminder(modelData.id, checked)
@@ -1313,7 +1316,7 @@ Dialog {
                                             }
                                             Label {
                                                 text: modelData.text + "  (" + modelData.time + " · " + remindersTab._daysLabel(modelData.days) + ")"
-                                                color: theme.textColor; Layout.fillWidth: true
+                                                color: theme.textColor; Layout.fillWidth: true; Layout.minimumWidth: 0
                                                 elide: Text.ElideRight
                                             }
                                             ThemedButton {

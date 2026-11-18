@@ -1026,7 +1026,15 @@ def main() -> int:
                         and "ScrollBar" not in cn
                         and "ScrollIndicator" not in cn
                     ):
-                        problems.append(f"tab{idx} overflow {cn} w={ow:.0f} tabW={tw:.0f}")
+                        chain = []
+                        node = o.parentItem()
+                        while node is not None and node is not tab:
+                            chain.append(f"{node.metaObject().className()}:{float(node.width()):.0f}")
+                            node = node.parentItem()
+                        problems.append(
+                            f"tab{idx} overflow {cn} x={x:.0f} w={ow:.0f} tabW={tw:.0f} "
+                            f"chain={'/'.join(chain[:6])}"
+                        )
                     if "Label" in cn or cn == "QQuickText":
                         text = _prop(o, "text")
                         cw = _prop(o, "contentWidth")
