@@ -406,7 +406,7 @@ Dialog {
 
                                 GroupBox {
                                     Layout.fillWidth: true
-                                    label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("تحديد الموقع تلقائياً"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تحديد موقعك الحالي عبر الإنترنت") }
+                                    label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("تحديد الموقع تلقائياً"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تحديد موقعك الحالي عبر الإنترنت") }
                                     background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                     ColumnLayout { width: parent.width; spacing: 6
                                         ThemedButton {
@@ -434,7 +434,7 @@ Dialog {
 
                                 GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("الموقع"); color: theme.textColor; font.bold: true }
+                                label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("الموقع"); color: theme.textColor; font.bold: true }
 
                                 background: Rectangle {
                                     color: theme.cardColor
@@ -573,7 +573,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("طريقة الحساب"); color: theme.textColor; font.bold: true }
+                                label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("طريقة الحساب"); color: theme.textColor; font.bold: true }
                                 background: Rectangle {
                                     color: theme.cardColor; radius: 8
                                     border.color: theme.borderColor; border.width: 1
@@ -595,7 +595,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("المذهب"); color: theme.textColor; font.bold: true }
+                                label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("المذهب"); color: theme.textColor; font.bold: true }
                                 background: Rectangle {
                                     color: theme.cardColor; radius: 8
                                     border.color: theme.borderColor; border.width: 1
@@ -653,7 +653,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("إزاحة أوقات الصلاة (دقائق)"); color: theme.textColor }
+                                label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("إزاحة أوقات الصلاة (دقائق)"); color: theme.textColor }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 4
                                     RowLayout { Layout.fillWidth: true
@@ -696,7 +696,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("إزاحة التاريخ الهجري"); color: theme.textColor }
+                                label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("إزاحة التاريخ الهجري"); color: theme.textColor }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
                                     ThemedSpinBox {
@@ -871,7 +871,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("ملفات الصوت لكل صلاة"); color: theme.textColor; font.bold: true }
+                                label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("ملفات الصوت لكل صلاة"); color: theme.textColor; font.bold: true }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 4
                                     Repeater {
@@ -926,7 +926,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("الصوت العام"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات الصوت العامة للأذان") }
+                                label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("الصوت العام"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات الصوت العامة للأذان") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 6
 
@@ -950,7 +950,7 @@ Dialog {
 
                                     RowLayout {
                                         Layout.fillWidth: true; visible: fadeInCb.checked
-                                        Label { text: tr("مدة التلاشي (ثوانٍ):"); color: theme.textColor; Layout.fillWidth: true; ToolTip.text: tr("مدة الزيادة التدريجية للصوت عند بداية الأذان") }
+                                        Label { text: tr("مدة التلاشي (ثوانٍ):"); color: theme.textColor; Layout.fillWidth: true; Layout.minimumWidth: 0; wrapMode: Text.WordWrap; ToolTip.text: tr("مدة الزيادة التدريجية للصوت عند بداية الأذان") }
                                         ThemedSpinBox { id: fadeDurSp; from: 1; to: 10
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("fade_in_duration", value) } }
                                     }
@@ -973,7 +973,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("تفعيل الأذان لكل صلاة"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تفعيل/إيقاف الأذان لكل صلاة على حدة") }
+                                label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("تفعيل الأذان لكل صلاة"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تفعيل/إيقاف الأذان لكل صلاة على حدة") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 4
 
@@ -1019,7 +1019,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("الأذان المبكر"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات التنبيه المبكر قبل الأذان") }
+                                label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("الأذان المبكر"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات التنبيه المبكر قبل الأذان") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 4
                                     ThemedCheckBox {
@@ -1028,8 +1028,8 @@ Dialog {
                                         ToolTip.text: tr("تفعيل التنبيه المبكر قبل الأذان بالدقائق المحددة")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("pre_azan_enabled", checked) } }
                                     RowLayout {
-                                        Layout.leftMargin: 20; visible: preAzanCb.checked
-                                        Label { text: tr("دقائق قبل الأذان:"); color: theme.textColor; ToolTip.text: tr("عدد الدقائق قبل الأذان للتنبيه المبكر") }
+                                        Layout.fillWidth: true; Layout.leftMargin: 20; visible: preAzanCb.checked
+                                        Label { text: tr("دقائق قبل الأذان:"); color: theme.textColor; Layout.fillWidth: true; Layout.minimumWidth: 0; wrapMode: Text.WordWrap; ToolTip.text: tr("عدد الدقائق قبل الأذان للتنبيه المبكر") }
                                         ThemedSpinBox { id: preAzanSp; from: 1; to: 60
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("pre_azan_minutes", value) } }
                                     }
@@ -1038,7 +1038,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("عدم الإزعاج (DND)"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إيقاف الإشعارات النظامية في أوقات محددة") }
+                                label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("عدم الإزعاج (DND)"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إيقاف الإشعارات النظامية في أوقات محددة") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 4
                                     ThemedCheckBox {
@@ -1047,17 +1047,20 @@ Dialog {
                                         ToolTip.text: tr("إيقاف إشعارات النظام خلال فترة DND")
                                         onCheckedChanged: { if (_populating) return; backendController.updateSetting("dnd_enabled", checked) } }
                                     RowLayout {
-                                        Layout.leftMargin: 20; visible: dndCb.checked
-                                        Label { text: tr("من الساعة:"); color: theme.textColor; ToolTip.text: tr("ساعة بداية فترة DND") }
+                                        Layout.fillWidth: true; Layout.leftMargin: 20; visible: dndCb.checked
+                                        Label { text: tr("من الساعة:"); color: theme.textColor; Layout.fillWidth: true; Layout.minimumWidth: 0; wrapMode: Text.WordWrap; ToolTip.text: tr("ساعة بداية فترة DND") }
                                         ThemedSpinBox { id: dndFromSp; from: 0; to: 23
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("dnd_from", value) } }
-                                        Label { text: tr("إلى الساعة:"); color: theme.textColor; ToolTip.text: tr("ساعة نهاية فترة DND") }
+                                    }
+                                    RowLayout {
+                                        Layout.fillWidth: true; Layout.leftMargin: 20; visible: dndCb.checked
+                                        Label { text: tr("إلى الساعة:"); color: theme.textColor; Layout.fillWidth: true; Layout.minimumWidth: 0; wrapMode: Text.WordWrap; ToolTip.text: tr("ساعة نهاية فترة DND") }
                                         ThemedSpinBox { id: dndToSp; from: 0; to: 23
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("dnd_to", value) } }
                                     }
                                     RowLayout {
-                                        Layout.leftMargin: 20; visible: dndCb.checked
-                                        Label { text: tr("مدة بعد الصلاة (دقيقة):"); color: theme.textColor; ToolTip.text: tr("مدة تفعيل DND بعد كل صلاة") }
+                                        Layout.fillWidth: true; Layout.leftMargin: 20; visible: dndCb.checked
+                                        Label { text: tr("مدة بعد الصلاة (دقيقة):"); color: theme.textColor; Layout.fillWidth: true; Layout.minimumWidth: 0; wrapMode: Text.WordWrap; ToolTip.text: tr("مدة تفعيل DND بعد كل صلاة") }
                                         ThemedSpinBox { id: dndDurSp; from: 5; to: 120
                                             onValueChanged: { if (_populating) return; backendController.updateSetting("dnd_duration", value) } }
                                     }
@@ -1066,7 +1069,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("الوضع الصامت"); color: theme.textColor; font.bold: true; ToolTip.text: tr("كتم جميع الأصوات والتنبيهات") }
+                                label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("الوضع الصامت"); color: theme.textColor; font.bold: true; ToolTip.text: tr("كتم جميع الأصوات والتنبيهات") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
                                     ThemedCheckBox {
@@ -1079,7 +1082,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("شريط النظام"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات أيقونة شريط النظام") }
+                                label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("شريط النظام"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات أيقونة شريط النظام") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
                                     ThemedCheckBox {
@@ -1120,7 +1123,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("الأذكار"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات الأذكار بعد الصلاة") }
+                                label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("الأذكار"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات الأذكار بعد الصلاة") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 6
                                     RowLayout {
@@ -1147,7 +1150,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("النافذة المنبثقة للأذكار"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات النافذة المنبثقة التي تظهر الأذكار") }
+                                label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("النافذة المنبثقة للأذكار"); color: theme.textColor; font.bold: true; ToolTip.text: tr("إعدادات النافذة المنبثقة التي تظهر الأذكار") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 6
                                     ThemedCheckBox {
@@ -1218,7 +1221,7 @@ Dialog {
 
                                 GroupBox {
                                     Layout.fillWidth: true
-                                    label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("إضافة تذكير"); color: theme.textColor; font.bold: true }
+                                    label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("إضافة تذكير"); color: theme.textColor; font.bold: true }
                                     background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                     ColumnLayout { width: parent.width; spacing: 6
                                         ThemedTextField {
@@ -1441,7 +1444,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("اللغة"); color: theme.textColor; font.bold: true; ToolTip.text: tr("اختيار لغة واجهة التطبيق") }
+                                label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("اللغة"); color: theme.textColor; font.bold: true; ToolTip.text: tr("اختيار لغة واجهة التطبيق") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
                     ThemedComboBox { id: langCombo; objectName: "languageCombo"; Layout.fillWidth: true
@@ -1461,7 +1464,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("المظهر"); color: theme.textColor; font.bold: true; ToolTip.text: tr("اختيار سمة ألوان التطبيق") }
+                                label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("المظهر"); color: theme.textColor; font.bold: true; ToolTip.text: tr("اختيار سمة ألوان التطبيق") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
                                     ThemedComboBox { id: themeCombo; objectName: "themeCombo"; Layout.fillWidth: true
@@ -1479,7 +1482,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("العرض"); color: theme.textColor; font.bold: true; ToolTip.text: tr("اختيار محرك العرض") }
+                                label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("العرض"); color: theme.textColor; font.bold: true; ToolTip.text: tr("اختيار محرك العرض") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 4
                                     Label { text: tr("محرك العرض:"); color: theme.textColor }
@@ -1511,7 +1514,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("بدء التشغيل التلقائي"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تشغيل التطبيق تلقائياً عند بدء تشغيل النظام") }
+                                label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("بدء التشغيل التلقائي"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تشغيل التطبيق تلقائياً عند بدء تشغيل النظام") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
                                     ThemedCheckBox {
@@ -1524,7 +1527,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("وضع النوم"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تقليل نشاط التطبيق في الخلفية") }
+                                label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("وضع النوم"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تقليل نشاط التطبيق في الخلفية") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
                                     ThemedCheckBox {
@@ -1537,7 +1540,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("صورة الخلفية"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تفعيل أو تعطيل صورة الخلفية في الواجهة الرئيسية") }
+                                label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("صورة الخلفية"); color: theme.textColor; font.bold: true; ToolTip.text: tr("تفعيل أو تعطيل صورة الخلفية في الواجهة الرئيسية") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
                                     ThemedCheckBox {
@@ -1550,7 +1553,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("الودجة المصغرة"); color: theme.textColor; font.bold: true; ToolTip.text: tr("نافذة صغيرة تعرض الصلاة القادمة والعد التنازلي") }
+                                label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("الودجة المصغرة"); color: theme.textColor; font.bold: true; ToolTip.text: tr("نافذة صغيرة تعرض الصلاة القادمة والعد التنازلي") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
                                     ThemedCheckBox {
@@ -1563,7 +1566,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("المنطقة الزمنية"); color: theme.textColor; font.bold: true; ToolTip.text: tr("اختيار المنطقة الزمنية لحساب مواقيت الصلاة") }
+                                label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("المنطقة الزمنية"); color: theme.textColor; font.bold: true; ToolTip.text: tr("اختيار المنطقة الزمنية لحساب مواقيت الصلاة") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width
                                     ThemedComboBox { id: timezoneCombo; objectName: "timezoneCombo"; Layout.fillWidth: true
@@ -1582,7 +1585,7 @@ Dialog {
 
                             GroupBox {
                                 Layout.fillWidth: true
-                                label: Label { z: 2; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("إدارة الإعدادات"); color: theme.textColor; font.bold: true; ToolTip.text: tr("استيراد/تصدير/إعادة تعيين الإعدادات") }
+                                label: Label { z: 2; width: parent ? Math.max(120, parent.width - 28) : implicitWidth; wrapMode: Text.WordWrap; horizontalAlignment: (typeof l10n !== "undefined" && l10n && l10n.isRtl) ? Text.AlignRight : Text.AlignLeft; text: tr("إدارة الإعدادات"); color: theme.textColor; font.bold: true; ToolTip.text: tr("استيراد/تصدير/إعادة تعيين الإعدادات") }
                                 background: Rectangle { color: theme.cardColor; radius: 8; border.color: theme.borderColor; border.width: 1 }
                                 ColumnLayout { width: parent.width; spacing: 6
                                     ThemedButton {
